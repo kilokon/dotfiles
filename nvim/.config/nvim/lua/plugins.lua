@@ -49,7 +49,7 @@ use "hrsh7th/cmp-nvim-lsp"
 use "neovim/nvim-lspconfig" -- enable LSP
 use "nvim-lua/lsp_extensions.nvim"
 use "ray-x/lsp_signature.nvim"
-
+use "kabouzeid/nvim-lspinstall"
 
 -- snippets
 use "L3MON4D3/LuaSnip" --snippet engine
@@ -101,6 +101,10 @@ use {
 
 -- Git
 use "lewis6991/gitsigns.nvim"
+
+-- VIM Dev Packages
+use "RishabhRD/popfix"
+use "hood/popui.nvim"
 
 
 end)

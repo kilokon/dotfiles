@@ -103,4 +103,8 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
    update_in_insert = true,
  }
 )
+
+--require'lspinstall'.setup() -- important
+
+--require("lspconfig").graphql.setup {}
 --END

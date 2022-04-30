@@ -4,6 +4,8 @@ vim.cmd "set noshowmode"
 vim.cmd "set hidden"
 vim.cmd "set nowrap"
 vim.cmd "set nojoinspaces"
+vim.cmd "filetype plugin indent on"
+
 
 local options = {
 -- Using wider tabs	

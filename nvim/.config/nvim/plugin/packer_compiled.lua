@@ -164,6 +164,11 @@ _G.packer_plugins = {
     path = "/home/aviik/.local/share/nvim/site/pack/packer/start/nvim-lspconfig",
     url = "https://github.com/neovim/nvim-lspconfig"
   },
+  ["nvim-lspinstall"] = {
+    loaded = true,
+    path = "/home/aviik/.local/share/nvim/site/pack/packer/start/nvim-lspinstall",
+    url = "https://github.com/kabouzeid/nvim-lspinstall"
+  },
   ["nvim-tree.lua"] = {
     loaded = true,
     path = "/home/aviik/.local/share/nvim/site/pack/packer/start/nvim-tree.lua",
@@ -193,6 +198,16 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/aviik/.local/share/nvim/site/pack/packer/start/plenary.nvim",
     url = "https://github.com/nvim-lua/plenary.nvim"
+  },
+  popfix = {
+    loaded = true,
+    path = "/home/aviik/.local/share/nvim/site/pack/packer/start/popfix",
+    url = "https://github.com/RishabhRD/popfix"
+  },
+  ["popui.nvim"] = {
+    loaded = true,
+    path = "/home/aviik/.local/share/nvim/site/pack/packer/start/popui.nvim",
+    url = "https://github.com/hood/popui.nvim"
   },
   ["popup.nvim"] = {
     loaded = true,
