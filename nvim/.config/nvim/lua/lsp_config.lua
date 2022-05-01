@@ -3,6 +3,13 @@ if not lsp_status_ok then
   return
 end
 
+local status_ok, saga = pcall(require, 'lspsaga')
+if not status_ok then
+  return
+end
+
+
+
 --local cmp_ok, cmp = pcall(require, 'cmp')
 --if not cmp_ok then
 --  return
@@ -103,6 +110,15 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
    update_in_insert = true,
  }
 )
+
+
+saga.init_lsp_saga()
+
+
+
+
+
+
 
 --require'lspinstall'.setup() -- important
 

@@ -9,8 +9,6 @@
 --vim.g.mapleader = ' '
 
 
-
-
 local function map(mode, lhs, rhs, opts)
         local options = { noremap = true, silent = true }
         if opts then
@@ -19,6 +17,10 @@ local function map(mode, lhs, rhs, opts)
         vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
+
+
+--smartquit
+map('n', "qq", '<cmd>lua require("utils/smart_quit")()<CR>')
 
 --Remap space as leader key
 map("", "<Space>", "<Nop>", opts)
@@ -32,9 +34,19 @@ map('', '<down>', '<nop>')
 map('', '<left>', '<nop>')
 map('', '<right>', '<nop>')
 
--- Close all windows and exit from Neovim with <leader> and q
+-- Navigate buffers with left/right keys
 map('n', '<right>', ':bn<CR>')
 map('n', '<left>', ':bp<CR>')
+
+
+-- Move text up and down
+-- Move text up and down
+map("n", "<A-j>", "<Esc>:m .+1<CR>==gi", opts)
+map("n", "<A-k>", "<Esc>:m .-2<CR>==gi", opts)
+map("v", "<A-j>", ":m .+1<CR>==", opts)
+map("v", "<A-k>", ":m .-2<CR>==", opts)
+map("v", "p", '"_dP', opts)
+
 
 
 -- Map Esc to kk
@@ -61,4 +73,13 @@ map('n', '<C-n>', ':NvimTreeToggle<CR>')            -- open/close
 map('n', '<leader>f', ':NvimTreeRefresh<CR>')       -- refresh
 map('n', '<leader>n', ':NvimTreeFindFile<CR>')      -- search file
 
+-- WhichKey
+map('n','<leader>', ":WhichKey<leader><CR>",{ noremap = true})
 
+-- LSP
+map('n', "gd", "<cmd>lua vim.lsp.buf.definition()<CR>",{ noremap = true})
+map('n',"<Leader>ld", "<cmd>LspTrouble lsp_definitions<CR>",{ noremap = true})
+-- map('n','<up>', "<cmd>RustMoveItemUp<CR>", { noremap = true})
+-- map('n','<down>', "<cmd>RustMoveItemDown<CR>", { noremap = true})
+-- map('n','<down>', "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {noremap = true})
+map('n', "rr", "<cmd>RustHoverActions<CR>")

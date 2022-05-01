@@ -49,9 +49,12 @@ use "hrsh7th/cmp-nvim-lsp"
 use "neovim/nvim-lspconfig" -- enable LSP
 use "nvim-lua/lsp_extensions.nvim"
 use "ray-x/lsp_signature.nvim"
-use "kabouzeid/nvim-lspinstall"
-
+--use "kabouzeid/nvim-lspinstall"
+use "glepnir/lspsaga.nvim"
+use {'nvim-telescope/telescope-ui-select.nvim' }
+use "nvim-telescope/telescope.nvim"
 -- snippets
+use "hrsh7th/vim-vsnip"
 use "L3MON4D3/LuaSnip" --snippet engine
 use "rafamadriz/friendly-snippets" -- a bunch of snippets to use
 
@@ -72,7 +75,14 @@ use "mhartington/formatter.nvim"
 
 -- rust
 use "simrat39/rust-tools.nvim"
-
+use {
+    'saecki/crates.nvim',
+    tag = 'v0.2.1',
+    requires = { 'nvim-lua/plenary.nvim' },
+    config = function()
+        require('crates').setup()
+    end,
+}
 -- Syntactic language support
 use "cespare/vim-toml"
 use "stephpy/vim-yaml"
@@ -96,6 +106,13 @@ use {
     requires = {
       'kyazdani42/nvim-web-devicons', -- optional, for file icon
     }
+}
+use {
+                'phaazon/hop.nvim',
+                branch = 'v1', -- optional but strongly recommended
+                config = function () 
+                require'hop'.setup { keys = 'etovxqpdygfblzhckisuran' }
+                end
 }
 
 
