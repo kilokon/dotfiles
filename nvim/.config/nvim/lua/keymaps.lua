@@ -1,7 +1,7 @@
-
 --local term_opts = { silent = true }
 
 -- Shorten function name
+
 --local keymap = vim.api.nvim_set_keymap
 
 
@@ -83,3 +83,10 @@ map('n',"<Leader>ld", "<cmd>LspTrouble lsp_definitions<CR>",{ noremap = true})
 -- map('n','<down>', "<cmd>RustMoveItemDown<CR>", { noremap = true})
 -- map('n','<down>', "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {noremap = true})
 map('n', "rr", "<cmd>RustHoverActions<CR>")
+
+
+--telescope
+map('n', '<leader>ff', ':Telescope find_files<CR>')
+map('n', '<leader>fg', ':Telescope live_grep<CR>')
+map('n', '<leader>fh', ':Telescope help_tags<CR>')
+map('n', '<leader>fb', ':Telescope buffers<CR>')

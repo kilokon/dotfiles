@@ -37,6 +37,10 @@ local options = {
 
  }
 
+--Python
+vim.g.python3_host_prog = '/usr/bin/python3'
+vim.g.python_host_prog = '/usr/bin/python'
+
 
 
 for k, v in pairs(options) do
