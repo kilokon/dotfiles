@@ -52,6 +52,7 @@ return packer.startup(function(use)
 	use("hrsh7th/vim-vsnip")
 	use("L3MON4D3/LuaSnip") --snippet engine
 	use("rafamadriz/friendly-snippets") -- a bunch of snippets to use
+	use({ "michaelb/sniprun", run = "bash ./install.sh" })
 
 	-- Debugging
 	use("mfussenegger/nvim-dap")
@@ -92,6 +93,10 @@ return packer.startup(function(use)
 	use("plasticboy/vim-markdown")
 
 	-- Ease of Use
+	use({
+		"akinsho/toggleterm.nvim",
+		tag = "v1.*",
+	})
 	use("machakann/vim-highlightedyank")
 	use("andymass/vim-matchup")
 	use("folke/which-key.nvim")

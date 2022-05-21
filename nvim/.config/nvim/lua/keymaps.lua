@@ -6,6 +6,13 @@
 
 -- use space as a the leader key
 --vim.g.mapleader = ' '
+-- Modes
+--   normal_mode = "n",
+--   insert_mode = "i",
+--   visual_mode = "v",
+--   visual_block_mode = "x",
+--   term_mode = "t",
+--   command_mode = "c",
 
 local function map(mode, lhs, rhs, opts)
 	local options = { noremap = true, silent = true }
@@ -14,9 +21,13 @@ local function map(mode, lhs, rhs, opts)
 	end
 	vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
+local opts = { noremap = true, silent = true }
 
 --smartquit
 map("n", "qq", '<cmd>lua require("utils/smart_quit")()<CR>')
+
+-- Cancel search highlighting with ESC
+map("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", opts)
 
 --Remap space as leader key
 map("", "<Space>", "<Nop>", opts)
@@ -66,7 +77,7 @@ map("n", "<leader>f", ":NvimTreeRefresh<CR>") -- refresh
 map("n", "<leader>n", ":NvimTreeFindFile<CR>") -- search file
 
 -- WhichKey
-map("n", "<leader>", ":WhichKey<leader><CR>", { noremap = true })
+-- map("", "<leader>", ":WhichKey<leader><CR>", { noremap = true })
 
 -- LSP
 map("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", { noremap = true })
@@ -86,42 +97,52 @@ map("n", "<leader>fh", ":Telescope help_tags<CR>")
 map("n", "<leader>fb", ":Telescope buffers<CR>")
 
 -- Hop
-map(
-	"n",
-	"f",
-	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true })<cr>",
-	{ noremap = true }
-)
-map(
-	"n",
-	"F",
-	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<cr>",
-	{ noremap = true }
-)
-map(
-	"o",
-	"f",
-	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true, inclusive_jump = true })<cr>",
-	{ noremap = true }
-)
-map(
-	"o",
-	"F",
-	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true, inclusive_jump = true })<cr>",
-	{ noremap = true }
-)
-map(
-	"n",
-	"t",
-	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true })<cr>",
-	{ noremap = true }
-)
-map(
-	"n",
-	"T",
-	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<cr>",
-	{ noremap = true }
-)
-map("n", ";w", "<cmd>lua require'hop'.hint_words()<cr>", {})
-map("n", ";l", "<cmd>lua require'hop'.hint_lines()<cr>", {})
-map("n", ";p", "<cmd>lua require'hop'.hint_patterns()<cr>", {})
+map("", "s", ":HopChar2<cr>", { silent = true })
+map("", "S", ":HopWord<cr>", { silent = true })
+-- map(
+-- 	"n",
+-- 	"f",
+-- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true })<cr>",
+-- 	{ noremap = true }
+-- )
+-- map(
+-- 	"n",
+-- 	"F",
+-- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<cr>",
+-- 	{ noremap = true }
+-- )
+-- map(
+-- 	"o",
+-- 	"f",
+-- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true, inclusive_jump = true })<cr>",
+-- 	{ noremap = true }
+-- )
+-- map(
+-- 	"o",
+-- 	"F",
+-- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true, inclusive_jump = true })<cr>",
+-- 	{ noremap = true }
+-- )
+-- map(
+-- 	"n",
+-- 	"t",
+-- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true })<cr>",
+-- 	{ noremap = true }
+-- )
+-- map(
+-- 	"n",
+-- 	"T",
+-- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<cr>",
+-- 	{ noremap = true }
+-- )
+-- map("n", ";w", "<cmd>lua require'hop'.hint_words()<cr>", {})
+-- map("n", ";l", "<cmd>lua require'hop'.hint_lines()<cr>", {})
+-- map("n", ";p", "<cmd>lua require'hop'.hint_patterns()<cr>", {})
+
+-- Terminal Toggling
+local Terminal = require("toggleterm.terminal").Terminal
+local floatTerminal = Terminal:new({
+	direction = "float",
+})
+
+map("n", "<leader>f", "<cmd>floatTerminal()<CR>", { noremap = true })

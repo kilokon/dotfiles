@@ -8,6 +8,14 @@ end
 
 alias vi="nvim"
 alias cls="clear"
+alias ls="exa"
+alias ll="exa -alh"
+alias tree="exa --tree"
+alias ef="exec fish"
+
+
 starship init fish | source
+zoxide init fish | source
+
 
 set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; set -gx PATH $HOME/.cabal/bin $PATH /home/aviik/.ghcup/bin # ghcup-env
