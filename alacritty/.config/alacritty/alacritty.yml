@@ -1,0 +1,28 @@
+
+# Shell
+#
+shell:
+  program: /bin/fish
+  args:
+    - --command=tmux
+
+
+font:
+  normal:
+    family: "OpenDyslexicMono Nerd Font"
+    style: Regular
+  bold:
+    family: "OpenDyslexic Nerd Font" 
+    style: Bold
+  italic:
+    family: "OpenDyslexic Nerd Font"
+    style: Italic
+  size:
+    13.0
+  offset:
+    x: 0
+    y: 0
+  glyph_offset:
+    x: 0
+    y: 0
+  use_thin_strokes: true
