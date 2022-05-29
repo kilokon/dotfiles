@@ -1,0 +1,8 @@
+ -*- mode: snippet -*-
+# contributor: aviikc
+# name: straight-use
+# key: su
+# --
+(use-package $1
+             :straight ($1 :type git :host github :repo "$2/$1")
+             $0)

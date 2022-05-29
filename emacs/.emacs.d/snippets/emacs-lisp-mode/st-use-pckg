@@ -1,0 +1,10 @@
+ -*- mode: snippet -*-
+# contributor: aviikc
+# name: straight-use
+# key: stf
+# --
+(straight-use-package
+ '($1 :type git :host github :repo "$2/$1"
+                :fork (:host github
+                       :repo "aviikc/$1"))
+  :$0)
