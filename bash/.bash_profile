@@ -12,3 +12,6 @@ if [ -e /home/aviik/.nix-profile/etc/profile.d/nix.sh ]; then . /home/aviik/.nix
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
+
+LC_ALL=C
+export LC_ALL

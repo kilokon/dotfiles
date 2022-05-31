@@ -1,6 +1,8 @@
 [user]
 	name = aviikc
-	email = aviik.chakraborty@gmail.com
+        email = aviik.chakraborty@gmail.com
+[pull]
+        rebase = true
 [init]
 	defaultBranch = main
 [credential "https://github.com"]
@@ -8,4 +10,12 @@
 	helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = 
-	helper = !/usr/bin/gh auth git-credential
+        helper = !/usr/bin/gh auth git-credential
+[alias]
+        c = commit -a
+        b = branch
+        ps= push
+        pl= pull
+        s = status
+        d = diff
+        l = log

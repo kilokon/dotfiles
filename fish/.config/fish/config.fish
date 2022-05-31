@@ -12,7 +12,7 @@ alias ls="exa"
 alias ll="exa -alh"
 alias tree="exa --tree"
 alias ef="exec fish"
-
+# alias cd="z"
 
 starship init fish | source
 zoxide init fish | source

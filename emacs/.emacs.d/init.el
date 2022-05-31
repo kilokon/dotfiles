@@ -2,8 +2,17 @@
 ;;--------------
 
 
+;;+-------------------------+
+;;|   Early Configuration   |
+;;+-------------------------+
+(setq gc-cons-threshold most-positive-fixnum) ; avoid GC during startup to save time
+
 ;;PERSONAL INFO
 ;;-------------
+
+;;Personal information
+(setq user-full-name "aviik c"
+      user-mail-address "aviik.chakraborty@gmail.com")
 
 ;;OS related
 ;;----------
@@ -18,10 +27,27 @@
  (interactive)
  (load-file user-init-file))
 
-(global-set-key (kbd "C-c r") 'aviikc/reload-init-file) 
+(global-set-key (kbd "C-c r") 'aviikc/reload-init-file)
 
+
+(setq w32-pass-lwindow-to-system nil)
+(setq w32-lwindow-modifier 'super) ; Left Windows key
+
+(setq w32-pass-rwindow-to-system nil)
+(setq w32-rwindow-modifier 'super) ; Right Windows key
+
+(setq w32-pass-apps-to-system nil)
+(setq w32-apps-modifier 'hyper) ; Menu/App key
+
+;; (global-set-key (kbd "s-right") 'previous-buffer)
+(define-key global-map [s-right] 'next-buffer)
+(define-key global-map [s-left] 'previous-buffer)
+
+;;(set-face-attribute 'default nil :font "Fira Code Retina" :height 120)
 ;;Available Servers
 ;;-----------------
+
+
 
 ;;+--------------------+
 ;;|  File Management   |
@@ -69,6 +95,7 @@
 ;;Default Settings
 ;;----------------
 (setq visible-bell 1                    ; Annoying Ding off
+      ring-bell-function 'ignore
       inhibit-startup-screen t
       initial-major-mode 'org-mode
       debug-on-error t                  ; Debug
@@ -79,7 +106,17 @@
       make-pointer-invisible t          ; Hide Mouse While editing
       package-enable-at-startup nil     ; Disable package.el in favor of straight.el
       enable-recursive-minibuffers t    ; Enable recursive minibuffers
-)
+      )
+
+;;Line Numbering ;; Disable line numbers for some modes
+(global-display-line-numbers-mode t)
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+		compilation
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 ;;Auto-Save Management
 ;;--------------------
@@ -113,26 +150,116 @@
 (tool-bar-mode 0)                   ;; Disable the tool bar
 (scroll-bar-mode 0)                 ;; Disable the scrollbar
 ;;Mode line controlled by power line
-(use-package doom-modeline
-  :straight (doom-modeline :type git :host github :repo "seagle0128/doom-modeline")
-  :hook (after-init . doom-modeline-mode)
-  :config
-  (set-face-attribute 'doom-modeline nil :family "Fira Code" :height 100
-  ;;                    'doom-modeline-inactive nil :family "Fira Code" :height 100)
-		      )
-   (set-face-attribute 'doom-modeline-evil-insert-state nil :foreground "orange"))
+;; (use-package doom-modeline
+;;   :straight (doom-modeline :type git :host github :repo "seagle0128/doom-modeline")
+;;   :hook (after-init . doom-modeline-mode)
+;;   :config
+;;   (set-face-attribute 'doom-modeline nil :family "Fira Code" :height 100
+;;   ;;                    'doom-modeline-inactive nil :family "Fira Code" :height 100)
+;; 		      )
+;;    (set-face-attribute 'doom-modeline-evil-insert-state nil :foreground "orange"))
 
 ;;  https://github.com/jwiegley/use-package#diminishing-and-delighting-minor-modes
 
 ;;+-----------+
 ;;|   Theme   |
 ;;+-----------+
-(use-package nano-theme
-  :straight(nano-theme :type git
-		       :host github
-                       :repo "rougier/nano-theme"))
-;;(nano-mode)
-(nano-dark)
+;; (use-package nano-emacs
+;;   :straight (nano-emacs :type git :host github :repo "rougier/nano-emacs")
+;;   :custom (setq nano-font-family-monospaced "Fira Code Retina"
+;; 		nano-font-size 14))
+;; (straight-use-package '(nano-emacs :type git
+;; 				   :host github
+;; 				   :repo "rougier/nano-emacs"))
+;; (require 'nano-faces)
+;; (require 'nano)
+;; (require 'nano-colors)
+;; (require 'nano-base-colors)
+;; (require 'nano-theme)
+;; (nano-dark)
+;; (setq nano-font-family-monospaced "Fira Code Retina"
+;;       nano-font-size 14)
+				   ;; :files (:defaults "/*")
+				   ;; :includes (nano
+				   ;; 	      nano-colors
+				   ;; 	      nano-base-colors
+				   ;; 	      nano-bindings
+				   ;; 	      nano-command
+				   ;; 	      nano-faces
+				   ;; 	      nano-agenda
+				   ;; 	      nano-faces
+				   ;; 	      nano-minibuffer
+				   ;; 	      nano-theme
+				   ;; 	      nano-writer)))
+
+;; (straight-use-package
+;;  '(nano-emacs :type git :host github :repo "rougier/nano-emacs"))
+;; ;;1st Nano Module
+;; (require 'nano)
+
+
+;; ;;Mandatory Nano Modules
+;; (require 'nano-base-colors)
+;; (require 'nano-faces)
+
+;; ;;Optional Nano Packages
+;; (require 'nano-theme-dark)
+;; ;; (require 'nano-theme)
+;; ;; (nano-theme)
+(straight-use-package '(nano-theme :type git :host github
+                                   :repo "rougier/nano-theme"))
+(load-theme 'nano-dark t)
+;; (use-package lambda-themes
+;;   :straight (:type git :host github :repo "lambda-emacs/lambda-themes") 
+;;   :custom
+;;   (lambda-themes-set-italic-comments t)
+;;   (lambda-themes-set-italic-keywords t)
+;;   (lambda-themes-set-variable-pitch t) 
+;;   :config
+;;   ;; load preferred theme 
+;;   (load-theme 'lambda-dark-faded t))
+
+
+;; (use-package lambda-line
+;;   :straight (:type git :host github :repo "lambda-emacs/lambda-line") 
+;;   :custom
+;;   (lambda-line-position 'bottom) ;; Set position of status-line 
+;;   (lambda-line-abbrev t) ;; abbreviate major modes
+;;   (lambda-line-hspace "  ")  ;; add some cushion
+;;   (lambda-line-prefix t) ;; use a prefix symbol
+;;   (lambda-line-prefix-padding nil) ;; no extra space for prefix 
+;;   (lambda-line-status-invert nil)  ;; no invert colors
+;;   (lambda-line-gui-ro-symbol  " ⨂") ;; symbols
+;;   (lambda-line-gui-mod-symbol " ⬤") 
+;;   (lambda-line-gui-rw-symbol  " ◯") 
+;;   ;;(lambda-line-space-top +.50)  ;; padding on top and bottom of line
+;;   ;;(lambda-line-space-bottom -.50)
+;;   ;;(lambda-line-symbol-position 0.1) ;; adjust the vertical placement of symbol
+;;   :config
+;;   ;; activate lambda-line 
+;;   (lambda-line-mode) 
+;;   ;; set divider line in footer
+;;   ;;(when (eq lambda-line-position 'top)
+;;   ;; (setq-default mode-line-format (list "%_"))
+;;   ;; (setq mode-line-format (list "%_")))
+;;   )
+(set-face-attribute 'default nil :font "Fira Code Retina" :height 130)
+
+;; Set the fixed pitch face
+;;(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height efs/default-font-size)
+
+;; Set the variable pitch face
+;;(set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular)
+;; (use-package fontset
+;;   :straight (:type built-in) ;; only include this if you use straight
+;;   :config
+;;   ;; Use symbola for proper unicode
+;;   (when (member "Fira Code Retina" (font-family-list))
+;;     ((set-face-attribute 'default nil :font "Fira Code Retina" :height 130))))
+
+
+
+
 (use-package diminish
   :straight (diminish :type git 
 		      :host github 
@@ -171,6 +298,13 @@
        (kill-buffer)
        (jump-to-register :magit-fullscreen)))
 
+(use-package diff-hl
+  :straight (diff-hl :type git :host github :repo "dgutov/diff-hl")
+  :init (global-diff-hl-mode)
+  :hook (diff-hl-mode . diff-hl-margin-mode))
+
+
+
 ;;+-----------------+
 ;;|   Undo & Redo   |
 ;;+-----------------+
@@ -180,9 +314,18 @@
 ;;|   Vim Controls   |
 ;;+------------------+
 (use-package general
-  :straight (general :type git :host github :repo "noctuid/general.el"))
-
-(general-define-key
+  :straight (general :type git :host github :repo "noctuid/general.el")
+  :init
+  (setq general-override-states '(insert
+                                  emacs
+                                  hybrid
+                                  normal
+                                  visual
+                                  motion
+                                  operator
+                                  replace))
+  :config
+  (general-define-key
    :states '(normal visual insert emacs)
    :prefix "SPC"
    :non-normal-prefix "C-SPC"
@@ -190,12 +333,19 @@
 
    ;; quitting
    "q" '(:ignore t :which-key "Quit")
-   "qq" 'save-buffers-kill-emacs)
+   "qq" 'save-buffers-kill-emacs))
 
   
 (use-package evil
   :straight (evil :type git :host github :repo "emacs-evil/evil")
-  :init (evil-mode))
+  :init (setq evil-want-keybinding nil)
+  :config (evil-mode))
+
+(use-package evil-collection
+  :straight (evil-collection :type git :host github :repo "emacs-evil/evil-collection")
+  :after evil
+  :init (evil-collection-init)
+  :custom (evil-collection-setup-minibuffer t))
 
 (use-package evil-nerd-commenter
   :straight (evil-nerd-commenter :type git
@@ -245,28 +395,42 @@
                                 vertico-multiform
                                 vertico-unobtrusive
                                 ))
+  :bind (:map vertico-map
+	      ("TAB" . vertico-next)
+	      ("<backtab>" . vertico-previous))
   :hook (minibuffer-setup . vertico-repeat-save)
   :custom
   (vertico-count 13)                    ; Number of candidates to display
   (vertico-resize t)
   (vertico-cycle t) 
   :config
-  (vertico-mode))
+  (vertico-mode)
+  ;; Configure directory extension.
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  ;; More convenient directory navigation commands
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)))
 
 
-;; (use-package orderless
-;;   :straight (cape :type git :host github :repo "oantolin/orderless")
-;;   :init
-;;   ;; Configure a custom style dispatcher (see the Consult wiki)
-;;   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
-;;   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-;;   (setq completion-styles '(orderless basic)
-;;         completion-category-defaults nil
-;;         completion-category-overrides '((file (styles partial-completion)))))
+(use-package orderless
+  :straight (orderless :type git :host github :repo "oantolin/orderless")
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
 
 ;; Enable richer annotations using the Marginalia package
 (use-package marginalia
-  :straight (cape :type git :host github :repo "minad/marginalia")
+  :straight (marginalia :type git :host github :repo "minad/marginalia")
   ;; Either bind `marginalia-cycle` globally or only in the minibuffer
    :bind (("M-A" . marginalia-cycle)
          :map minibuffer-local-map
@@ -335,9 +499,9 @@
 	 (lsp-mode . lsp-ui-mode))
   :commands lsp
   :custom
-  (lsp-rust-analyzer-cargo-watch-command "clippy")
-  :config
-  (setq rustic-lsp-server 'rust-analyzer))
+  (lsp-rust-analyzer-cargo-watch-command "clippy"))
+  ;;:config
+  ;;(setq rustic-lsp-server 'rust-analyzer))
 
 ;; optionally
 (use-package lsp-ui
@@ -407,11 +571,9 @@
   :init (exec-path-from-shell-initialize))
 
 
-
 ;;+----------------------------------+
 ;;|   Programming Language Support   |
 ;;+----------------------------------+
-
 
 ;;Elisp -Formatter
 (use-package elisp-autofmt
@@ -425,6 +587,7 @@
     :repo "https://codeberg.org/ideasman42/emacs-elisp-autofmt.git"))
 
 ;;Rust
+;;------
 (use-package rustic
   :straight (rustic :type git :host github :repo "brotzeit/rustic")
   :ensure
@@ -455,6 +618,13 @@
   (when buffer-file-name
     (setq-local buffer-save-without-query t)))
 
+;;GD Script
+;;----------
+(use-package gdscript-mode
+    :straight (gdscript-mode
+               :type git
+               :host github
+               :repo "godotengine/emacs-gdscript-mode"))
 
 ;;Major mode for editing JSON files of any size
 (use-package jsonian
@@ -475,7 +645,7 @@
   :straight (treemacs :type git
 		      :host github
 		      :repo "Alexander-Miller/treemacs"
-		      :files (:defaults "src/extra/*" "src/elisp/*" "src/scripts/*")
+		      :files (:defaults "src/*/*") ;;"src/elisp/*" "src/scripts/*")
 		      :includes (treemacs-evil
 				 treemacs-all-the-icons
 				 treemacs-magit))
@@ -505,22 +675,132 @@
     (which-key-mode))
 
 
+;;+----------------------+
+;;|   Org-Mode Support   |
+;;+----------------------+
 
-;;https://github.com/coldnew/coldnew-emacs/blob/master/init.org
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(warning-suppress-log-types '((straight) (straight) (straight)))
- '(warning-suppress-types '((straight) (straight) (straight))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(defun aviik/org-mode-font-faces ()
+  (setq-local org-hidden-keywords '(title author date startup))
+  (setq-default line-spacing 1)
+  (setq org-startup-indented t
+	org-hide-leading-stars t
+	org-num-skip-unnumbered t
+	org-num-skip-footnotes t
+	org-num-max-level 2
+	org-num-face nil
+	header-line-format nil
+	fill-column 72)
+
+  (require 'org-element)
+  (setq org-indent--heading-line-prefixes
+        (make-vector org-indent--deepest-level nil))
+  (setq org-indent--inlinetask-line-prefixes
+        (make-vector org-indent--deepest-level nil))
+  (setq org-indent--text-line-prefixes
+        (make-vector org-indent--deepest-level nil))
+
+  (face-remap-add-relative 'org-level-1
+			   :family "Roboto" :height 160 )
+  (face-remap-add-relative 'org-level-2
+			   :family "Roboto" :height 140 )
+  (face-remap-add-relative 'org-level-3
+			   :family "Roboto" :height 120 )
+  (face-remap-add-relative 'org-document-title
+			   :family "Roboto" :height 180 :weight 'medium))
+
+
+(defun aviikc/org-mode-setup()
+  (aviik/org-mode-font-faces)
+  (org-indent-mode)
+  (org-num-mode)
+  (variable-pitch-mode)
+  (visual-line-mode)
+  )
+
+
+
+(straight-use-package '(org :type built-in))
+
+(use-package org
+  :ensure org-plus-contrib
+  :hook (org-mode . aviikc/org-mode-setup)
+;;  :custom
+  :config (message "Loading Org.........")
+  )
 
 
 
 
+;;(remove-hook 'window-configuration-change-hook #'nano-modeline-update-windows)
+
+(use-package org-sidebar
+  :straight (org-sidebar :type git :host github :repo "alphapapa/org-sidebar"))
+;;  :hook (org-mode . org-sidebar))
+
+;;https://github.com/alphapapa/org-super-agenda#installation
+(use-package org-super-agenda
+  :straight (org-super-agenda :type git :host github :repo "alphapapa/org-super-agenda"))
+
+
+;; (use-package org-superstar
+;;   :straight (org-superstar :type git :host github :repo "integral-dw/org-superstar-mode")
+;;   :hook (org-mode . org-superstar-mode))
+
+;; (use-package org-sticky-header
+;;   :straight (org-sticky-header :type git :host github :repo "alphapapa/org-sticky-header")
+;;   :hook (org-mode . org-sticky-header-mode))
+
+(use-package evil-org
+  :straight (evil-org :type git :host github :repo "Somelauw/evil-org-mode")
+  :after org
+  :hook (org-mode . (lambda () evil-org-mode))
+  :config  (require 'evil-org-agenda)
+           (evil-org-agenda-set-keys))
+
+;;https://github.com/tecosaur/org-pandoc-import
+(use-package org-pandoc-import
+  :straight (:host github
+             :repo "tecosaur/org-pandoc-import"
+             :files ("*.el" "filters" "preprocessors")))
+
+;; (use-package org-padding
+;;   :straight (org-padding  :type git :host github :repo "TonCherAmi/org-padding")
+;;   :hook (org-mode . org-padding-mode)
+;;   :config (setq org-padding-block-begin-line-padding '(2.0 . nil))
+;;   (setq org-padding-block-end-line-padding '(nil . 1.0))
+;;   (setq org-padding-heading-padding-alist
+;; 	'((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
+
+
+;;;Hugo
+;;;Ox-hugo
+;;;https://ox-hugo.scripter.co/
+(use-package ox-hugo
+  :straight(ox-hugo :type git
+                    :host github
+                    :repo "kaushalmodi/ox-hugo")
+  :after ox)
+
+;;;; ===========================
+;;;; Publishing with Org Mode
+;;;; ===========================
+
+;;;Presentations with Org-Reveal
+;;;https://github.com/yjwen/org-reveal
+(use-package ox-reveal
+  :straight (ox-reveal :type git :host github :repo "yjwen/org-reveal"))
+
+
+
+;;(require 'nano-help)
+
+;;Mode line controlled by power line
+(use-package doom-modeline
+  :straight (doom-modeline :type git :host github :repo "seagle0128/doom-modeline")
+  :hook (after-init . doom-modeline-mode)
+  :config
+  ;; (set-face-attribute 'doom-modeline nil :family "Fira Code" :height 100
+  ;; ;;                    'doom-modeline-inactive nil :family "Fira Code" :height 100)
+  ;; 		      )
+   (set-face-attribute 'doom-modeline-evil-insert-state nil :foreground "orange"))
+(menu-bar-mode -1)
