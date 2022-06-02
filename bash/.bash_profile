@@ -13,5 +13,5 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-LC_ALL=C
-export LC_ALL
+#LC_ALL=C
+#export LC_ALL

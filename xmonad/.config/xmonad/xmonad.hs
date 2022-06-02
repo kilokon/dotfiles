@@ -2,7 +2,7 @@
 import XMonad
 import qualified XMonad.StackSet as W
 import XMonad.ManageHook
-
+import Data.Ratio 
 --LAYOUT
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.IndependentScreens
@@ -11,6 +11,7 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.Renamed
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.ResizableTile
+import XMonad.Layout.Spiral
 import XMonad.Layout.Spacing
 import XMonad.Layout.PerScreen
 
@@ -31,6 +32,9 @@ import Graphics.X11.Xlib
 import Graphics.X11.Xlib.Extras
 
 myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+aviikVfxSW      = ["Krita", "Blender", "Houdini", "Nuke"]
+aviikGameGuis   = ["Godot"]
+aviikInspVfx    = ["rvplayer", "djv"]
 
 windowCount :: X (Maybe String)
 windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace . W.current . windowset
@@ -52,6 +56,7 @@ myConfig = def
     , terminal  = "alacritty"
     , workspaces = withScreens 2 myWorkspaces
     , focusFollowsMouse  = False
+    , focusedBorderColor = "#000000"
     , borderWidth        = 1
     , layoutHook = myLayout      -- Use custom layouts
     , manageHook = myManageHook  -- Match on certain windows
@@ -100,6 +105,13 @@ threeRowColumn = renamed [Replace "threeRow"]
                 where colum_side = (ThreeCol 1 (3/100) (1/2))
                       row_side   = Mirror (ThreeCol 1 (3/100) (1/2))
                       aviik_adaptive_row_column = ifWider 1080 colum_side row_side
+
+layoutSpiral = renamed [Replace "spiral"]
+                $limitWindows 6
+                $ adaptive_fibonacci
+                where lndscape_monitor = (spiral (125 % 146))
+                      potrait_monitor = Mirror lndscape_monitor
+                      adaptive_fibonacci = ifWider 1080 lndscape_monitor potrait_monitor 
 
 myLayout = tallayout ||| Full ||| threeRowColumn
 

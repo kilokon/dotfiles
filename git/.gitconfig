@@ -4,13 +4,17 @@
 [pull]
         rebase = true
 [init]
-	defaultBranch = main
+        defaultBranch = main
+
 [credential "https://github.com"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = 
         helper = !/usr/bin/gh auth git-credential
+[core]
+    pager = delta
+
 [alias]
         c = commit -a
         b = branch
@@ -19,3 +23,22 @@
         s = status
         d = diff
         l = log
+
+[interactive]
+    diffFilter = delta --color-only --features=interactive
+
+[delta]
+    features = decorations
+
+[delta "interactive"]
+    keep-plus-minus-markers = false
+
+[delta "decorations"]
+    commit-decoration-style = blue ol
+    commit-style = raw
+    file-style = omit
+    hunk-header-decoration-style = blue box
+    hunk-header-file-style = red
+    hunk-header-line-number-style = "#067a00"
+    hunk-header-style = file line-number syntax
+
