@@ -369,10 +369,10 @@
 (setq yas-snippet-dirs '(
                          "~/.emacs.d/snippets"))
 (yas-global-mode t)
-(define-key yas-minor-mode-map (kbd "M-z") 'yas-expand)
+(define-key yas-minor-mode-map (kbd "<tab>") 'yas-expand)
 ;; use Meta-j and Meta-k to jump between fields
-(define-key yas-keymap (kbd "M-j") 'yas-next-field-or-maybe-expand)
-(define-key yas-keymap (kbd "M-k") 'yas-prev-field)
+;;(define-key yas-keymap (kbd "M-j") 'yas-next-field-or-maybe-expand)
+;;(define-key yas-keymap (kbd "M-k") 'yas-prev-field)
 
 ;;+----------------------+
 ;;|  Completion System   |
@@ -570,6 +570,17 @@
   :ensure
   :init (exec-path-from-shell-initialize))
 
+;;+------------+
+;;|   Parser   |
+;;+------------+
+
+(straight-use-package 'tree-sitter)
+(straight-use-package 'tree-sitter-langs)
+(require 'tree-sitter)
+(require 'tree-sitter-langs)
+
+(global-tree-sitter-mode)
+
 
 ;;+----------------------------------+
 ;;|   Programming Language Support   |
@@ -617,6 +628,21 @@
   ;; no longer be necessary.
   (when buffer-file-name
     (setq-local buffer-save-without-query t)))
+
+
+
+;;Haskell
+(use-package haskell-mode
+  :straight (haskell-mode :type git :host github :repo "haskell/haskell-mode")
+  :hook (haskell-mode . interactive-haskell-mode)
+    )
+
+(add-hook 'haskell-mode-hook
+          (lambda ()
+            (set (make-local-variable 'company-backends)
+                 (append '((company-capf company-dabbrev-code))
+                         company-backends))))
+
 
 ;;GD Script
 ;;----------
@@ -689,25 +715,7 @@
 	org-num-max-level 2
 	org-num-face nil
 	header-line-format nil
-	fill-column 72)
-
-  (require 'org-element)
-  (setq org-indent--heading-line-prefixes
-        (make-vector org-indent--deepest-level nil))
-  (setq org-indent--inlinetask-line-prefixes
-        (make-vector org-indent--deepest-level nil))
-  (setq org-indent--text-line-prefixes
-        (make-vector org-indent--deepest-level nil))
-
-  (face-remap-add-relative 'org-level-1
-			   :family "Roboto" :height 160 )
-  (face-remap-add-relative 'org-level-2
-			   :family "Roboto" :height 140 )
-  (face-remap-add-relative 'org-level-3
-			   :family "Roboto" :height 120 )
-  (face-remap-add-relative 'org-document-title
-			   :family "Roboto" :height 180 :weight 'medium))
-
+	fill-column 72))
 
 (defun aviikc/org-mode-setup()
   (aviik/org-mode-font-faces)

@@ -9,13 +9,13 @@ shell:
 
 font:
   normal:
-    family: "OpenDyslexicMono Nerd Font"
+    family: "Iosevka Nerd Font Mono"
     style: Regular
   bold:
-    family: "OpenDyslexic Nerd Font" 
+    family: "Iosevka Nerd Font Mono" 
     style: Bold
   italic:
-    family: "OpenDyslexic Nerd Font"
+    family: "Iosevka Nerd Font Mono"
     style: Italic
   size:
     13.0
