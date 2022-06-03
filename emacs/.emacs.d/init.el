@@ -1,4 +1,4 @@
-;;Aviik's Config
+:;;Aviik's Config
 ;;--------------
 
 
@@ -311,7 +311,7 @@
 (straight-use-package 'undo-fu)
 
 ;;+------------------+
-;;|   Vim Controls   |
+;;|   Key Controls   |
 ;;+------------------+
 (use-package general
   :straight (general :type git :host github :repo "noctuid/general.el")
@@ -325,8 +325,13 @@
                                   operator
                                   replace))
   :config
+  (general-evil-setup t)
+  (general-create-definer aviik/leadr-key-def
+    :keymaps '(normal insert visual emacs)
+    :prefix "C-i")
+
   (general-define-key
-   :states '(normal visual insert emacs)
+   :states '(normal visual emacs)
    :prefix "SPC"
    :non-normal-prefix "C-SPC"
    :keymaps 'override
@@ -335,10 +340,20 @@
    "q" '(:ignore t :which-key "Quit")
    "qq" 'save-buffers-kill-emacs))
 
+(aviik/leadr-key-def
+  "fe" '((lambda () (interactive) (find-file "~/.dotfiles/emacs/.emacs.d/init.el"))))
+
+
+
+;;+-----------------------+
+;;|   Vi Style Workflow   |
+;;+-----------------------+
+
   
 (use-package evil
   :straight (evil :type git :host github :repo "emacs-evil/evil")
-  :init (setq evil-want-keybinding nil)
+  :init (setq evil-disable-insert-state-bindings t
+	      evil-want-keybinding nil)
   :config (evil-mode))
 
 (use-package evil-collection
@@ -352,6 +367,24 @@
                                  :host github
                                  :repo "redguardtoo/evil-nerd-commenter")
   :bind ("M-;" . evilnc-comment-or-uncomment-lines))
+
+
+;;+----------------------------+
+;;|   Emacs Interface to w3m   |
+;;+----------------------------+
+(use-package w3m
+  :straight (emacs-w3m :type git :host github :repo "emacs-w3m/emacs-w3m")
+  :bind (("C-x M-e" . tsa/transient-w3m)
+	 :map w3m-mode-map
+	 ;;("e" . tsa/transient-w3m)
+	 ;;("M-o" . ace-link-w3m)
+	 )
+  :demand w3m-load
+  :custom
+  (w3m-search-default-engine "google")
+  (w3m-quick-start nil)
+  (w3m-display-mode 'plain)
+  (w3m-use-title-buffer-name t))
 
 
 ;;+----------------------------------------+
@@ -494,6 +527,7 @@
   (setq lsp-keymap-prefix "C-c l")
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
          ((c-mode c++-mode) . lsp)
+	  (haskell-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration)
 	 (lsp-mode . lsp-ui-mode))
@@ -532,16 +566,34 @@
          ("C-n" . company-select-next)
          ("C-p" . company-select-previous))
   :init
-  (global-company-mode))
-
+  (global-company-mode)
+  :config (setq company-backends '((company-capf company-dabbrev-code company-dabbrev))))
+(add-to-list 'company-backends 'company-ghc)
 
 (use-package company-box
   :straight (company-box :type git :host github :repo "sebastiencs/company-box")
   :hook (company-mode . company-box-mode))
 
+
+(use-package company-ghci
+  :straight (company-ghci :type git :host github :repo "horellana/company-ghci"))
+
+
 ;;+-----------------------------------+
 ;;|   Terminals & External Payloads   |
 ;;+-----------------------------------+
+(use-package term-toggle
+  :straight (term-toggle :type git :host github :repo "amno1/emacs-term-toggle")
+  :bind ("<f2>" . term-toggle-eshell)
+  :config (setq term-toggle-kill-buffer-on-term-exit t))
+
+(use-package vterm
+  :straight (vterm :type git :host github :repo "akermu/emacs-libvterm")
+  :commands (vterm vterm-other-window)
+  )
+
+
+
 ;;Runstuff
 (use-package run-stuff
   :straight
@@ -574,12 +626,10 @@
 ;;|   Parser   |
 ;;+------------+
 
-(straight-use-package 'tree-sitter)
-(straight-use-package 'tree-sitter-langs)
-(require 'tree-sitter)
-(require 'tree-sitter-langs)
+;((require 'tree-sitter)
+;(require 'tree-sitter-langs)
 
-(global-tree-sitter-mode)
+;;(global-tree-sitter-mode)
 
 
 ;;+----------------------------------+
@@ -629,19 +679,51 @@
   (when buffer-file-name
     (setq-local buffer-save-without-query t)))
 
+(use-package lsp-haskell
+    :straight (lsp-haskell :type git :host github :repo "emacs-lsp/lsp-haskell"))
+
 
 
 ;;Haskell
 (use-package haskell-mode
   :straight (haskell-mode :type git :host github :repo "haskell/haskell-mode")
-  :hook (haskell-mode . interactive-haskell-mode)
-    )
+  ;; :init((custom-set-variables
+  ;;         '(haskell-process-suggest-remove-import-lines t)
+  ;;         '(haskell-process-auto-import-loaded-modules t)
+  ;;         '(haskell-process-log t)))
+  :bind (:map haskell-mode-map
+	      ("C-c h" . hoogle)
+	      )
+  :hook ((haskell-mode . interactive-haskell-mode)
+	 (haskell-mode . (lambda ()
+                           (set (make-local-variable 'company-backends)
+                                (append '((company-capf company-dabbrev-code))
+                                        company-backends))))
+	 ;;(haskell-mode . haskell-indentation-mode)
+	 (haskell-mode . turn-on-haskell-unicode-input-method)
+	 ;;(haskell-mode . flyspell-prog-mode)
+	 )
+  :config
+  (setq ;;lsp-enable-symbol-highlighting nil
+       ;;lsp-signature-auto-activate nil
+       haskell-stylish-on-save t))
 
-(add-hook 'haskell-mode-hook
-          (lambda ()
-            (set (make-local-variable 'company-backends)
-                 (append '((company-capf company-dabbrev-code))
-                         company-backends))))
+;; (add-to-list 'align-rules-list
+;;              '(haskell-types
+;;                (regexp . "\\(\\s-+\\)\\(::\\|∷\\)\\s-+")
+;;                (modes quote (haskell-mode literate-haskell-mode))))
+;; (add-to-list 'align-rules-list
+;;              '(haskell-assignment
+;;                (regexp . "\\(\\s-+\\)=\\s-+")
+;;                (modes quote (haskell-mode literate-haskell-mode))))
+;; (add-to-list 'align-rules-list
+;;              '(haskell-arrows
+;;                (regexp . "\\(\\s-+\\)\\(->\\|→\\)\\s-+")
+;;                (modes quote (haskell-mode literate-haskell-mode))))
+;; (add-to-list 'align-rules-list
+;;              '(haskell-left-arrows
+;;                (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
+;;                (modes quote (haskell-mode literate-haskell-mode))))
 
 
 ;;GD Script
@@ -665,6 +747,24 @@
 ;;+---------------+
 (with-eval-after-load 'rustic-mode
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+;;+-------------------+
+;;|   Bug Reproduce   |
+;;+-------------------+
+(straight-use-package '(yodel :host github :repo "progfolio/yodel"))
+
+;; test model format
+;; (yodel
+;;   :post*
+;;   (yodel-file
+;;     :point "|"
+;;     :with* "test: |fail"
+;;     :then*
+;;     (kill-word 1)
+;;     (insert "pass")
+;;     (message "%s" (buffer-string))))
+
+
 
 
 (use-package treemacs

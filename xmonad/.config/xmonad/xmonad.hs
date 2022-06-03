@@ -1,8 +1,11 @@
 --Aviik's Xmonad Config 060122
+
 import XMonad
 import qualified XMonad.StackSet as W
+import qualified Data.Map        as M
 import XMonad.ManageHook
 import Data.Ratio 
+
 --LAYOUT
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.IndependentScreens
@@ -26,12 +29,16 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.FadeInactive
+
 --ACTIONS
+import XMonad.Actions.PhysicalScreens
 import XMonad.Actions.CycleWS  (shiftNextScreen, shiftPrevScreen, WSType(..), nextScreen, prevScreen, toggleWS)
 import Graphics.X11.Xlib
 import Graphics.X11.Xlib.Extras
 
-myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+
+myWorkspaces = withScreens 2 ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 aviikVfxSW      = ["Krita", "Blender", "Houdini", "Nuke"]
 aviikGameGuis   = ["Godot"]
 aviikInspVfx    = ["rvplayer", "djv"]
@@ -54,10 +61,11 @@ main =  xmonad
 myConfig = def
     { modMask    = mod4Mask      -- Rebind Mod to the Super key
     , terminal  = "alacritty"
-    , workspaces = withScreens 2 myWorkspaces
+    , workspaces = myWorkspaces
     , focusFollowsMouse  = False
     , focusedBorderColor = "#000000"
     , borderWidth        = 1
+    , keys               = myKeys
     , layoutHook = myLayout      -- Use custom layouts
     , manageHook = myManageHook  -- Match on certain windows
     , startupHook = myStartupHook
@@ -71,19 +79,28 @@ myConfig = def
     , ("M-z>"           ,       toggleWS                        )
     , ("M-<Left>"       ,       nextScreen                      )       -- Switch focus to next monitor
     , ("M-<Right>"      ,       prevScreen                      )       -- Switch focus to prev monitor
+    --, ("M-<Return>"     ,       sendMessage W.swapMaster )
     , ("M-S-<Left>"     ,       shiftNextScreen  >> nextScreen  )
     , ("M-S-<Right>"    ,       shiftPrevScreen  >> prevScreen  )
-    , ("M-C-<up>"       ,       sendMessage NextLayout )             -- Switch to next layout
+ --   , ("M-C-<up>"       ,       sendMessage NextLayout )             -- Switch to next layout
     , ("M-C-t"           ,      namedScratchpadAction scratchpads "htop")
-    ]
+    ] 
+
+-- keyBindings conf = let modm = modMask conf in M.fromList $
+--     {- lots of other keybindings -}
+--     [((m .|. modm, k), windows $ onCurrentScreen f i)
+--         | (i, k) <- zip (workspaces' conf) [xK_1 .. xK_9]
+--         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
 
 myManageHook :: ManageHook
 myManageHook = composeAll . concat $
         [ [ className =? "blender" --> doCenterFloat]
+        , [(className =? "firefox" <&&> resource =? "Dialog") --> doFloat]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_SPLASH"        --> doCenterFloat]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_NOTIFICATION"  --> doCenterFloat]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"  --> doCenterFloat]
-        , [isDialog            --> doFloat]
+        , [ isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_UTILITY"       --> doIgnore]
+        , [isDialog     --> doFloat ]
         , [namedScratchpadManageHook scratchpads]
 
     ] -- <+> namedScratchpadManageHook scratchpads
@@ -113,11 +130,19 @@ layoutSpiral = renamed [Replace "spiral"]
                       potrait_monitor = Mirror lndscape_monitor
                       adaptive_fibonacci = ifWider 1080 lndscape_monitor potrait_monitor 
 
-myLayout = tallayout ||| Full ||| threeRowColumn
+myLayout = tallayout ||| layoutSpiral ||| Full ||| threeRowColumn
 
 
 myStartupHook = do
-  spawnOnce "feh --bg-max --randomize ~/.wallpaper/* &"
+ -- spawnOnce "feh --bg-max --randomize --xinerama-index 0 ~/.wallpaper/landscape_orientation/* &"
+  spawnOnce "feh --randomize --bg-fill --no-fehbg --xinerama-index 0 ~/.wallpaper/landscape_orientation/* &"
+  spawnOnce "feh --randomize --bg-fill --no-fehbg --xinerama-index 1 ~/.wallpaper/potrait_orientation/* &"
 
 
-
+myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $ 
+        [((modm,               xK_space ), sendMessage NextLayout)
+        ]
+        ++
+        [((m .|. modm, k), windows $ onCurrentScreen f i)
+            | (i, k) <- zip (workspaces' conf) ([xK_1 .. xK_9])
+            , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
