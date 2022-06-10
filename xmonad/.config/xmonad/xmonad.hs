@@ -31,8 +31,11 @@ import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.FadeInactive
 
 --ACTIONS
+import qualified XMonad.Actions.FlexibleResize as Flex
 import XMonad.Actions.PhysicalScreens
-import XMonad.Actions.CycleWS  (shiftNextScreen, shiftPrevScreen, WSType(..), nextScreen, prevScreen, toggleWS)
+import XMonad.Actions.CycleWS  (shiftNextScreen, shiftPrevScreen,
+                                WSType(..), nextScreen, prevScreen,
+                                toggleWS, prevWS, nextWS)
 import Graphics.X11.Xlib
 import Graphics.X11.Xlib.Extras
 
@@ -46,7 +49,8 @@ aviikInspVfx    = ["rvplayer", "djv"]
 windowCount :: X (Maybe String)
 windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace . W.current . windowset
 scratchpads = [
-        NS "ytop" "st -e ytop" (title =? "ytop") defaultFloating ]
+        NS "python" "alacritty --title python3 -e python3" (title =? "python3") (customFloating $ W.RationalRect 0 0 1 (3/12))
+        ]
 
 transparentHook :: X ()
 transparentHook = fadeInactiveLogHook fadeAmount
@@ -68,22 +72,28 @@ myConfig = def
     , keys               = myKeys
     , layoutHook = myLayout      -- Use custom layouts
     , manageHook = myManageHook  -- Match on certain windows
-    , startupHook = myStartupHook
-    , logHook = transparentHook
+    , mouseBindings     = myMouseBindings
+--    , startupHook = myStartupHook
+--    , logHook = transparentHook
     }
   `additionalKeysP`
     [ ("M-r"            ,       spawn "xmonad --recompile"      ) 
     , ("M-S-r"          ,       spawn "xmonad --recompile && xmonad --restart")        -- Restarts xmonad
-    , ("M-C-s"          ,       unGrab *> spawn "scrot -s"      )
+    , ("M-S-<Return>"   ,       spawn "alacritty"               )
+    , ("M-p"            ,       spawn "hmenu -f ~/.secrets/hmenu_history")
+    , ("<Print>"        ,       unGrab *> spawn "scrot -e 'mv $f ~/.images/screen_prints'"      )
     , ("M-f"            ,       spawn "firefox"                 )
+    , ("M-S-c"          ,       kill)
     , ("M-z>"           ,       toggleWS                        )
+    , ("M-<Return>"     ,       windows W.swapMaster            )
+    , ("M-<Up>"         ,       windows W.focusUp               )
+    , ("M-<Down>"       ,       windows W.focusDown             )
     , ("M-<Left>"       ,       nextScreen                      )       -- Switch focus to next monitor
     , ("M-<Right>"      ,       prevScreen                      )       -- Switch focus to prev monitor
-    --, ("M-<Return>"     ,       sendMessage W.swapMaster )
     , ("M-S-<Left>"     ,       shiftNextScreen  >> nextScreen  )
     , ("M-S-<Right>"    ,       shiftPrevScreen  >> prevScreen  )
- --   , ("M-C-<up>"       ,       sendMessage NextLayout )             -- Switch to next layout
-    , ("M-C-t"           ,      namedScratchpadAction scratchpads "htop")
+    , ("M-S-f"          ,       withFocused $ windows . W.sink  ) 
+    , ("M-C-t"          ,       namedScratchpadAction scratchpads "python")
     ] 
 
 -- keyBindings conf = let modm = modMask conf in M.fromList $
@@ -95,7 +105,7 @@ myConfig = def
 myManageHook :: ManageHook
 myManageHook = composeAll . concat $
         [ [ className =? "blender" --> doCenterFloat]
-        , [(className =? "firefox" <&&> resource =? "Dialog") --> doFloat]
+        , [ className =? "Navigator" --> doFloat]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_SPLASH"        --> doCenterFloat]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_NOTIFICATION"  --> doCenterFloat]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"  --> doCenterFloat]
@@ -110,7 +120,7 @@ tallayout = renamed [Replace "tall"]
            $ limitWindows 12
            $ spacingWithEdge 10 
            $ aviik_adaptiveTall 
-           where landscapeSide = (ResizableTall 1 (3/100) (1/2) [])
+           where landscapeSide = ResizableTall 1 (3/100) (1/2) []
                  potraitSide= Mirror (Tall 1 (3/100) (60/100))
                  aviik_adaptiveTall = ifWider 1080 landscapeSide potraitSide 
 
@@ -119,30 +129,42 @@ threeRowColumn = renamed [Replace "threeRow"]
                 $ limitWindows 7
                 $ spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True
                 $ aviik_adaptive_row_column
-                where colum_side = (ThreeCol 1 (3/100) (1/2))
+                where colum_side = ThreeCol 1 (3/100) (1/2)
                       row_side   = Mirror (ThreeCol 1 (3/100) (1/2))
                       aviik_adaptive_row_column = ifWider 1080 colum_side row_side
 
 layoutSpiral = renamed [Replace "spiral"]
                 $limitWindows 6
                 $ adaptive_fibonacci
-                where lndscape_monitor = (spiral (125 % 146))
+                where lndscape_monitor = spiral (125 % 146)
                       potrait_monitor = Mirror lndscape_monitor
                       adaptive_fibonacci = ifWider 1080 lndscape_monitor potrait_monitor 
 
 myLayout = tallayout ||| layoutSpiral ||| Full ||| threeRowColumn
 
 
+
 myStartupHook = do
+        spawnOnce "feh --randomize --bg-fill ~/.images/wallpapers/lndscp/* ~/.images/wallpapers/tall/* &"
  -- spawnOnce "feh --bg-max --randomize --xinerama-index 0 ~/.wallpaper/landscape_orientation/* &"
-  spawnOnce "feh --randomize --bg-fill --no-fehbg --xinerama-index 0 ~/.wallpaper/landscape_orientation/* &"
-  spawnOnce "feh --randomize --bg-fill --no-fehbg --xinerama-index 1 ~/.wallpaper/potrait_orientation/* &"
+  --spawnOnce "feh --randomize --bg-fill --no-fehbg --xinerama-index 0 ~/.wallpaper/landscape_orientation/* &"
+  --spawnOnce "feh --randomize --bg-fill --no-fehbg --xinerama-index 1 ~/.wallpaper/potrait_orientation/* &"
 
-
-myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $ 
-        [((modm,               xK_space ), sendMessage NextLayout)
+  
+-- Mouse bindings:
+myMouseBindings (XConfig {XMonad.modMask = modMask}) = M.fromList $
+        [ ((modMask .|. shiftMask, button1), \w -> focus w >> mouseMoveWindow w >> windows W.shiftMaster) -- set the window to floating mode and move by dragging
+        , ((modMask, button2), \w -> focus w >> windows W.shiftMaster) -- raise the window to the top of the stack
+        , ((modMask, button3), \w -> focus w >> Flex.mouseResizeWindow w) -- set the window to floating mode and resize by dragging
+        , ((modMask, button4), const prevWS) -- switch to previous workspace
+        , ((modMask, button5), const nextWS) -- switch to next workspace
+        -- , ((modMask, button9), (toggleWS)) -- switch to next workspace
         ]
-        ++
+
+-- keybindings
+myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $ 
+        ((modm,               xK_space ), sendMessage NextLayout)
+        :
         [((m .|. modm, k), windows $ onCurrentScreen f i)
-            | (i, k) <- zip (workspaces' conf) ([xK_1 .. xK_9])
+            | (i, k) <- zip (workspaces' conf) [xK_1 .. xK_9]
             , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]

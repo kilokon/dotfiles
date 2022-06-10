@@ -4,8 +4,8 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-if [ -e /home/aviik/.nix-profile/etc/profile.d/nix.sh ]; then . /home/aviik/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
-. "$HOME/.cargo/env"
+#if [ -e /home/aviik/.nix-profile/etc/profile.d/nix.sh ]; then . /home/aviik/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+#. "$HOME/.cargo/env"
 
 
 # set PATH so it includes user's private bin if it exists

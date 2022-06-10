@@ -9,6 +9,9 @@ export PATH="$HOME/tools/lua-language-server/bin:$PATH"
 eval "$(starship init bash)"
 
 
+GPG_TTY=$(tty)
+export GPG_TTY
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 alias vi="nvim"
 
@@ -18,3 +21,4 @@ eval "$(zoxide init bash)"
 [ -f "/home/aviik/.ghcup/env" ] && source "/home/aviik/.ghcup/env" # ghcup-env
 
 source ~/.bash_completion/alacritty
+

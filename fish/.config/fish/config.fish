@@ -12,7 +12,10 @@ alias ls="exa"
 alias ll="exa -alh"
 alias tree="exa --tree"
 alias ef="exec fish"
-# alias cd="z"
+alias eb="exec bash"
+alias cd..="cd .."
+alias nvxmo="nvim ~/.dotfiles/xmonad/.config/xmonad/xmonad.hs"
+alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
 
 starship init fish | source
 zoxide init fish | source
