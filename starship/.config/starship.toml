@@ -1,0 +1,13 @@
+
+
+#my right format
+right_format = "$time"
+
+
+[time]
+disabled = false
+format = '[\[ $time \]]($style) '
+time_format = "%d-%m-%Y  %T"
+utc_time_offset = "local"
+
+

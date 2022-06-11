@@ -143,6 +143,14 @@
 
 ;;;Template
 ;;(straight-use-package '(<package-name> :local-repo "~/.emacs.d/lisp/<package-name>" :type nil))
+;;+-------------------+
+;;|   Time and date   |
+;;+-------------------+
+;;https://github.com/alphapapa/ts.el
+(use-package ts
+  :straight (ts :type git :host github :repo "alphapapa/ts.el"))
+
+
 ;;;
 ;;+--------------+
 ;;|  Interface   |
@@ -635,6 +643,9 @@
 ;;+----------------------------------+
 ;;|   Programming Language Support   |
 ;;+----------------------------------+
+;;E-Lisp Develoment - The missing hash table library for Emacs.
+(use-package ht
+  :straight (ht :type git :host github :repo "Wilfred/ht.el"))
 
 ;;Elisp -Formatter
 (use-package elisp-autofmt
@@ -834,7 +845,102 @@
   :hook (org-mode . aviikc/org-mode-setup)
 ;;  :custom
   :config (message "Loading Org.........")
+)
+
+(setq org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-deadline-if-done t
+      org-agenda-include-deadlines t
+      org-agenda-block-separator #x2501
+      org-agenda-compact-blocks t
+      org-agenda-start-with-log-mode t)
+
+
+(defun my/set-general-faces-org ()
+  ;; I have removed indentation to make the file look cleaner
+  (org-indent-mode -1)
+ ;; (my/buffer-face-mode-variable)
+  (setq line-spacing 0.1
+        org-pretty-entities t
+        org-startup-indented t
+        org-adapt-indentation nil)
+  (variable-pitch-mode +1)
+  (mapc
+   (lambda (face) ;; Other fonts that require it are set to fixed-pitch.
+     (set-face-attribute face nil :inherit 'fixed-pitch))
+   (list 'org-block
+         'org-table
+         'org-verbatim
+         'org-block-begin-line
+         'org-block-end-line
+         'org-meta-line
+         'org-date
+         'org-drawer
+         'org-property-value
+         'org-special-keyword
+         'org-document-info-keyword))
+  (mapc ;; This sets the fonts to a smaller size
+   (lambda (face)
+     (set-face-attribute face nil :height 0.8))
+   (list 'org-document-info-keyword
+         'org-block-begin-line
+         'org-block-end-line
+         'org-meta-line
+         'org-drawer
+         'org-property-value
+         )))
+
+(defun my/set-specific-faces-org ()
+  (set-face-attribute 'org-code nil
+                      :inherit '(shadow fixed-pitch))
+  ;; Without indentation the headlines need to be different to be visible
+  (set-face-attribute 'org-level-1 nil
+                      :height 1.25
+                      :foreground "#BEA4DB")
+  (set-face-attribute 'org-level-2 nil
+                      :height 1.15
+                      :foreground "#A382FF"
+                      :slant 'italic)
+  (set-face-attribute 'org-level-3 nil
+                      :height 1.1
+                      :foreground "#5E65CC"
+                      :slant 'italic)
+  (set-face-attribute 'org-level-4 nil
+                      :height 1.05
+                      :foreground "#ABABFF")
+  (set-face-attribute 'org-level-5 nil
+                      :foreground "#2843FB")
+  (set-face-attribute 'org-date nil
+                      :foreground "#ECBE7B"
+                      :height 0.8)
+  (set-face-attribute 'org-document-title nil
+                      :foreground "DarkOrange3"
+                      :height 1.3)
+  (set-face-attribute 'org-ellipsis nil
+                      :foreground "#4f747a" :underline nil)
+  (set-face-attribute 'variable-pitch nil
+                      :family "Roboto Slab" :height 1.2))
+(defun my/set-keyword-faces-org ()
+  (mapc (lambda (pair) (push pair prettify-symbols-alist))
+        '(;; Syntax
+          ("TODO" .     "")
+          ("DONE" .     "")
+          ("WAITING" .  "")
+          ("HOLD" .     "")
+          ("NEXT" .     "")
+          ("CANCELLED" . "")
+          ("#+begin_quote" . "“")
+          ("#+end_quote" . "”")))
+  (prettify-symbols-mode +1)
   )
+
+(defun my/style-org ()
+  (my/set-general-faces-org)
+  (my/set-specific-faces-org)
+  (my/set-keyword-faces-org)
+  )
+(add-hook 'org-mode-hook 'my/style-org)
+
+
 
 
 
@@ -849,14 +955,100 @@
 (use-package org-super-agenda
   :straight (org-super-agenda :type git :host github :repo "alphapapa/org-super-agenda"))
 
+(let ((org-super-agenda-groups
+       '(;; Each group has an implicit boolean OR operator between its selectors.
+         (:name "Today"  ; Optionally specify section name
+                :time-grid t  ; Items that appear on the time grid
+                :todo "TODAY")  ; Items that have this TODO keyword
+         (:name "Important"
+                ;; Single arguments given alone
+                :tag "bills"
+                :priority "A")
+         ;; Set order of multiple groups at once
+         (:order-multi (2 (:name "Shopping in town"
+                                 ;; Boolean AND group matches items that match all subgroups
+                                 :and (:tag "shopping" :tag "@town"))
+                          (:name "Food-related"
+                                 ;; Multiple args given in list with implicit OR
+                                 :tag ("food" "dinner"))
+                          (:name "Personal"
+                                 :habit t
+                                 :tag "personal")
+                          (:name "Space-related (non-moon-or-planet-related)"
+                                 ;; Regexps match case-insensitively on the entire entry
+                                 :and (:regexp ("space" "NASA")
+                                               ;; Boolean NOT also has implicit OR between selectors
+                                               :not (:regexp "moon" :tag "planet")))))
+         ;; Groups supply their own section names when none are given
+         (:todo "WAITING" :order 8)  ; Set order of this section
+         (:todo ("SOMEDAY" "TO-READ" "CHECK" "TO-WATCH" "WATCHING")
+                ;; Show this group at the end of the agenda (since it has the
+                ;; highest number). If you specified this group last, items
+                ;; with these todo keywords that e.g. have priority A would be
+                ;; displayed in that group instead, because items are grouped
+                ;; out in the order the groups are listed.
+                :order 9)
+         (:priority<= "B"
+                      ;; Show this section after "Today" and "Important", because
+                      ;; their order is unspecified, defaulting to 0. Sections
+                      ;; are displayed lowest-number-first.
+                      :order 1)
+         ;; After the last group, the agenda will display items that didn't
+         ;; match any of these groups, with the default order position of 99
+         )))
+  (org-agenda nil "a"))
 
-;; (use-package org-superstar
-;;   :straight (org-superstar :type git :host github :repo "integral-dw/org-superstar-mode")
-;;   :hook (org-mode . org-superstar-mode))
 
-;; (use-package org-sticky-header
-;;   :straight (org-sticky-header :type git :host github :repo "alphapapa/org-sticky-header")
-;;   :hook (org-mode . org-sticky-header-mode))
+(setq org-agenda-custom-commands
+      '(("z" "Hugo view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                          :time-grid t
+                          :date today
+                          :todo "TODAY"
+                          :scheduled today
+                          :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '(;; Each group has an implicit boolean OR operator between its selectors.
+                          (:name "Today"
+                           :deadline today
+                           :face (:background "black"))
+                          (:name "Passed deadline"
+                           :and (:deadline past :todo ("TODO" "WAITING" "HOLD" "NEXT"))
+                           :face (:background "#7f1b19"))
+                          (:name "Work important"
+                           :and (:priority>= "B" :category "Work" :todo ("TODO" "NEXT")))
+                          (:name "Work other"
+                           :and (:category "Work" :todo ("TODO" "NEXT")))
+                          (:name "Important"
+                           :priority "A")
+                          (:priority<= "B"
+                           ;; Show this section after "Today" and "Important", because
+                           ;; their order is unspecified, defaulting to 0. Sections
+                           ;; are displayed lowest-number-first.
+                           :order 1)
+                          (:name "Papers"
+                           :file-path "org/roam/notes")
+                          (:name "Waiting"
+                           :todo "WAITING"
+                           :order 9)
+                          (:name "On hold"
+                           :todo "HOLD"
+                           :order 10)))))))))
+(add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
+
+
+
+
+
+
+
+
+
+
+
 
 (use-package evil-org
   :straight (evil-org :type git :host github :repo "Somelauw/evil-org-mode")
@@ -870,14 +1062,6 @@
   :straight (:host github
              :repo "tecosaur/org-pandoc-import"
              :files ("*.el" "filters" "preprocessors")))
-
-;; (use-package org-padding
-;;   :straight (org-padding  :type git :host github :repo "TonCherAmi/org-padding")
-;;   :hook (org-mode . org-padding-mode)
-;;   :config (setq org-padding-block-begin-line-padding '(2.0 . nil))
-;;   (setq org-padding-block-end-line-padding '(nil . 1.0))
-;;   (setq org-padding-heading-padding-alist
-;; 	'((4.0 . 1.5) (3.0 . 0.5) (3.0 . 0.5) (3.0 . 0.5) (2.5 . 0.5) (2.0 . 0.5) (1.5 . 0.5) (0.5 . 0.5))))
 
 
 ;;;Hugo
