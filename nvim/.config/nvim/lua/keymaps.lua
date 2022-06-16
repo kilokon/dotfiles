@@ -52,6 +52,14 @@ map("v", "<A-j>", ":m .+1<CR>==", opts)
 map("v", "<A-k>", ":m .-2<CR>==", opts)
 map("v", "p", '"_dP', opts)
 
+
+-- copy from and to system clipboard
+keymap("v", "<Leader>y", '"+y')
+keymap("n", "<C-y>", '"+p')
+keymap("n", "<Leader>P", '"+P')
+
+
+
 -- Map Esc to kk
 map("i", "kk", "<Esc>")
 
@@ -87,8 +95,18 @@ map("n", "<Leader>ld", "<cmd>LspTrouble lsp_definitions<CR>", { noremap = true }
 -- map('n','<down>', "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {noremap = true})
 
 -- Rust Tools
-map("n", "rf", "<cmd>RustHoverActions<CR>")
-map("n", "rc", "<cmd>RustOpenCargo<CR>")
+--map("n", "rf", "<cmd>RustHoverActions<CR>")
+--map("n", "rc", "<cmd>RustOpenCargo<CR>")
+-- Rust Analyzer
+
+map("n", "ro", "<cmd>CocCommand rust-analyzer.openDocs<CR>", { noremap = true})
+map("n", "rt", "<cmd>CocCommand rust-analyzer.openCargoToml<CR>", { noremap = true})
+map("n", "rr", "<cmd>CocCommand rust-analyzer.run<CR>", { noremap = true})
+map("n", "re", "<cmd>CocCommand rust-analyzer.reload<CR>", { noremap = true})
+map("n", "rd", "<cmd>CocCommand rust-analyzer.debug<CR>", { noremap = true})
+map("n", "re", "<cmd>CocCommand rust-analyzer.reload<CR>", { noremap = true})
+
+
 
 --Telescope
 map("n", "<leader>ff", ":Telescope find_files<CR>")
@@ -99,45 +117,6 @@ map("n", "<leader>fb", ":Telescope buffers<CR>")
 -- Hop
 map("", "s", ":HopChar2<cr>", { silent = true })
 map("", "S", ":HopWord<cr>", { silent = true })
--- map(
--- 	"n",
--- 	"f",
--- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true })<cr>",
--- 	{ noremap = true }
--- )
--- map(
--- 	"n",
--- 	"F",
--- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<cr>",
--- 	{ noremap = true }
--- )
--- map(
--- 	"o",
--- 	"f",
--- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true, inclusive_jump = true })<cr>",
--- 	{ noremap = true }
--- )
--- map(
--- 	"o",
--- 	"F",
--- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true, inclusive_jump = true })<cr>",
--- 	{ noremap = true }
--- )
--- map(
--- 	"n",
--- 	"t",
--- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.AFTER_CURSOR, current_line_only = true })<cr>",
--- 	{ noremap = true }
--- )
--- map(
--- 	"n",
--- 	"T",
--- 	"<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<cr>",
--- 	{ noremap = true }
--- )
--- map("n", ";w", "<cmd>lua require'hop'.hint_words()<cr>", {})
--- map("n", ";l", "<cmd>lua require'hop'.hint_lines()<cr>", {})
--- map("n", ";p", "<cmd>lua require'hop'.hint_patterns()<cr>", {})
 
 -- Terminal Toggling
 local Terminal = require("toggleterm.terminal").Terminal

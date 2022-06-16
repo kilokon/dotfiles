@@ -4,13 +4,15 @@ if not status_ok then
 end
 
 toggleterm.setup({
-	size = 10,
+	size = 20,
 	open_mapping = [[<c-t>]],
 	shade_filetypes = {},
 	shade_terminals = false,
 	start_in_insert = true,
 	persist_size = true,
 	direction = "horizontal",
+        hide_numbers = true, -- hide the number column in toggleterm buffers
+        shell = vim.o.shell
 })
 
 function _G.set_terminal_keymaps()
@@ -43,4 +45,4 @@ end
 -- 	toggling_term:toggle()
 -- end
 --
--- vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _toggling_term()<CR>", { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<leader>g", "<cmd>lua _toggling_term()<CR>", qwqq{ noremap = true, silent = true })

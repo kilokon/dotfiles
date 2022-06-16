@@ -217,56 +217,7 @@
 (straight-use-package '(nano-theme :type git :host github
                                    :repo "rougier/nano-theme"))
 (load-theme 'nano-dark t)
-;; (use-package lambda-themes
-;;   :straight (:type git :host github :repo "lambda-emacs/lambda-themes") 
-;;   :custom
-;;   (lambda-themes-set-italic-comments t)
-;;   (lambda-themes-set-italic-keywords t)
-;;   (lambda-themes-set-variable-pitch t) 
-;;   :config
-;;   ;; load preferred theme 
-;;   (load-theme 'lambda-dark-faded t))
-
-
-;; (use-package lambda-line
-;;   :straight (:type git :host github :repo "lambda-emacs/lambda-line") 
-;;   :custom
-;;   (lambda-line-position 'bottom) ;; Set position of status-line 
-;;   (lambda-line-abbrev t) ;; abbreviate major modes
-;;   (lambda-line-hspace "  ")  ;; add some cushion
-;;   (lambda-line-prefix t) ;; use a prefix symbol
-;;   (lambda-line-prefix-padding nil) ;; no extra space for prefix 
-;;   (lambda-line-status-invert nil)  ;; no invert colors
-;;   (lambda-line-gui-ro-symbol  " ⨂") ;; symbols
-;;   (lambda-line-gui-mod-symbol " ⬤") 
-;;   (lambda-line-gui-rw-symbol  " ◯") 
-;;   ;;(lambda-line-space-top +.50)  ;; padding on top and bottom of line
-;;   ;;(lambda-line-space-bottom -.50)
-;;   ;;(lambda-line-symbol-position 0.1) ;; adjust the vertical placement of symbol
-;;   :config
-;;   ;; activate lambda-line 
-;;   (lambda-line-mode) 
-;;   ;; set divider line in footer
-;;   ;;(when (eq lambda-line-position 'top)
-;;   ;; (setq-default mode-line-format (list "%_"))
-;;   ;; (setq mode-line-format (list "%_")))
-;;   )
 (set-face-attribute 'default nil :font "Fira Code Retina" :height 130)
-
-;; Set the fixed pitch face
-;;(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height efs/default-font-size)
-
-;; Set the variable pitch face
-;;(set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular)
-;; (use-package fontset
-;;   :straight (:type built-in) ;; only include this if you use straight
-;;   :config
-;;   ;; Use symbola for proper unicode
-;;   (when (member "Fira Code Retina" (font-family-list))
-;;     ((set-face-attribute 'default nil :font "Fira Code Retina" :height 130))))
-
-
-
 
 (use-package diminish
   :straight (diminish :type git 
@@ -282,7 +233,7 @@
 ;;+---------------------+
 (use-package magit
    :straight (magit :type git :host github :repo "magit/magit")
-   :diminish auto-revert-mode
+;;   :diminish auto-revert-mode
    :bind
    (("C-c C-g" . magit-status)
     :map magit-status-mode-map
@@ -533,9 +484,11 @@
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         ((c-mode c++-mode) . lsp)
-	  (haskell-mode . lsp)
+  :hook (((c-mode
+	   c++-mode
+	   python-mode
+	   rust-mode
+	   haskell-mode) . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration)
 	 (lsp-mode . lsp-ui-mode))
@@ -576,7 +529,10 @@
   :init
   (global-company-mode)
   :config (setq company-backends '((company-capf company-dabbrev-code company-dabbrev))))
-(add-to-list 'company-backends 'company-ghc)
+(add-to-list 'company-backends '(company-ghci
+				 company-shell
+				 company-shell-env
+				 company-fish-shell))
 
 (use-package company-box
   :straight (company-box :type git :host github :repo "sebastiencs/company-box")
@@ -585,6 +541,10 @@
 
 (use-package company-ghci
   :straight (company-ghci :type git :host github :repo "horellana/company-ghci"))
+
+(use-package company-shell
+  :straight (company-shell :type git :host github :repo "Alexander-Miller/company-shell"))
+
 
 
 ;;+-----------------------------------+
@@ -815,30 +775,8 @@
 ;;+----------------------+
 ;;|   Org-Mode Support   |
 ;;+----------------------+
-
-(defun aviik/org-mode-font-faces ()
-  (setq-local org-hidden-keywords '(title author date startup))
-  (setq-default line-spacing 1)
-  (setq org-startup-indented t
-	org-hide-leading-stars t
-	org-num-skip-unnumbered t
-	org-num-skip-footnotes t
-	org-num-max-level 2
-	org-num-face nil
-	header-line-format nil
-	fill-column 72))
-
-(defun aviikc/org-mode-setup()
-  (aviik/org-mode-font-faces)
-  (org-indent-mode)
-  (org-num-mode)
-  (variable-pitch-mode)
-  (visual-line-mode)
-  )
-
-
-
 (straight-use-package '(org :type built-in))
+
 
 (use-package org
   :ensure org-plus-contrib
@@ -847,6 +785,33 @@
   :config (message "Loading Org.........")
 )
 
+(defun aviik/org-mode-font-faces ()
+;;  (setq-local org-hidden-keywords '(title author date startup))
+  (setq-default line-spacing 1)
+  (setq org-startup-indented t
+	org-directory "~/OneDrive/org"
+	;;Todo keywords I need
+        org-todo-keywords '((sequence "TODO(t)" "IN-PROGRESS(n)" "|" "DONE(d)" "CANCELED(c@)"))
+	org-export-allow-bind-keywords t
+	org-fontify-done-headline t
+	;; org-hide-leading-stars t
+	;; org-num-skip-unnumbered t
+	;; org-num-skip-footnotes t
+	;; org-num-max-level 2
+	;; org-num-face nil
+	header-line-format nil
+	fill-column 72))
+
+(defun aviikc/org-mode-setup()
+  (aviik/org-mode-font-faces)
+  (org-indent-mode)
+;;  (org-num-mode)
+  (variable-pitch-mode)
+  (visual-line-mode)
+  )
+
+
+
 (setq org-agenda-skip-scheduled-if-done t
       org-agenda-skip-deadline-if-done t
       org-agenda-include-deadlines t
@@ -854,40 +819,6 @@
       org-agenda-compact-blocks t
       org-agenda-start-with-log-mode t)
 
-
-(defun my/set-general-faces-org ()
-  ;; I have removed indentation to make the file look cleaner
-  (org-indent-mode -1)
- ;; (my/buffer-face-mode-variable)
-  (setq line-spacing 0.1
-        org-pretty-entities t
-        org-startup-indented t
-        org-adapt-indentation nil)
-  (variable-pitch-mode +1)
-  (mapc
-   (lambda (face) ;; Other fonts that require it are set to fixed-pitch.
-     (set-face-attribute face nil :inherit 'fixed-pitch))
-   (list 'org-block
-         'org-table
-         'org-verbatim
-         'org-block-begin-line
-         'org-block-end-line
-         'org-meta-line
-         'org-date
-         'org-drawer
-         'org-property-value
-         'org-special-keyword
-         'org-document-info-keyword))
-  (mapc ;; This sets the fonts to a smaller size
-   (lambda (face)
-     (set-face-attribute face nil :height 0.8))
-   (list 'org-document-info-keyword
-         'org-block-begin-line
-         'org-block-end-line
-         'org-meta-line
-         'org-drawer
-         'org-property-value
-         )))
 
 (defun my/set-specific-faces-org ()
   (set-face-attribute 'org-code nil
@@ -933,116 +864,35 @@
   (prettify-symbols-mode +1)
   )
 
-(defun my/style-org ()
-  (my/set-general-faces-org)
-  (my/set-specific-faces-org)
-  (my/set-keyword-faces-org)
-  )
-(add-hook 'org-mode-hook 'my/style-org)
 
-
-
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (shell . t)
+     (lisp . t))))
 
 
 
 ;;(remove-hook 'window-configuration-change-hook #'nano-modeline-update-windows)
 
 (use-package org-sidebar
-  :straight (org-sidebar :type git :host github :repo "alphapapa/org-sidebar"))
-;;  :hook (org-mode . org-sidebar))
+  :straight (org-sidebar :type git :host github :repo "alphapapa/org-sidebar")
+  :after org-mode)
 
 ;;https://github.com/alphapapa/org-super-agenda#installation
 (use-package org-super-agenda
-  :straight (org-super-agenda :type git :host github :repo "alphapapa/org-super-agenda"))
-
-(let ((org-super-agenda-groups
-       '(;; Each group has an implicit boolean OR operator between its selectors.
-         (:name "Today"  ; Optionally specify section name
-                :time-grid t  ; Items that appear on the time grid
-                :todo "TODAY")  ; Items that have this TODO keyword
-         (:name "Important"
-                ;; Single arguments given alone
-                :tag "bills"
-                :priority "A")
-         ;; Set order of multiple groups at once
-         (:order-multi (2 (:name "Shopping in town"
-                                 ;; Boolean AND group matches items that match all subgroups
-                                 :and (:tag "shopping" :tag "@town"))
-                          (:name "Food-related"
-                                 ;; Multiple args given in list with implicit OR
-                                 :tag ("food" "dinner"))
-                          (:name "Personal"
-                                 :habit t
-                                 :tag "personal")
-                          (:name "Space-related (non-moon-or-planet-related)"
-                                 ;; Regexps match case-insensitively on the entire entry
-                                 :and (:regexp ("space" "NASA")
-                                               ;; Boolean NOT also has implicit OR between selectors
-                                               :not (:regexp "moon" :tag "planet")))))
-         ;; Groups supply their own section names when none are given
-         (:todo "WAITING" :order 8)  ; Set order of this section
-         (:todo ("SOMEDAY" "TO-READ" "CHECK" "TO-WATCH" "WATCHING")
-                ;; Show this group at the end of the agenda (since it has the
-                ;; highest number). If you specified this group last, items
-                ;; with these todo keywords that e.g. have priority A would be
-                ;; displayed in that group instead, because items are grouped
-                ;; out in the order the groups are listed.
-                :order 9)
-         (:priority<= "B"
-                      ;; Show this section after "Today" and "Important", because
-                      ;; their order is unspecified, defaulting to 0. Sections
-                      ;; are displayed lowest-number-first.
-                      :order 1)
-         ;; After the last group, the agenda will display items that didn't
-         ;; match any of these groups, with the default order position of 99
-         )))
-  (org-agenda nil "a"))
-
-
-(setq org-agenda-custom-commands
-      '(("z" "Hugo view"
-         ((agenda "" ((org-agenda-span 'day)
-                      (org-super-agenda-groups
-                       '((:name "Today"
-                          :time-grid t
-                          :date today
-                          :todo "TODAY"
-                          :scheduled today
-                          :order 1)))))
-          (alltodo "" ((org-agenda-overriding-header "")
-                       (org-super-agenda-groups
-                        '(;; Each group has an implicit boolean OR operator between its selectors.
-                          (:name "Today"
-                           :deadline today
-                           :face (:background "black"))
-                          (:name "Passed deadline"
-                           :and (:deadline past :todo ("TODO" "WAITING" "HOLD" "NEXT"))
-                           :face (:background "#7f1b19"))
-                          (:name "Work important"
-                           :and (:priority>= "B" :category "Work" :todo ("TODO" "NEXT")))
-                          (:name "Work other"
-                           :and (:category "Work" :todo ("TODO" "NEXT")))
-                          (:name "Important"
-                           :priority "A")
-                          (:priority<= "B"
-                           ;; Show this section after "Today" and "Important", because
-                           ;; their order is unspecified, defaulting to 0. Sections
-                           ;; are displayed lowest-number-first.
-                           :order 1)
-                          (:name "Papers"
-                           :file-path "org/roam/notes")
-                          (:name "Waiting"
-                           :todo "WAITING"
-                           :order 9)
-                          (:name "On hold"
-                           :todo "HOLD"
-                           :order 10)))))))))
-(add-hook 'org-agenda-mode-hook 'org-super-agenda-mode)
-
-
-
-
-
+  :straight (org-super-agenda :type git :host github :repo "alphapapa/org-super-agenda")
+  :hook (org-agenda-mode . org-super-agenda-mode)
+  :config
+  (org-super-agenda-mode t)
+  (setq org-super-agenda-groups
+        '((:name "Work" :tag "work" :order 1)
+          (:name "In Progress" :todo "IN-PROGRESS" :order 1)
+          (:name "Projects" :tag "project" :order 3)
+          (:name "Home" :tag "home" :order 2)
+          (:name "Study" :tag "study" :order 4)
+          (:name "Habits" :tag "habit" :order 5))))
 
 
 
@@ -1073,6 +923,13 @@
                     :repo "kaushalmodi/ox-hugo")
   :after ox)
 
+(use-package ox-json
+  :straight (ox-json :type git :host github :repo "jlumpe/ox-json")
+  :after ox)
+
+
+
+
 ;;;; ===========================
 ;;;; Publishing with Org Mode
 ;;;; ===========================
@@ -1096,3 +953,12 @@
   ;; 		      )
    (set-face-attribute 'doom-modeline-evil-insert-state nil :foreground "orange"))
 (menu-bar-mode -1)
+
+
+(setq org-publish-project-alist
+      '(("Org-Json"
+         :base-directory "~/OneDrive/org/"
+         :base-extension "org"
+         :publishing-directory "~/OneDrive/dev/a_data"
+         :recursive t
+         :publishing-function ox-json-export-to-file)))

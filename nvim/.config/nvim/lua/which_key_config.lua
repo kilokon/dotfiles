@@ -171,7 +171,17 @@ local mappings = {
     u = { "<cmd>lua require'dapui'.toggle()<cr>", "UI" },
     x = { "<cmd>lua require'dap'.terminate()<cr>", "Exit" },
   },
-
+  c = {
+                name = "coc",
+                l = { '<cmd>CocConfig<cr>', "Coc Config" },
+                r = {
+                        name = "rust-analyzer",
+                        o = {"<cmd>CocCommand rust-analyzer.openDocs<cr>", "Open Docs"},
+                        c = {"<cmd>CocCommand rust-analyzer.openCargoToml<cr>", "Cargo.toml"},
+                        r = {"<cmd>CocCommand rust-analyzer.run<cr>", "Run"},
+                        l = {"<cmd>CocCommand rust-analyzer.reload<cr>", "Reload"},
+                },
+        },
   -- nnoremap <silent> <leader>B :lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
   -- nnoremap <silent> <leader>lp :lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>
   -- require("dapui").open()
@@ -195,6 +205,7 @@ local mappings = {
     R = { "<cmd>Telescope registers<cr>", "Registers" },
     k = { "<cmd>Telescope keymaps<cr>", "Keymaps" },
     C = { "<cmd>Telescope commands<cr>", "Commands" },
+  
   },
 
   g = {
@@ -228,37 +239,38 @@ local mappings = {
       p = { "<cmd>Gist -b -p<cr>", "Create Private" },
     },
   },
-  l = {
-    name = "LSP",
-    a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
-    d = { "<cmd>TroubleToggle<cr>", "Diagnostics" },
-    w = {
-      "<cmd>Telescope lsp_workspace_diagnostics<cr>",
-      "Workspace Diagnostics",
-    },
-    f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
-    F = { "<cmd>LspToggleAutoFormat<cr>", "Toggle Autoformat" },
-    i = { "<cmd>LspInfo<cr>", "Info" },
-    I = { "<cmd>LspInstallInfo<cr>", "Installer Info" },
-    j = {
-      "<cmd>lua vim.diagnostic.goto_next({buffer=0})<CR>",
-      "Next Diagnostic",
-    },
-    k = {
-      "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>",
-      "Prev Diagnostic",
-    },
-    l = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-    o = { "<cmd>SymbolsOutline<cr>", "Outline" },
-    q = { "<cmd>lua vim.lsp.diagnostic.set_loclist()<cr>", "Quickfix" },
-    r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
-    R = { "<cmd>TroubleToggle lsp_references<cr>", "References" },
-    s = { "<cmd>Telescope lsp_document_symbols<cr>", "Document Symbols" },
-    S = {
-      "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",
-      "Workspace Symbols",
-    },
-  },
+
+  -- l = {
+  --   name = "LSP",
+  --   a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
+  --   d = { "<cmd>TroubleToggle<cr>", "Diagnostics" },
+  --   w = {
+  --     "<cmd>Telescope lsp_workspace_diagnostics<cr>",
+  --     "Workspace Diagnostics",
+  --   },
+  --   f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
+  --   F = { "<cmd>LspToggleAutoFormat<cr>", "Toggle Autoformat" },
+  --   i = { "<cmd>LspInfo<cr>", "Info" },
+  --   I = { "<cmd>LspInstallInfo<cr>", "Installer Info" },
+  --   j = {
+  --     "<cmd>lua vim.diagnostic.goto_next({buffer=0})<CR>",
+  --     "Next Diagnostic",
+  --   },
+--     k = {
+--       "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>",
+--       "Prev Diagnostic",
+--     },
+-- --    l = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
+--     o = { "<cmd>SymbolsOutline<cr>", "Outline" },
+--     q = { "<cmd>lua vim.lsp.diagnostic.set_loclist()<cr>", "Quickfix" },
+--     r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+--     R = { "<cmd>TroubleToggle lsp_references<cr>", "References" },
+--     s = { "<cmd>Telescope lsp_document_symbols<cr>", "Document Symbols" },
+--     S = {
+--       "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>",
+--       "Workspace Symbols",
+    -- },
+  -- },
 
   s = {
     name = "Surround",
@@ -270,21 +282,21 @@ local mappings = {
     b = { "<cmd>lua require('surround').toggle_brackets()<cr>", "Brackets" },
   },
 
-  S = {
-    -- name = "Session",
-    -- s = { "<cmd>SaveSession<cr>", "Save" },
-    -- l = { "<cmd>LoadLastSession!<cr>", "Load Last" },
-    -- d = { "<cmd>LoadCurrentDirSession!<cr>", "Load Last Dir" },
-    -- f = { "<cmd>Telescope sessions save_current=false<cr>", "Find Session" },
-    name = "SnipRun",
-    c = { "<cmd>SnipClose<cr>", "Close" },
-    f = { "<cmd>%SnipRun<cr>", "Run File" },
-    i = { "<cmd>SnipInfo<cr>", "Info" },
-    m = { "<cmd>SnipReplMemoryClean<cr>", "Mem Clean" },
-    r = { "<cmd>SnipReset<cr>", "Reset" },
-    t = { "<cmd>SnipRunToggle<cr>", "Toggle" },
-    x = { "<cmd>SnipTerminate<cr>", "Terminate" },
-  },
+  -- S = {
+  --   -- name = "Session",
+  --   -- s = { "<cmd>SaveSession<cr>", "Save" },
+  --   -- l = { "<cmd>LoadLastSession!<cr>", "Load Last" },
+  --   -- d = { "<cmd>LoadCurrentDirSession!<cr>", "Load Last Dir" },
+  --   -- f = { "<cmd>Telescope sessions save_current=false<cr>", "Find Session" },
+  --   name = "SnipRun",
+  --   c = { "<cmd>SnipClose<cr>", "Close" },
+  --   f = { "<cmd>%SnipRun<cr>", "Run File" },
+  --   i = { "<cmd>SnipInfo<cr>", "Info" },
+  --   m = { "<cmd>SnipReplMemoryClean<cr>", "Mem Clean" },
+  --   r = { "<cmd>SnipReset<cr>", "Reset" },
+  --   t = { "<cmd>SnipRunToggle<cr>", "Toggle" },
+  --   x = { "<cmd>SnipTerminate<cr>", "Terminate" },
+  -- },
 
   t = {
     name = "Terminal",

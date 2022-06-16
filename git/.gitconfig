@@ -1,6 +1,7 @@
 [user]
 	name = aviikc
         email = aviik.chakraborty@gmail.com
+	signingKey = D4DE1B98493F0375
 [pull]
         rebase = true
 [init]
@@ -42,3 +43,8 @@
     hunk-header-line-number-style = "#067a00"
     hunk-header-style = file line-number syntax
 
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f

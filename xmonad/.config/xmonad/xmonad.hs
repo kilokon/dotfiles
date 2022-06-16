@@ -73,17 +73,18 @@ myConfig = def
     , layoutHook = myLayout      -- Use custom layouts
     , manageHook = myManageHook  -- Match on certain windows
     , mouseBindings     = myMouseBindings
---    , startupHook = myStartupHook
+    , startupHook = myStartupHook
 --    , logHook = transparentHook
     }
   `additionalKeysP`
     [ ("M-r"            ,       spawn "xmonad --recompile"      ) 
-    , ("M-S-r"          ,       spawn "xmonad --recompile && xmonad --restart")        -- Restarts xmonad
+    , ("M-q"            ,       spawn "xmonad --recompile && xmonad --restart")        -- Restarts xmonad
     , ("M-S-<Return>"   ,       spawn "alacritty"               )
     , ("M-p"            ,       spawn "hmenu -f ~/.secrets/hmenu_history")
-    , ("<Print>"        ,       unGrab *> spawn "scrot -e 'mv $f ~/.images/screen_prints'"      )
+    , ("M-<Print>"        ,       unGrab *> spawn "scrot ~/.images/screen_prints/%Y-%m-%d-%T-screenshot.png"      )
+ --   , ("<Print>"        ,       withPrefixArgument takeScreenshot)
     , ("M-f"            ,       spawn "firefox"                 )
-    , ("M-S-c"          ,       kill)
+    , ("M-c"            ,       kill)
     , ("M-z>"           ,       toggleWS                        )
     , ("M-<Return>"     ,       windows W.swapMaster            )
     , ("M-<Up>"         ,       windows W.focusUp               )
@@ -94,7 +95,9 @@ myConfig = def
     , ("M-S-<Right>"    ,       shiftPrevScreen  >> prevScreen  )
     , ("M-S-f"          ,       withFocused $ windows . W.sink  ) 
     , ("M-C-t"          ,       namedScratchpadAction scratchpads "python")
-    ] 
+    ]
+--    where
+
 
 -- keyBindings conf = let modm = modMask conf in M.fromList $
 --     {- lots of other keybindings -}
@@ -104,8 +107,9 @@ myConfig = def
 
 myManageHook :: ManageHook
 myManageHook = composeAll . concat $
-        [ [ className =? "blender" --> doCenterFloat]
-        , [ className =? "Navigator" --> doFloat]
+        [ [ className =? "blender"       --> doCenterFloat        ]
+        , [ className =? "Navigator"     --> doFloat              ]
+        , [ className =? "Firefox"       --> doShift        "3"   ]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_SPLASH"        --> doCenterFloat]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_NOTIFICATION"  --> doCenterFloat]
         , [ isInProperty "_NET_WM_WINDOW_TYPE" "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"  --> doCenterFloat]
@@ -140,7 +144,7 @@ layoutSpiral = renamed [Replace "spiral"]
                       potrait_monitor = Mirror lndscape_monitor
                       adaptive_fibonacci = ifWider 1080 lndscape_monitor potrait_monitor 
 
-myLayout = tallayout ||| layoutSpiral ||| Full ||| threeRowColumn
+myLayout = threeRowColumn ||| tallayout ||| layoutSpiral ||| Full
 
 
 
@@ -168,3 +172,4 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         [((m .|. modm, k), windows $ onCurrentScreen f i)
             | (i, k) <- zip (workspaces' conf) [xK_1 .. xK_9]
             , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+

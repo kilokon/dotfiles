@@ -405,3 +405,27 @@ let-env config = {
 }
 
 source ~/.cache/starship/init.nu
+#
+let-env PROMPT_COMMAND_RIGHT = {
+    starship prompt --right
+}
+
+source ~/.dotfiles/nu/.config/nushell/.zoxide.nu
+
+# alias ll = ls -la | select name type size modified
+def ll [dir_name?: string] {
+  if ($dir_name == null) {
+    ls -la $env.PWD | select name type size modified
+  } else {
+    ls -la $dir_name | select name type size modified
+  }
+}
+#aliases
+alias cls = clear
+alias cd.. = cd ..
+
+# open ~/.scripts/nu/aliases.nu
+#variables
+# source ~/.scripts/nu/functions.nu
+#functions
+# source ~/.scripts/nu/variables.nu

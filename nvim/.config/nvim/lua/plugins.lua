@@ -46,7 +46,7 @@ use {'neoclide/coc.nvim', branch = 'release'}
 --	use("williamboman/nvim-lsp-installer")
 --	use("glepnir/lspsaga.nvim")
 --	use({ "nvim-telescope/telescope-ui-select.nvim" })
---	use("nvim-telescope/telescope.nvim")
+	use("nvim-telescope/telescope.nvim")
 --	use("runiq/fidget.nvim") --UI for nvim-lsp progress
 --
 --	-- snippets
@@ -70,15 +70,15 @@ use {'neoclide/coc.nvim', branch = 'release'}
 	use("mhartington/formatter.nvim")
 
 	-- rust
-	use("simrat39/rust-tools.nvim")
-	use({
-		"saecki/crates.nvim",
-		tag = "v0.2.1",
-		requires = { "nvim-lua/plenary.nvim" },
-		config = function()
-			require("crates").setup()
-		end,
-	})
+--	use("simrat39/rust-tools.nvim")
+	-- use({
+	-- 	"saecki/crates.nvim",
+	-- 	tag = "v0.2.1",
+	-- 	requires = { "nvim-lua/plenary.nvim" },
+	-- 	config = function()
+	-- 		require("crates").setup()
+	-- 	end,
+	-- })
 
 	--Lua
 --	use("folke/lua-dev.nvim")
@@ -91,7 +91,8 @@ use {'neoclide/coc.nvim', branch = 'release'}
 --	--"use "fatih/vim-go"
 --	use("dag/vim-fish")
 --	use("godlygeek/tabular")
-	use("plasticboy/vim-markdown")
+	use("windwp/nvim-spectre")
+        use("plasticboy/vim-markdown")
 
 	-- Ease of Use
 	use({
