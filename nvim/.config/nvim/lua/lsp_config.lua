@@ -79,17 +79,17 @@ end
 local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 -- LANGUAGE SERVERS
-require("nvim-lsp-installer").setup({
-	ensure_installed = { "rust_analyzer", "sumneko_lua", "bashls", "hls" }, -- ensure these servers are always installed
-	automatic_installation = true, -- automatically detect which servers to install (based on which servers are set up via lspconfig)
-	ui = {
-		icons = {
-			server_installed = "✓",
-			server_pending = "➜",
-			server_uninstalled = "✗",
-		},
-	},
-})
+-- require("nvim-lsp-installer").setup({
+-- 	ensure_installed = { "rust_analyzer" }, -- ensure these servers are always installed
+-- 	automatic_installation = true, -- automatically detect which servers to install (based on which servers are set up via lspconfig)
+-- 	ui = {
+-- 		icons = {
+-- 			server_installed = "✓",
+-- 			server_pending = "➜",
+-- 			server_uninstalled = "✗",
+-- 		},
+-- 	},
+-- })
 
 -- Fidget.nvim Standalone UI for nvim-lsp progress
 require("fidget").setup({})
@@ -114,21 +114,22 @@ lspconfig.rust_analyzer.setup({
 	},
 	capabilities = capabilities,
 })
-local luadev = require("lua-dev").setup({
-	--add any options here, or leave empty to use the default settings
-	lspconfig = {
-		cmd = { "lua-language-server" },
-	},
-})
+
+-- local luadev = require("lua-dev").setup({
+-- 	--add any options here, or leave empty to use the default settings
+-- 	lspconfig = {
+-- 		cmd = { "lua-language-server" },
+-- 	},
+-- })
 --Lua LSP
-lspconfig.sumneko_lua.setup(luadev)
+-- lspconfig.sumneko_lua.setup(luadev)
 
 --Haskel Language Server
-lspconfig.hls.setup({
-	cmd = { "haskell-language-server-wrapper", "--lsp" },
-	--filetypes = { "haskell", "lhaskell" },
-	--root_dir = root_pattern("*.cabal", "stack.yaml", "cabal.project", "package.yaml", "hie.yaml"),
-})
+-- lspconfig.hls.setup({
+-- 	cmd = { "haskell-language-server-wrapper", "--lsp" },
+-- 	--filetypes = { "haskell", "lhaskell" },
+-- 	--root_dir = root_pattern("*.cabal", "stack.yaml", "cabal.project", "package.yaml", "hie.yaml"),
+-- })
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
 	virtual_text = true,

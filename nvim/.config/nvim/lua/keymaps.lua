@@ -54,9 +54,9 @@ map("v", "p", '"_dP', opts)
 
 
 -- copy from and to system clipboard
-keymap("v", "<Leader>y", '"+y')
-keymap("n", "<C-y>", '"+p')
-keymap("n", "<Leader>P", '"+P')
+map("v", "<Leader>y", '"+y')
+map("n", "<C-y>", '"+p')
+map("n", "<Leader>P", '"+P')
 
 
 
@@ -119,9 +119,9 @@ map("", "s", ":HopChar2<cr>", { silent = true })
 map("", "S", ":HopWord<cr>", { silent = true })
 
 -- Terminal Toggling
-local Terminal = require("toggleterm.terminal").Terminal
-local floatTerminal = Terminal:new({
-	direction = "float",
-})
-
-map("n", "<leader>f", "<cmd>floatTerminal()<CR>", { noremap = true })
+-- local Terminal = require("toggleterm.terminal").Terminal
+-- local floatTerminal = Terminal:new({
+-- 	direction = "float",
+-- })
+--
+-- map("n", "<leader>f", "<cmd>floatTerminal()<CR>", { noremap = true })

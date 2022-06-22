@@ -28,32 +28,32 @@ return packer.startup(function(use)
 	use("airblade/vim-rooter")
 
 	-- LSP
-use {'neoclide/coc.nvim', branch = 'release'}	
-	--use "neovim/nvim-lspconfig" -- enable LSP
-	--use "williamboman/nvim-lsp-installer" -- simple to use language server installer
-	--use "nvim-lua/lsp_extensions.nvim"
+        use {'neoclide/coc.nvim', branch = 'release'}	
+	use "neovim/nvim-lspconfig" -- enable LSP
+	use "williamboman/nvim-lsp-installer" -- simple to use language server installer
+	use "nvim-lua/lsp_extensions.nvim"
 	-- Semantic language support
 
 	-- cmp plugins
---	use("hrsh7th/nvim-cmp")
---	use("hrsh7th/cmp-buffer") -- buffer completions
---	use("hrsh7th/cmp-path") -- path completions
---	use("hrsh7th/cmp-cmdline") -- cmdline completions
---	use("hrsh7th/cmp-nvim-lsp")
---	use("neovim/nvim-lspconfig") -- enable LSP
---	use("nvim-lua/lsp_extensions.nvim")
---	use("ray-x/lsp_signature.nvim")
---	use("williamboman/nvim-lsp-installer")
---	use("glepnir/lspsaga.nvim")
---	use({ "nvim-telescope/telescope-ui-select.nvim" })
-	use("nvim-telescope/telescope.nvim")
---	use("runiq/fidget.nvim") --UI for nvim-lsp progress
---
---	-- snippets
---	use("hrsh7th/vim-vsnip")
---	use("L3MON4D3/LuaSnip") --snippet engine
---	use("rafamadriz/friendly-snippets") -- a bunch of snippets to use
---	use({ "michaelb/sniprun", run = "bash ./install.sh" })
+	use("hrsh7th/nvim-cmp")
+	use("hrsh7th/cmp-buffer") -- buffer completions
+	use("hrsh7th/cmp-path") -- path completions
+	use("hrsh7th/cmp-cmdline") -- cmdline completions
+	use("hrsh7th/cmp-nvim-lsp")
+	--use("neovim/nvim-lspconfig") -- enable LSP
+	--use("nvim-lua/lsp_extensions.nvim")
+	use("ray-x/lsp_signature.nvim")
+	--use("williamboman/nvim-lsp-installer")
+	use("glepnir/lspsaga.nvim")
+	use("nvim-telescope/telescope-ui-select.nvim")
+        use("nvim-telescope/telescope.nvim")
+	use("runiq/fidget.nvim") --UI for nvim-lsp progress
+
+	-- snippets
+	use("hrsh7th/vim-vsnip")
+	use("L3MON4D3/LuaSnip") --snippet engine
+	use("rafamadriz/friendly-snippets") -- a bunch of snippets to use
+	use({ "michaelb/sniprun", run = "bash ./install.sh" })
 
 	-- Debugging
 	use("mfussenegger/nvim-dap")
@@ -70,15 +70,15 @@ use {'neoclide/coc.nvim', branch = 'release'}
 	use("mhartington/formatter.nvim")
 
 	-- rust
---	use("simrat39/rust-tools.nvim")
-	-- use({
-	-- 	"saecki/crates.nvim",
-	-- 	tag = "v0.2.1",
-	-- 	requires = { "nvim-lua/plenary.nvim" },
-	-- 	config = function()
-	-- 		require("crates").setup()
-	-- 	end,
-	-- })
+	use("simrat39/rust-tools.nvim")
+	use({
+	 	"saecki/crates.nvim",
+	 	tag = "v0.2.1",
+	 	requires = { "nvim-lua/plenary.nvim" },
+	 	config = function()
+	 		require("crates").setup()
+	 	end,
+	 })
 
 	--Lua
 --	use("folke/lua-dev.nvim")
