@@ -1,4 +1,5 @@
 -- Update this path
+-- local extension_path = HOME .. '/.vscode-oss/extensions/vadimcn.vscode-lldb-1.7.0/'
 local extension_path = vim.env.HOME .. '/.vscode-oss/extensions/vadimcn.vscode-lldb-1.7.0/'
 local codelldb_path = extension_path .. 'adapter/codelldb'
 local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
@@ -114,13 +115,25 @@ local defaults = {
 			"x11",
                 },
         },
-    -- ... other configs
         dap = {
-                adapter = require('rust-tools.dap').get_codelldb_adapter(
-                codelldb_path, liblldb_path)
-                
-        }
+		adapter = {
+			type = "executable",
+			command = "lldb-vscode",
+			name = "rt_lldb",
+		},
+	},
+    -- ... other configs
+        -- dap = {
+        --         adapter = require('rust-tools.dap').get_codelldb_adapter(
+        --         codelldb_path, liblldb_path)
+        --
+        -- }
 }
 
 -- Normal setup
-require('rust-tools').setup(opts)
+require('rust-tools').setup(defaults)
+-- RustRunnables
+require('rust-tools.runnables').runnables()
+-- Command:
+-- RustHoverActions
+require'rust-tools.hover_actions'.hover_actions()

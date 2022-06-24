@@ -13,6 +13,6 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 export PATH=~/dev/exercism:$PATH
-
+export PATH=$PATH:/usr/local/go/bin
 #LC_ALL=C
 #export LC_ALL

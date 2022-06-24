@@ -2,7 +2,7 @@
 # Shell
 #
 shell:
-  program: /usr/bin/nu
+  program: /usr/bin/fish
 
 # window:
 #   opacity: 0.85

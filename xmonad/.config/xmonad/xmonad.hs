@@ -64,7 +64,7 @@ main =  xmonad
 
 myConfig = def
     { modMask    = mod4Mask      -- Rebind Mod to the Super key
-    , terminal  = "alacritty"
+    , terminal  = "wezterm"
     , workspaces = myWorkspaces
     , focusFollowsMouse  = False
     , focusedBorderColor = "#000000"
@@ -79,7 +79,7 @@ myConfig = def
   `additionalKeysP`
     [ ("M-r"            ,       spawn "xmonad --recompile"      ) 
     , ("M-q"            ,       spawn "xmonad --recompile && xmonad --restart")        -- Restarts xmonad
-    , ("M-S-<Return>"   ,       spawn "alacritty"               )
+    , ("M-S-<Return>"   ,       spawn "wezterm"               )
     , ("M-p"            ,       spawn "hmenu -f ~/.secrets/hmenu_history")
     , ("M-<Print>"        ,       unGrab *> spawn "scrot ~/.images/screen_prints/%Y-%m-%d-%T-screenshot.png"      )
  --   , ("<Print>"        ,       withPrefixArgument takeScreenshot)
