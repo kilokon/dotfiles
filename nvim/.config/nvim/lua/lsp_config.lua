@@ -8,33 +8,6 @@ if not status_ok then
 	return
 end
 
---local cmp_ok, cmp = pcall(require, 'cmp')
---if not cmp_ok then
---  return
---end
-
---cmp.setup({
---  snippet = {
---    -- REQUIRED by nvim-cmp. get rid of it once we can
---    expand = function(args)
---      vim.fn["vsnip#anonymous"](args.body)
---    end,
---  },
---  mapping = {
---    -- Tab immediately completes. C-n/C-p to select.
---    ['<Tab>'] = cmp.mapping.confirm({ select = true })
---  },
---  sources = cmp.config.sources({
---    -- TODO: currently snippets from lsp end up getting prioritized -- stop that!
---    { name = 'nvim_lsp' },
---  }, {
---    { name = 'path' },
---  }),
---  experimental = {
---    ghost_text = true,
---  },
---})
-
 -- Setup lspconfig.
 
 local on_attach = function(client, bufnr)
@@ -93,6 +66,16 @@ local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protoco
 
 -- Fidget.nvim Standalone UI for nvim-lsp progress
 require("fidget").setup({})
+--
+-- require("hover").setup{
+--         init = function ()
+--                 require('hover.providers.lsp')
+--                 require('hover.providers.man')
+--         end,
+--         title = true
+-- }
+--
+
 
 -- Rust Language via Rust Analyzer
 lspconfig.rust_analyzer.setup({
@@ -115,14 +98,14 @@ lspconfig.rust_analyzer.setup({
 	capabilities = capabilities,
 })
 
--- local luadev = require("lua-dev").setup({
--- 	--add any options here, or leave empty to use the default settings
--- 	lspconfig = {
--- 		cmd = { "lua-language-server" },
--- 	},
--- })
+local luadev = require("lua-dev").setup({
+	--add any options here, or leave empty to use the default settings
+	lspconfig = {
+		cmd = { "lua-language-server" },
+	},
+})
 --Lua LSP
--- lspconfig.sumneko_lua.setup(luadev)
+lspconfig.sumneko_lua.setup(luadev)
 
 --Haskel Language Server
 -- lspconfig.hls.setup({
