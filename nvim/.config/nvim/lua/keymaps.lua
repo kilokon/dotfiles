@@ -95,16 +95,17 @@ map("n", "<Leader>ld", "<cmd>LspTrouble lsp_definitions<CR>", { noremap = true }
 -- map('n','<down>', "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {noremap = true})
 
 -- Rust Tools
---map("n", "rf", "<cmd>RustHoverActions<CR>")
---map("n", "rc", "<cmd>RustOpenCargo<CR>")
+map("n", "rr", "<cmd>RustHoverActions<CR><cmd>RustHoverActions<CR>")
+map("n", "rc", "<cmd>RustOpenCargo<CR>")
+map("n", "rd", "<cmd>RustOpenExternalDocs<CR>")
 -- Rust Analyzer
 
-map("n", "ro", "<cmd>CocCommand rust-analyzer.openDocs<CR>", { noremap = true})
-map("n", "rt", "<cmd>CocCommand rust-analyzer.openCargoToml<CR>", { noremap = true})
-map("n", "rr", "<cmd>CocCommand rust-analyzer.run<CR>", { noremap = true})
-map("n", "re", "<cmd>CocCommand rust-analyzer.reload<CR>", { noremap = true})
-map("n", "rd", "<cmd>CocCommand rust-analyzer.debug<CR>", { noremap = true})
-map("n", "re", "<cmd>CocCommand rust-analyzer.reload<CR>", { noremap = true})
+-- map("n", "ro", "<cmd>CocCommand rust-analyzer.openDocs<CR>", { noremap = true})
+-- map("n", "rt", "<cmd>CocCommand rust-analyzer.openCargoToml<CR>", { noremap = true})
+-- map("n", "rr", "<cmd>CocCommand rust-analyzer.run<CR>", { noremap = true})
+-- map("n", "re", "<cmd>CocCommand rust-analyzer.reload<CR>", { noremap = true})
+-- map("n", "rd", "<cmd>CocCommand rust-analyzer.debug<CR>", { noremap = true})
+-- map("n", "re", "<cmd>CocCommand rust-analyzer.reload<CR>", { noremap = true})
 
 
 

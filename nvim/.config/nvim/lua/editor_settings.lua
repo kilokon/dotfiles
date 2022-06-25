@@ -33,6 +33,9 @@ local options = {
 
 	-- text
 	encoding = "utf-8",
+
+        --hover
+        --hover_with_actions = true,
 }
 
 --Python
