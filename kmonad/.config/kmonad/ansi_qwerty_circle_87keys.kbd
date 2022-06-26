@@ -14,7 +14,17 @@
 
 
 (defalias
-        caps (tap-next esc lctl)
+        caps (layer-toggle rusty)
+        - #(- >)
+        = #(= >)
+        ; #(: :)
+        , #(< <)
+        . #(> >)
+        d #(g d)
+        c #(g D)
+        [ #([ d)
+        ] #(] d)
+        s #(spc h S)
 ;;  num  (tap-macro nlck (layer-switch numpad)) ;; Bind 'num' to numpad Layer
 ;;  def  (tap-macro nlck (layer-switch qwerty)) ;; Bind 'def' to qwerty Layer
 ;;  nm2 (layer-toggle numbers) ;; Bind 'nm2' to numbers under left hand layer for fast input
@@ -33,6 +43,28 @@
 )
 
 
+
+
+#| --------------------------------------------------------------------------
+Template
+
+(deflayer
+   _      _    _    _    _    _    _    _    _    _    _    _    _               _       _       _
+   _      _    _    _    _    _    _    _    _    _    _    _    _    _          _       _       _
+   _      _    _    _    _    _    _    _    _    _    _    _    _    _          _       _       _
+   _      _    _    _    _    _    _    _    _    _    _    _    _
+   _      _    _    _    _    _    _    _    _    _    _    _                            _
+   _      _    _           _            _    _    _      _               _       -       _
+)
+
+
+
+-----------------------------------------------------------------------------|#
+
+
+
+
+
 (deflayer qwerty
   esc     f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12            prnt    slck    pause
    `      1    2    3    4    5    6    7    8    9    0    -    =    bspc      ins     home    pgup
@@ -42,4 +74,11 @@
   lctl    lmet lalt           spc            ralt rmet cmp  rctl                left    down    right
 )
 
-
+(deflayer rusty
+   _      _    _    _    _    _    _    _    _    _    _    _    _               _       _       _
+   _      _    _    _    _    _    _    _    _    _    _    @-    @=    _          _       _       _
+   _      _    _    _    _    _    _    _    _    _    _    @[    @]    _          _       _       _
+   _      _    @s   @d    _    _    _    _    _    _   @;    _    _
+   _      _    _    @c    _    _    _    _    @,    @.       _    _                         _
+   _      _    _           _            _    _    _      _                       _       _       _
+)
