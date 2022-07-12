@@ -14,9 +14,11 @@ return {
   hide_tab_bar_if_only_one_tab = true,
   window_background_opacity = 0.7,
   text_background_opacity = 0.6,
-
-  leader = { key = "a", mods = "CTRL", timeout_milliseconds = 3000 },
+  disable_default_key_bindings = true,
+  leader = { key = "VoidSymbol", mods = "", timeout_milliseconds = 3000 },
   keys = {
+    { key = "C", mods = "CTRL", action = wezterm.action.Copy },
+    { key = "v", mods = "SHIFT|CTRL", action = wezterm.action.Paste },
     {
       key = "r",
       mods = "LEADER",
@@ -60,7 +62,7 @@ return {
       action = wezterm.action({ RotatePanes = "CounterClockwise" }),
     },
     {
-      key = "n",
+      key = "r",
       mods = "CTRL",
       action = wezterm.action({
         RotatePanes = "Clockwise",

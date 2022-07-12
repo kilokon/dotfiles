@@ -23,6 +23,10 @@ return packer.startup(function(use)
   --Color Schemes
   use("folke/tokyonight.nvim")
 
+  use({
+    "romgrk/barbar.nvim",
+    requires = { "kyazdani42/nvim-web-devicons" },
+  })
   -- Fuzzy finder
   use("ibhagwan/fzf-lua")
   use("airblade/vim-rooter")
@@ -74,7 +78,7 @@ return packer.startup(function(use)
   use("simrat39/rust-tools.nvim")
   use({
     "saecki/crates.nvim",
- --   tag = "v0.2.1",
+    --   tag = "v0.2.1",
     event = { "BufRead Cargo.toml" },
     requires = { "nvim-lua/plenary.nvim" },
     config = function()

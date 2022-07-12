@@ -1,0 +1,1 @@
+/home/aviik/.local/share/broot/launcher/fish/br.fish

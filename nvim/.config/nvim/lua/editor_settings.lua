@@ -46,6 +46,11 @@ for k, v in pairs(options) do
 	vim.opt[k] = v
 end
 
+-- vim.cmd('nnoremap <C-y > "+y')
+-- vim.cmd('vnoremap <C-y > "+y')
+-- vim.cmd('nnoremap <C-p > "+p')
+-- vim.cmd('vnoremap <C-p > "+p')
+
 -- Wrapping options
 vim.opt.formatoptions =
 	tc, -- wrap text and comments using textwidth

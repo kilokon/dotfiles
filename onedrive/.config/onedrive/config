@@ -8,7 +8,7 @@
 sync_dir = "~/OneDrive"
 skip_file = "~*|.~*|*.tmp|*.lock|*.hi|*.o"
 # monitor_interval = "300"
-skip_dir = ".pycache|build|.vscode|.git|.intellij|target"
+skip_dir = ".pycache|build|.vscode|.git|.intellij|target|.ccls-cache | .ccls*"
 # log_dir = "/var/log/onedrive/"
 # drive_id = ""
 # upload_only = "false"

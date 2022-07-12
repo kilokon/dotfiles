@@ -15,11 +15,11 @@
 --   command_mode = "c",
 
 local function map(mode, lhs, rhs, opts)
-	local options = { noremap = true, silent = true }
-	if opts then
-		options = vim.tbl_extend("force", options, opts)
-	end
-	vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+  local options = { noremap = true, silent = true }
+  if opts then
+    options = vim.tbl_extend("force", options, opts)
+  end
+  vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 local opts = { noremap = true, silent = true }
 
@@ -35,15 +35,19 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -- Disable arrow keys
-map("", "<up>", "<nop>")
-map("", "<down>", "<nop>")
-map("", "<left>", "<nop>")
-map("", "<right>", "<nop>")
+-- map("", "C-<up>", "<nop>")
+-- map("", "C-<down>", "<nop>")
+-- map("", "C-<left>", "<nop>")
+-- map("", "C-<right>", "<nop>")
+
+--map("n", "<A-<right>>", "<nop>")
+--map("n", "<A-<left>>", "<nop>")
 
 -- Navigate buffers with left/right keys
-map("n", "<right>", ":bn<CR>")
-map("n", "<left>", ":bp<CR>")
-
+--map("n", "A-<right>", ":bn<CR>")
+--map("n", "A-<left>", ":bp<CR>")
+--map("n", "C-p", ":")
+--map("v", "A-<right>", ":bn<CR>")
 -- Move text up and down
 -- Move text up and down
 map("n", "<A-j>", "<Esc>:m .+1<CR>==gi", opts)
@@ -52,16 +56,16 @@ map("v", "<A-j>", ":m .+1<CR>==", opts)
 map("v", "<A-k>", ":m .-2<CR>==", opts)
 map("v", "p", '"_dP', opts)
 
-
 -- copy from and to system clipboard
 map("v", "<Leader>y", '"+y')
 map("n", "<C-y>", '"+p')
 map("n", "<Leader>P", '"+P')
 
-
-
 -- Map Esc to kk
 map("i", "kk", "<Esc>")
+
+-- vv to generate new vertical split
+map("", "vv", "<C-w>v")
 
 -- Clear search highlighting with <leader> and c
 map("n", "<leader>c", ":nohl<CR>")
@@ -74,6 +78,14 @@ map("v", ">", ">gv", opts)
 -----------------------------------------------------------
 -- Applications and Plugins shortcuts
 -----------------------------------------------------------
+--tab-barbar
+-- Move to previous/next
+map("n", "<A-,>", "<Cmd>BufferPrevious<CR>", opts)
+map("n", "<A-.>", "<Cmd>BufferNext<CR>", opts)
+-- Close buffer
+map("n", "<A-c>", "<Cmd>BufferClose<CR>", opts)
+-- Magic buffer-picking mode
+map("n", "<C-p>", "<Cmd>BufferPick<CR>", opts)
 
 -- Terminal mappings
 map("n", "<C-t>", ":Term<CR>", { noremap = true }) -- open
@@ -89,7 +101,12 @@ map("n", "<leader>n", ":NvimTreeFindFile<CR>") -- search file
 
 -- LSP
 map("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", { noremap = true })
-map("n", "<Leader>ld", "<cmd>LspTrouble lsp_definitions<CR>", { noremap = true })
+map(
+  "n",
+  "<Leader>ld",
+  "<cmd>LspTrouble lsp_definitions<CR>",
+  { noremap = true }
+)
 -- map('n','<up>', "<cmd>RustMoveItemUp<CR>", { noremap = true})
 -- map('n','<down>', "<cmd>RustMoveItemDown<CR>", { noremap = true})
 -- map('n','<down>', "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {noremap = true})
@@ -106,8 +123,6 @@ map("n", "rd", "<cmd>RustOpenExternalDocs<CR>")
 -- map("n", "re", "<cmd>CocCommand rust-analyzer.reload<CR>", { noremap = true})
 -- map("n", "rd", "<cmd>CocCommand rust-analyzer.debug<CR>", { noremap = true})
 -- map("n", "re", "<cmd>CocCommand rust-analyzer.reload<CR>", { noremap = true})
-
-
 
 --Telescope
 map("n", "<leader>ff", ":Telescope find_files<CR>")

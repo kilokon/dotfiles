@@ -85,7 +85,7 @@ myConfig = def
  --   , ("<Print>"        ,       withPrefixArgument takeScreenshot)
     , ("M-f"            ,       spawn "firefox"                 )
     , ("M-c"            ,       kill)
-    , ("M-z>"           ,       toggleWS                        )
+    , ("M-<Tab>"           ,       toggleWS                        )
     , ("M-<Return>"     ,       windows W.swapMaster            )
     , ("M-<Up>"         ,       windows W.focusUp               )
     , ("M-<Down>"       ,       windows W.focusDown             )
@@ -94,6 +94,10 @@ myConfig = def
     , ("M-S-<Left>"     ,       shiftNextScreen  >> nextScreen  )
     , ("M-S-<Right>"    ,       shiftPrevScreen  >> prevScreen  )
     , ("M-S-f"          ,       withFocused $ windows . W.sink  ) 
+    -- , ("M-a"            ,       sendMessage MirrorShrink        )
+    -- , ("M-z"            ,       sendMessage MirrorExpand        )
+       , ("M-a", sendMessage Shrink)                             -- (0)
+    , ("M-z", sendMessage Expand)
     , ("M-C-t"          ,       namedScratchpadAction scratchpads "python")
     ]
 --    where
