@@ -438,3 +438,4 @@ See `dwim-shell-command-execute-script' for all other params."
 (provide 'dwim-shell-command)
 
 ;;; dwim-shell-command.el ends here
+

@@ -6,3 +6,4 @@
 (use-package $1
              :straight ($1 :type git :host github :repo "$2/$1")
              $0)
+

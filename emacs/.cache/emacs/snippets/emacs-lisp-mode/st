@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Straight
+# key: <s
+# --
+
+  :straight ($1 :type git 
+                :host github 
+                :repo "$2/$1")
