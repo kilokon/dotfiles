@@ -26,8 +26,24 @@
 (setenv "BROWSER" "firefox")
 ;;I keep pressing :wq
 (defconst wq "Use C-x C-c")
-(defvar kK/backup-dir (expand-file-name "backups" user-emacs-directory))
+(defvar kilo/backup-dir (expand-file-name "backups" user-emacs-directory))
+(defvar kilo/oneDrive (expand-file-name "OneDrive" (getenv "HOME")))
+(defconst kilo-key "<VoidSymbol>") 	;Using Capslock as VoidSymbol via Kmonad
 
+
+;;+----------------+
+;;|  `Interface'   |
+;;+----------------+
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
+(push '(mode-line-format . 0) default-frame-alist)
+(tool-bar-mode 0)                   ;; Disable the tool bar
+(scroll-bar-mode 0)                 ;; Disable the scrollbar
+(menu-bar-mode -1)
+(tooltip-mode -1)
+(set-fringe-mode 7)
+(global-hl-line-mode 1)
 
 ;;+-------------+
 ;;|  `Defuns'   |
@@ -42,6 +58,19 @@
   "Switch to the current session's scratch buffer."
   (interactive)
   (switch-to-buffer "*scratch*"))
+
+;; https://emacs.stackexchange.com/questions/63147/toggle-between-relative-and-absolute-line-numbers-lisp-syntax
+(defun kilo/toggle-line-numbering ()
+  "Toggle line numbering between absolute and relative."
+  (interactive)
+  (if (eq display-line-numbers 'relative)
+      (setq display-line-numbers t)
+    (setq display-line-numbers 'relative)))
+
+;; Yank from history
+(defun yank-hist-select ()
+  (interactive)
+  (insert (completing-read "Yank:" kill-ring)))
 
 ;;;;http://chopmo.dk/2016/10/27/emacs-highlighting-current-word.html
 ;;;;(require 'hi-lock)
@@ -69,20 +98,32 @@
     (kill-new (if eproject-mode
                   (s-chop-prefix (eproject-root) filename)
                 filename))))
-
 ;; hitting <C-S-backspace>, the binding for kill-whole-line appends to kill ring
 
+(defun kilo/org-mode-visual-fill ()
+  (setq visual-fill-column-width 110
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
 
 ;; Comment Uncomment Region
-(defun kk/comment-or-uncomment-line-or-region ()
+(defun kilo/comment-or-uncomment-line-or-region ()
   "Comments or uncomments the current line or region."
   (interactive)
   (if (region-active-p)
       (comment-or-uncomment-region (region-beginning) (region-end))
     (comment-or-uncomment-region (line-beginning-position) (line-end-position))
     ))
-
-
+;; https://www.emacswiki.org/emacs/lazycat-toolkit.el
+(defun kilo/ielm-toggle ()
+  "Toggle ielm buffer."
+  (interactive)
+  (require 'ielm)
+  (let ((ielm-buffer-name "*ielm*"))
+    (if (get-buffer ielm-buffer-name)
+        (if (string-equal ielm-buffer-name (buffer-name))
+            (bury-buffer)
+          (switch-to-buffer ielm-buffer-name))
+      (ielm))))
 
 ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
 (defun crm-indicator (args)
@@ -112,7 +153,7 @@
 (setq w32-lwindow-modifier 'super) ; Left Windows key
 (current-word)
 
-;;-----------------
+
 
 ;;+----------------------+
 ;;|   'Elisp-Learning'   |
@@ -150,18 +191,20 @@
     ;; Terminal mode
     (message "I'm in terminal mode")
     (message "Unable to load graphic mode setup"))
-
+;;This gets multiple choices
+;;(completing-read "My Prompt: " '("red" "green" "blue") nil nil)
 
 ;;+----------------------+
 ;;|  'File-Management'   |
 ;;+----------------------+
-
+;; This org babel line comes on top of file management
+;; (org-babel-load-file (concat user-emacs-directory "conf.org"))
 
 (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
       url-history-file (expand-file-name "url/history" user-emacs-directory))
 ;; Backup File
-(unless (file-exists-p kK/backup-dir)
-  (mkdir kK/backup-dir))
+(unless (file-exists-p kilo/backup-dir)
+  (mkdir kilo/backup-dir))
 
 
 (setq
@@ -172,9 +215,9 @@
  kept-old-versions 2
  version-control t       ; use versioned backups
  backup-directory-alist
- `((".*" . ,kK/backup-dir))
+ `((".*" . ,kilo/backup-dir))
  auto-save-file-name-transforms
- `((".*" ,kK/backup-dir t)))
+ `((".*" ,kilo/backup-dir t)))
 
 
 
@@ -190,11 +233,13 @@
 ;;Snippets Directory
 (defvar kilo-snippet-dir (expand-file-name "snippets" user-emacs-directory))
 
+
+
 ;;History
 (savehist-mode)
 ;;Recent Files
 (recentf-mode t)
-
+(add-hook 'kill-emacs-hook #'recentf-cleanup)
 ;;+-------------------------------+
 ;;|   `Version-Greater-Than--28'   |
 ;;+-------------------------------+
@@ -218,7 +263,7 @@
       ring-bell-function 'ignore
       inhibit-startup-screen t
       ;; initial-major-mode 'org-mode
-      initial-major-mode 'eshell-mode
+      initial-major-mode 'org-mode
       initial-scratch-message ""
       browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "firefox"
@@ -233,29 +278,11 @@
       tab-always-indent 'complete ; Enable indentation+completion using the TAB key.
       completion-cycle-threshold 3 ; TAB cycle if there are only few candidates
       )
-(setq 
-      )
 
-
-
-;;
-;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;`End-Of-Defaults';;;;;;;;;;;;;;;;;;;;;
-;;
-;; 
 
 
-;;Line Numbering ;; Disable line numbers for some modes
-(global-display-line-numbers-mode t)
-(dolist (mode '(org-mode-hook
-		vundo-1
-                term-mode-hook
-		vterm-mode-hook
-		compilation
-                shell-mode-hook
-                treemacs-mode-hook
-                eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
 
 ;;Auto-Save Management
 ;;--------------------
@@ -279,8 +306,15 @@
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)
 
+
 ;;;Template
 ;;(straight-use-package '(<package-name> :local-repo "~/.emacs.d/lisp/<package-name>" :type nil))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;`End-Of-Package-Management';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
 ;;+-----------------------+
 ;;|   `Time' and `Date'   |
 ;;+-----------------------+
@@ -290,19 +324,7 @@
 
 
 
-;;+----------------+
-;;|  `Interface'   |
-;;+----------------+
-(push '(menu-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
-(push '(mode-line-format . 0) default-frame-alist)
-(tool-bar-mode 0)                   ;; Disable the tool bar
-(scroll-bar-mode 0)                 ;; Disable the scrollbar
-(menu-bar-mode -1)
-(tooltip-mode -1)
-(set-fringe-mode 7)
-(global-hl-line-mode 1)
+
 
 
 ;;+-------------+
@@ -338,6 +360,33 @@
   :bind (("C->" . mc/mark-next-like-this)
 	 ("C-<" . mc/mark-previous-like-this)
 	 ("C-c C-<" .  mc/mark-all-like-this)))
+
+(use-package pulsar
+  :straight t ;; (pulsar :type git :repo "https://git.sr.ht/~protesilaos/pulsar")
+  ;; :hook ((consult-a))
+  :config
+  (setq pulsar-pulse-functions
+	'( forward-page
+           backward-page
+           scroll-up-command
+           scroll-down-command
+	   org-next-visible-heading
+           org-previous-visible-heading
+           org-forward-heading-same-level
+           org-backward-heading-same-level
+           outline-backward-same-level
+           outline-forward-same-level
+           outline-next-visible-heading
+           outline-previous-visible-heading
+           outline-up-heading))
+  (setq pulsar-pulse-on-window-change t)
+  (setq pulsar-pulse t)
+  (setq pulsar-delay 0.055)
+  (setq pulsar-iterations 10)
+  (setq pulsar-face 'pulsar-magenta)
+  (setq pulsar-highlight-face 'pulsar-yellow)
+
+  (pulsar-global-mode 1))
 
 
 ;;+--------------------------------+
@@ -485,10 +534,15 @@
                                   operator
                                   replace)))
 (general-define-key
-:states '(insert emacs normal hybrid motion visual operator)
+;; :states '(insert emacs normal hybrid motion visual operator)
  :prefix "SPC"
  :non-normal-prefix "S-SPC"
  :keymaps 'override)
+
+
+(general-create-definer kilo-leader-key
+  :prefix kilo-key)
+
 
 ;; (use-package bind-map
 ;;   :straight t)
@@ -497,55 +551,6 @@
 ;;https://github.com/mohkale/emacs/blob/master/init.org#leader
 (straight-use-package
  '(spaceleader :type git :host github :repo "mohkale/spaceleader"))
-
-;; (use-package spaceleader
-;;   ;; :straight (spaceleader :type git :host github :repo "mohkale/spaceleader")
-;;   :demand t 
-;;   :config
-;;   (require 'spaceleader-use-package)
-;;   (leader-declare-prefix leader-server-leader-prefix "lang-server")
-;;   (leader-declare-prefix leader-minor-mode-leader-prefix "minor-modes")
-;;   :general
-;;   ("C-@" (general-simulate-key "C-SPC")) ;; C-SPC in terminal
-;;   ;; Make my none-normal leader key active even in normal states.
-;;   (:states leader-norm-states
-;; 	   "C-SPC" (eval `(general-simulate-key ,leader-key)))
-;;   ;; Setup C-, to trigger my major-mode leader-keys in both insert and normal states.
-;;   (:keymaps 'override
-;; 	    :states leader-norm-states
-;; 	    "C-," (eval `(general-simulate-key ,(concat leader-key " " leader-major-mode-prefix))))
-;;   (:keymaps 'override
-;; 	    :states leader-nnorm-states
-;; 	    "C-," (eval `(general-simulate-key ,(concat leader-nnorm-key " " leader-major-mode-prefix)))))
-
-
-;;https://github.com/mohkale/spaceleader
-(defconst leader-minor-mode-leader-prefix "q"
-  "leader key for minor mode bindings.
-this leader prefix is expected to be muddled and unreliable...
-due to tonnes of different minor modes collabratively binding to it.
-
-That said... I need a place to put minor-mode keys and this was
-unoccupied.")
-
-(defconst leader-server-leader-prefix "l"
-  "put leader keys related to active servers under this prefix.")
-
-(defconst leader-diff-leader-prefix "d"
-  "leader prefix under which diff bindings are assigned.")
-
-
-
-(leader-set-keys
-  "TAB" '(switch-to-last-buffer+ :wk "last-buffer")
-  "SPC" '(execute-extended-command-for-buffer :wk "M-x"))
-
-;; remembering my day to day shortcuts
-;;
-;; Esc followed by < #beginning of file
-;; Esc followed by > #end of file
-;; C-l clears terminal 
-
 
 
 ;;Global-Shortcuts
@@ -561,14 +566,24 @@ unoccupied.")
 (global-set-key (kbd "C-a") 'back-to-indentation)
 (global-set-key (kbd "C-c c c") 'aviik/quick-copy-line)
 (global-set-key (kbd "C-c C-w") 'kill-buffer-and-window)
-(global-set-key (kbd "C-/") 'kk/comment-or-uncomment-line-or-region)
+(global-set-key (kbd "C-/") 'kilo/comment-or-uncomment-line-or-region)
 (global-set-key (kbd "C-x k") 'kill-this-buffer)
+(global-set-key (kbd "C-c y") 'yank-hist-select)
+(global-set-key (kbd "<f6>") 'display-line-numbers-mode)
+(global-set-key (kbd "C-<f6>") 'kilo/toggle-line-numbering)
 
 
+;;+----------------+
+;;|   `Bookmark'   |
+;;+----------------+
+(use-package linkmarks
+  :straight (linkmarks :type git :host github :repo "dustinlacewell/linkmarks")
+  :config )
 
-;;+----------------------------+
-;;|   Emacs Interface to w3m   |
-;;+----------------------------+
+
+;;+-----------+
+;;|   `w3m'   |
+;;+-----------+
 (use-package w3m
   :straight (emacs-w3m :type git
 		       :host github
@@ -620,30 +635,130 @@ unoccupied.")
               ([remap dired-do-shell-command] . dwim-shell-command)
               ([remap dired-smart-shell-command] . dwim-shell-command)))
 
+;; This is *NECESSARY* for Doom users who enabled `dired' module
+;; (map! :map dired-mode-map :ng "q" #'quit-window)
+
+(use-package dirvish
+    :straight (dirvish :type git 
+                :host github 
+                :repo "alexluigit/dirvish")
+  :init
+  (dirvish-override-dired-mode)
+  :custom
+  ;; Go back home? Just press `bh'
+  (dirvish-bookmark-entries
+   '(("h" "~/"                          "Home")
+     ("d" "~/Downloads/"                "Downloads")
+     ("m" "/mnt/"                       "Drives")))
+  ;; (dirvish-header-line-format '(:left (path) :right (free-space)))
+  (dirvish-mode-line-format	      ; it's ok to place string inside
+   '(:left (sort file-time " " file-size symlink) :right (omit yank index)))
+  ;; Don't worry, Dirvish is still performant even you enable all these attributes
+  (dirvish-attributes '(all-the-icons file-size collapse subtree-state vc-state git-msg))
+  ;; Maybe the icons are too big to your eyes
+  ;; (dirvish-all-the-icons-height 0.8)
+  ;; In case you want the details at startup like `dired'
+  ;; (dirvish-hide-details nil)
+  :config
+  (dirvish-peek-mode)
+  ;; Dired options are respected except a few exceptions, see *In relation to Dired* section above
+  (setq dired-dwim-target t)
+  (setq delete-by-moving-to-trash t)
+  ;; Enable mouse drag-and-drop files to other applications
+  (setq dired-mouse-drag-files t)	; added in Emacs 29
+  (setq mouse-drag-and-drop-region-cross-program t) ; added in Emacs 29
+  ;; Make sure to use the long name of flags when exists
+  ;; eg. use "--almost-all" instead of "-A"
+  ;; Otherwise some commands won't work properly
+  (setq dired-listing-switches
+        "-l --almost-all --human-readable --time-style=long-iso --group-directories-first --no-group")
+  :bind
+  ;; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+  (("C-c f" . dirvish-fd)
+   :map dired-mode-map ; Dirvish respects all the keybindings in this map
+   ;; ("h" . dired-up-directory)
+   ;; ("j" . dired-next-line)
+   ;; ("k" . dired-previous-line)
+   ;; ("l" . dired-find-file)
+   ;; ("i" . wdired-change-to-wdired-mode)
+   ;; ("." . dired-omit-mode)
+   ("b"   . dirvish-bookmark-jump)
+   ("f"   . dirvish-file-info-menu)
+   ("y"   . dirvish-yank-menu)
+   ("N"   . dirvish-narrow)
+   ("^"   . dirvish-history-last)
+   ("s"   . dirvish-quicksort)	; remapped `dired-sort-toggle-or-edit'
+   ("?"   . dirvish-dispatch)	; remapped `dired-summary'
+   ("TAB" . dirvish-subtree-toggle)
+   ("SPC" . dirvish-history-jump)
+   ("M-n" . dirvish-history-go-forward)
+   ("M-p" . dirvish-history-go-backward)
+   ("M-l" . dirvish-ls-switches-menu)
+   ("M-m" . dirvish-mark-menu)
+   ("M-f" . dirvish-toggle-fullscreen)
+   ("M-s" . dirvish-setup-menu)
+   ("M-e" . dirvish-emerge-menu)
+   ("M-j" . dirvish-fd-jump)))
+
+
 (use-package dired-x
   :straight (:type built-in)
-  :after dired)
+  ;; Enable dired-omit-mode by default
+  ;; :hook
+  ;; (dired-mode . dired-omit-mode)
+  :config
+  ;; Make dired-omit-mode hide all "dotfiles"
+  (setq dired-omit-files
+        (concat dired-omit-files "\\|^\\..*$")))
 
-(use-package dired-single
-  :straight (dired-single :type git
-			  :host github
-			  :repo "crocket/dired-single")
-  :after dired
-  :general
-  (dired-mode-map
-   :states 'normal
-   "h" 'dired-single-up-directory
-   "l" 'dired-single-buffer
-   "q" 'kill-current-buffer))
+;; Some tips to speed up Dired/Dirvish over TRAMP
+(use-package tramp
+  :straight (:type built-in)
+  :config
+  (add-to-list 'tramp-connection-properties
+               (list (regexp-quote "/ssh:YOUR_HOSTNAME:")
+                     "direct-async-process" t))
+  (setq tramp-verbose 0)
+  (setq tramp-auto-save-directory (locate-user-emacs-file "tramp/"))
+  (setq tramp-chunksize 2000)
+  (setq tramp-use-ssh-controlmaster-options nil))
 
-(use-package all-the-icons-dired
-  :straight (all-the-icons-dired :type git
-				 :host github
-				 :repo "jtbm37/all-the-icons-dired")
-  :if (display-graphic-p)
-  :hook (dired-mode . (lambda () (interactive)
-                        (unless (file-remote-p default-directory)
-                          (all-the-icons-dired-mode)))))
+;; Addtional syntax highlighting for dired
+(use-package diredfl
+    :straight (diredfl :type git 
+                :host github 
+                :repo "purcell/diredfl")
+
+  :hook
+  (dired-mode . diredfl-mode))
+
+
+
+
+;; (use-package dired-x
+;;   :straight (:type built-in)
+;;   :after dired)
+
+;; (use-package dired-single
+;;   :straight (dired-single :type git
+;; 			  :host github
+;; 			  :repo "crocket/dired-single")
+;;   :after dired
+;;   :general
+;;   (dired-mode-map
+;;    :states 'normal
+;;    "h" 'dired-single-up-directory
+;;    "l" 'dired-single-buffer
+;;    "q" 'kill-current-buffer))
+
+;; (use-package all-the-icons-dired
+;;   :straight (all-the-icons-dired :type git
+;; 				 :host github
+;; 				 :repo "jtbm37/all-the-icons-dired")
+;;   :if (display-graphic-p)
+;;   :hook (dired-mode . (lambda () (interactive)
+;;                         (unless (file-remote-p default-directory)
+;;                           (all-the-icons-dired-mode)))))
 
 
 
@@ -679,7 +794,7 @@ with open(fpath , 'w') as f:
 (use-package embark
   :straight (embark :type git :host github :repo "oantolin/embark")
   :bind
-  (("C-c ," . embark-act)       ;; pick some comfortable binding
+  (("C-." . embark-act)       ;; pick some comfortable binding
    ("C-c ." . embark-dwim)
    ("C-s-e" . embark-export)
    ("C-h b" . embark-bindings))
@@ -697,6 +812,53 @@ with open(fpath , 'w') as f:
 	       '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
 		 nil
 		 (window-parameters (mode-line-format . none)))))
+
+(use-package embark-consult
+  :straight t
+  :after (embark consult)
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+
+(defun embark-which-key-indicator ()
+  "An embark indicator that displays keymaps using which-key.
+The which-key help message will show the type and value of the
+current target followed by an ellipsis if there are further
+targets."
+  (lambda (&optional keymap targets prefix)
+    (if (null keymap)
+        (which-key--hide-popup-ignore-command)
+      (which-key--show-keymap
+       (if (eq (plist-get (car targets) :type) 'embark-become)
+           "Become"
+         (format "Act on %s '%s'%s"
+                 (plist-get (car targets) :type)
+                 (embark--truncate-target (plist-get (car targets) :target))
+                 (if (cdr targets) "…" "")))
+       (if prefix
+           (pcase (lookup-key keymap prefix 'accept-default)
+             ((and (pred keymapp) km) km)
+             (_ (key-binding prefix 'accept-default)))
+         keymap)
+       nil nil t (lambda (binding)
+                   (not (string-suffix-p "-argument" (cdr binding))))))))
+
+(setq embark-indicators
+  '(embark-which-key-indicator
+    embark-highlight-indicator
+    embark-isearch-highlight-indicator))
+
+(defun embark-hide-which-key-indicator (fn &rest args)
+  "Hide the which-key indicator immediately when using the completing-read prompter."
+  (which-key--hide-popup-ignore-command)
+  (let ((embark-indicators
+         (remq #'embark-which-key-indicator embark-indicators)))
+      (apply fn args)))
+
+(advice-add #'embark-completing-read-prompter
+            :around #'embark-hide-which-key-indicator)
+
+
+
 
 ;;+-----------------------+
 ;;| `Completion-System'   |
@@ -724,36 +886,47 @@ with open(fpath , 'w') as f:
 	      ("C-k" . vertico-previous)
               ("C-f" . vertico-exit)
               :map minibuffer-local-map
-                  ("M-h" . backward-kill-word))
-;;  :general
-;;  (aviik/leadr-key-def
-;;    "ff" 'find-file )
+              ("M-h" . backward-kill-word))
+  ;;  :general
+  ;;  (aviik/leadr-key-def
+  ;;    "ff" 'find-file )
   :hook (minibuffer-setup . vertico-repeat-save)
   :custom
-  (vertico-count 13)                    ; Number of candidates to display
+  (vertico-count 13)		     ; Number of candidates to display
   (vertico-resize t)
   (vertico-cycle t) 
   :init
   (vertico-mode)
   ;; Configure directory extension.
   (use-package vertico-directory
-   :after vertico
-   :ensure nil
-   ;; More convenient directory navigation commands
-   :bind (:map vertico-map
-              ("RET" . vertico-directory-enter)
-              ("DEL" . vertico-directory-delete-char)
-              ("M-DEL" . vertico-directory-delete-word))
-   ;; Tidy shadowed file names
-   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)))
+    :after vertico
+    :ensure nil
+    ;; More convenient directory navigation commands
+    :bind (:map vertico-map
+		("RET" . vertico-directory-enter)
+		("DEL" . vertico-directory-delete-char)
+		("M-DEL" . vertico-directory-delete-word))
+    ;; Tidy shadowed file names
+    :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)))
 
 
 ;;+------------------------+
 ;;|   `Narrowing-System'   |
 ;;+------------------------+
+
+;; fzf provider for consult
+(use-package affe
+    :straight (affe :type git 
+                :host github 
+                :repo "minad/affe")
+  :config
+  ;; Manual preview key for `affe-grep'
+  (consult-customize affe-grep :preview-key (kbd "M-.")))
+
 (use-package consult
   :straight (consult :type git :host github :repo "minad/consult")
-  :bind (("C-s" . consult-line))
+  :bind (("C-s" . consult-line)
+	 ("M-y" . consult-yank-pop))
   :custom (completion-in-region-function #'consult-completion-in-region))
 
 (use-package consult-dir
@@ -779,6 +952,15 @@ with open(fpath , 'w') as f:
   (("C-c p f" . consult-project-extra-find)
    ("C-c p o" . consult-project-extra-find-other-window)))
 
+;; Some connections to `Pulsar'
+;; integration with the `consult' package:
+(add-hook 'consult-after-jump-hook #'pulsar-recenter-top)
+(add-hook 'consult-after-jump-hook #'pulsar-reveal-entry)
+
+;; integration with the built-in `imenu':
+(add-hook 'imenu-after-jump-hook #'pulsar-recenter-top)
+(add-hook 'imenu-after-jump-hook #'pulsar-reveal-entry)
+
 ;;+---------------------------------------------+
 ;;|   `Completion-Content-Filtering/Ordering'   |
 ;;+---------------------------------------------+
@@ -793,66 +975,71 @@ with open(fpath , 'w') as f:
   ;;       completion-category-defaults nil
   ;;       completion-category-overrides '((file (styles partial-completion))))
   :config
-  (setq completion-styles '(orderless flex)
-        completion-category-overrides '((eglot (styles . (orderless flex)))))
-  (defvar +orderless-dispatch-alist
-    '((?% . char-fold-to-regexp)
-      (?! . orderless-without-literal)
-      (?`. orderless-initialism)
-      (?= . orderless-literal)
-      (?~ . orderless-flex)))
-  (defun +orderless-dispatch (pattern index _total)
-    (cond
-     ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
-     ((string-suffix-p "$" pattern)
-      `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
-     ;; File extensions
-     ((and
-       ;; Completing filename or eshell
-       (or minibuffer-completing-file-name
-	   (derived-mode-p 'eshell-mode))
-       ;; File extension
-       (string-match-p "\\`\\.." pattern))
-      `(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
-     ;; Ignore single !
-     ((string= "!" pattern) `(orderless-literal . ""))
-     ;; Prefix and suffix
-     ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
-	  (cons (cdr x) (substring pattern 1))
-	(when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
-	  (cons (cdr x) (substring pattern 0 -1)))))))
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides nil
+        completion-ignore-case t))
+  
+ ;;  (setq completion-styles '(orderless flex)
+;;         completion-category-overrides '((eglot (styles . (orderless flex)))))
+;;   (defvar +orderless-dispatch-alist
+;;     '((?% . char-fold-to-regexp)
+;;       (?! . orderless-without-literal)
+;;       (?`. orderless-initialism)
+;;       (?= . orderless-literal)
+;;       (?~ . orderless-flex)))
+;;   (defun +orderless-dispatch (pattern index _total)
+;;     (cond
+;;      ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
+;;      ((string-suffix-p "$" pattern)
+;;       `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
+;;      ;; File extensions
+;;      ((and
+;;        ;; Completing filename or eshell
+;;        (or minibuffer-completing-file-name
+;; 	   (derived-mode-p 'eshell-mode))
+;;        ;; File extension
+;;        (string-match-p "\\`\\.." pattern))
+;;       `(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
+;;      ;; Ignore single !
+;;      ((string= "!" pattern) `(orderless-literal . ""))
+;;      ;; Prefix and suffix
+;;      ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
+;; 	  (cons (cdr x) (substring pattern 1))
+;; 	(when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
+;; 	  (cons (cdr x) (substring pattern 0 -1)))))))
 
-  ;; Define orderless style with initialism by default
-  (orderless-define-completion-style +orderless-with-initialism
-    (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
+;;   ;; Define orderless style with initialism by default
+;;   (orderless-define-completion-style +orderless-with-initialism
+;;     (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
 
-  ;; Certain dynamic completion tables (completion-table-dynamic)
-  ;; do not work properly with orderless. One can add basic as a fallback.
-  ;; Basic will only be used when orderless fails, which happens only for
-  ;; these special tables.
-  (setq completion-styles '(orderless basic)
-	completion-category-defaults nil
-;;; Enable partial-completion for files.
-;;; Either give orderless precedence or partial-completion.
-;;; Note that completion-category-overrides is not really an override,
-;;; but rather prepended to the default completion-styles.
-	;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
-	completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
-					;; enable initialism by default for symbols
-					(command (styles +orderless-with-initialism))
-					(variable (styles +orderless-with-initialism))
-					(symbol (styles +orderless-with-initialism)))
-	orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
-	orderless-style-dispatchers '(+orderless-dispatch)))
+;;   ;; Certain dynamic completion tables (completion-table-dynamic)
+;;   ;; do not work properly with orderless. One can add basic as a fallback.
+;;   ;; Basic will only be used when orderless fails, which happens only for
+;;   ;; these special tables.
+;;   (setq completion-styles '(orderless basic)
+;; 	completion-category-defaults nil
+;; ;;; Enable partial-completion for files.
+;; ;;; Either give orderless precedence or partial-completion.
+;; ;;; Note that completion-category-overrides is not really an override,
+;; ;;; but rather prepended to the default completion-styles.
+;; 	;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
+;; 	completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
+;; 					;; enable initialism by default for symbols
+;; 					(command (styles +orderless-with-initialism))
+;; 					(variable (styles +orderless-with-initialism))
+;; 					(symbol (styles +orderless-with-initialism)))
+;; 	orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+;; 	orderless-style-dispatchers '(+orderless-dispatch)))
 
-;;; For Corfu
-(defun orderless-fast-dispatch (word index total)
-  (and (= index 0) (= total 1) (length< word 4)
-       `(orderless-regexp . ,(concat "^" (regexp-quote word)))))
+;; ;;; For Corfu
+;; (defun orderless-fast-dispatch (word index total)
+;;   (and (= index 0) (= total 1) (length< word 4)
+;;        `(orderless-regexp . ,(concat "^" (regexp-quote word)))))
 
-(orderless-define-completion-style orderless-fast
-  (orderless-dispatch '(orderless-fast-dispatch))
-  (orderless-matching-styles '(orderless-literal orderless-regexp)))
+;; (orderless-define-completion-style orderless-fast
+;;   (orderless-dispatch '(orderless-fast-dispatch))
+;;   (orderless-matching-styles '(orderless-literal orderless-regexp)))
 
 
 
@@ -894,7 +1081,7 @@ with open(fpath , 'w') as f:
 	("M-d" . corfu-show-documentation)
 	("M-l" . 'corfu-show-location)
 	("TAB" . corfu-next)
-	([tab] . corfu-next)
+	;; ([tab] . corfu-next)
 	("S-TAB" . corfu-previous)
 	([backtab] . corfu-previous))
   
@@ -1140,23 +1327,12 @@ with open(fpath , 'w') as f:
   :straight (lsp-mode :type git
                       :host github
                       :repo "emacs-lsp/lsp-mode")
-;;   ;;:init
-;;   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-;;   ;;(setq lsp-keymap-prefix "C-c l")
-;;   :hook (((c-mode
-;; 	   c++-mode
-;; 	   python-mode
-;; 	   rustic-mode
-;; 	   haskell-mode) . lsp)
-;;          ;; if you want which-key integration
-;;          (lsp-mode . lsp-enable-which-key-integration)
-;; 	 (lsp-mode . lsp-ui-mode))
   :commands lsp
   :custom
-   (lsp-rust-analyzer-cargo-watch-command "clippy")
-;;   (lsp-eldoc-render-all t)
-;;   (lsp-idle-delay 0.6)
-;;     ;; enable / disable the hints as you prefer:
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  ;;   (lsp-eldoc-render-all t)
+  ;;   (lsp-idle-delay 0.6)
+  ;;     ;; enable / disable the hints as you prefer:
   (lsp-rust-analyzer-server-display-inlay-hints t)
   (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
   (lsp-rust-analyzer-display-chaining-hints t)
@@ -1166,21 +1342,14 @@ with open(fpath , 'w') as f:
   (lsp-rust-analyzer-display-reborrow-hints nil)
   :config
   (setq rustic-lsp-server 'rust-analyzer)
-  :bind (:map lsp-mode-map
-	      ("TAB" . completion-at-point)
-              ("C-c l d" . xref-find-definitions)
-              ("C-c l r" . xref-find-references)
-              ("C-c l n" . lsp-ui-find-next-reference)
-              ("C-c l p" . lsp-ui-find-prev-reference)
-              ("C-c l i" . counsel-imenu)
-	      ("C-c l e" . lsp-ui-flycheck-list)
-              ("C-c l q" . lsp-workspace-restart)
-              ("C-c l Q" . lsp-workspace-shutdown)
-	      ("C-c l S" . lsp-ui-sideline-mode)
-              ("C-c l X" . lsp-execute-code-action)
-             ("C-c l n"   . lsp-ui-peek-find-implementation)))
+  :general (kilo-leader-key
+	    ;; :keymaps 'lsp-mode-map
+	    "ld" '(xref-find-definitions   :which-key "Find Definitions")
+	    "lr" '(xref-find-references    :which-key "Find References")
+	    "lq" '(lsp-workspace-restart   :which-key "Restart Lsp")
+	    "lx" '(lsp-workspace-shutdown  :which-key "Kill Lsp Server")
+	    "la" '(lsp-execute-code-action :which-key "Execute Code Action")))
 
-;; optionally
 (use-package lsp-ui
   :straight (lsp-ui :type git
                     :host github
@@ -1190,8 +1359,7 @@ with open(fpath , 'w') as f:
   (:map lsp-mode-map
         ("C-c C-r" . lsp-ui-peek-find-references)
         ("C-c C-j" . lsp-ui-peek-find-definitions)
-        ("C-c i"   . lsp-ui-peek-find-implementation)
-        ;;("C-c m"   . lsp-ui-imenu)
+        ;; ("C-c m"   . lsp-ui-imenu)
         ("C-c s"   . lsp-ui-sideline-mode)
         ("C-c d"   . aviik/toggle-lsp-ui-doc))
   :custom
@@ -1200,79 +1368,25 @@ with open(fpath , 'w') as f:
   (lsp-ui-doc-enable nil)
   (lsp-ui-sideline-code-actions-prefix ""))
 
-
 (setq lsp-completion-provider :none)
 (defun corfu-lsp-setup ()
   (setq-local completion-styles '(orderless)
               completion-category-defaults nil))
 (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
 
-;; (use-package consult-lsp
-;;   :straight (consult-lsp :type git :host github :repo "gagbo/consult-lsp")
-;;   :bind(("C-c E" . consult-lsp-diagnostics)
-;; 	("C-c S" . consult-lsp-symbols)
-;; 	("C-c F" . consult-lsp-file-symbols)))
-
-
-
-
-;; (use-package company
-;;   :straight (company :type git
-;;                      :host github
-;;                      :repo "company-mode/company-mode")
-;;   :diminish (company-mode  .  " Ⓒ ")
-;;   :bind (:map company-active-map
-;;          ("C-n" . company-select-next)
-;;          ("C-p" . company-select-previous)
-;; 	(:map company-mode-map
-;; 	("<tab>". tab-indent-or-complete)
-;; 	("TAB". tab-indent-or-complete)))
-;;   :init
-;;   (global-company-mode)
-;;   :config (setq company-backends
-;; 		'((
-;; ;;		   company-capf
-;; ;;		   company-fish-shell
-;; 		   company-dabbrev-code)
-;; 		  (company-abbrev company-dabbrev)))
-  
-;; (use-package company-statistics
-;;   :straight t
-;;   :init
-;;   (company-statistics-mode))
-
-;; (use-package company-web
-;;   :straight t)
-
-;; (use-package company-try-hard
-;;   :straight t
-;;   :bind
-;;   (("C-<tab>" . company-try-hard)
-;;    :map company-active-map
-;;    ("C-<tab>" . company-try-hard)))
-
-;;   (use-package company-quickhelp
-;;     :straight t
-;;     :config
-;;     (company-quickhelp-mode)))
-
-
-;; (use-package company-box
-;;   :straight (company-box :type git
-;; 			 :host github
-;; 			 :repo "sebastiencs/company-box")
-;;   :hook (company-mode . company-box-mode))
-
-
-;; (use-package company-ghci
-;;   :straight (company-ghci :type git
-;; 			  :host github
-;; 			  :repo "horellana/company-ghci"))
-
-;; (use-package company-shell
-;;   :straight (company-shell :type git
-;; 			   :host github
-;; 			   :repo "Alexander-Miller/company-shell"))
+(use-package consult-lsp
+  :straight (consult-lsp :type git
+			 :host github
+			 :repo "gagbo/consult-lsp")
+  :general (kilo-leader-key
+	    :keymaps 'lsp-mode-map
+	    "c"   '(:ignore t                 :which-key "Consult-Lsp")
+	    "cd"  '(consult-lsp-diagnostics   :which-key "Lsp Diagnostics")
+	    "ci"  '(consult-imenu             :which-key "Consult Imenu")
+	    "cf"  '(consult-flymake           :which-key "Consult Flymake")
+	    "cs"  '(consult-lsp-symbols       :which-key "Consult Lsp Symbols")
+	    ;; "cfa" '(consult-lsp-file-symbols  :which-key "Consult Lsp File Symbols")
+	    ))
 
 ;;Eglot
 (use-package eglot
@@ -1325,44 +1439,29 @@ with open(fpath , 'w') as f:
 ;; auto-close parentheses
 ;; (electric-pair-mode +1)
 
-(use-package smartparens
-  :straight (smartparens :type git
-			 :host github
-			 :repo "Fuco1/smartparens"
-			 :files (:defaults "*.el")
-			 :includes (smartparens-config
-				    smartparens-rusts
-				    smartparens
-				    smartparens-pkg
-				    sp-sublimetext-like))
-  ;; 		      :includes (treemacs-evil
-  :diminish (smartparens-mode)
-  :hook ((rustic-mode
-	  toml-mode
-	  conf-toml-mode) . smartparens-mode  ))
+(straight-use-package 'smartparens)
+(require 'smartparens-config)
 
-;; (use-package smartparens-config
-;;   :straight (smartparens)
-;;   :after (smartparens-mode))
-	   
+;; Always start smartparens mode in js-mode.
+(add-hook 'rustic-mode-hook #'smartparens-mode)
+
 ;;+-----------------------------------------+
 ;;|   Garbage Collection & Parser Priming   |
 ;;+-----------------------------------------+
 
- (setq gc-cons-threshold (* 100 1024 1024)
-       read-process-output-max (* 1024 1024)
-       treemacs-space-between-root-nodes nil)
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil)
 
 ;;+-----------------------------------+
 ;;|   Terminals & External Payloads   |
 ;;+-----------------------------------+
 
-
 (use-package eshell
   :straight (:type built-in)
 ;;  :commands (aviik/toggle-eshell)
-  :custom (setq eshell-aliases-file (expand-file-name "/eshell/aliases" user-emacs-directory)
-		eshell-directory-name "~/.dotfiles")
+  ;; :custom (setq eshell-aliases-file (expand-file-name "/eshell/aliases" user-emacs-directory)
+  ;; 		eshell-directory-name "~/.dotfiles")
   ;; :general
   ;; (aviik/leadr-key-def
   ;;  "e" '(:ignore t :which-key "Eshell")
@@ -1370,13 +1469,18 @@ with open(fpath , 'w') as f:
   :config
   (setq eshell-cmpl-ignore-case t
 	eshell-cd-on-directory t
-	eshell-prompt-function (lambda nil
+	eshell-prompt-function (lambda ()
 				 (concat
-				  (propertize (format "[%s]" (abbreviate-file-name (eshell/pwd))) 'face '(:foreground "#8787af"))
-				  ;; (propertize " λ " 'face '(:foreground "#f75f5f"))
+				  (propertize " λ " 'face '(:foreground "#f75f5f"))
 				  (propertize " ॐ " 'face `(:foreground "white"))
 				  (propertize " ❯ " 'face '(:foreground "#f75f5f"))))
-	eshell-prompt-regexp "^λ "
+	;; eshell-prompt-function (lambda nil
+	;; 			 (concat
+	;; 			  (propertize (format "[%s]" (abbreviate-file-name (eshell/pwd))) 'face '(:foreground "#8787af"))
+	;; 			  ;; (propertize " λ " 'face '(:foreground "#f75f5f"))
+	;; 			  (propertize " ॐ " 'face `(:foreground "white"))
+	;; 			  (propertize " ❯ " 'face '(:foreground "#f75f5f"))))
+	;; eshell-prompt-regexp "^λ "
 	eshell-history-size         50
 	eshell-buffer-maximum-lines 300
 	eshell-hist-ignoredups t
@@ -1386,6 +1490,11 @@ with open(fpath , 'w') as f:
 	eshell-scroll-to-bottom-on-input t
 	eshell-prefer-lisp-functions nil))
 
+(defun eshell/clear ()
+  "clear the eshell buffer."
+  (interactive)
+  (let ((inhibit-read-only t))
+    (erase-buffer)))
 
 (add-hook 'eshell-mode-hook (lambda ()
 			      (eshell/alias "ff" "find-file $1")
@@ -1393,7 +1502,7 @@ with open(fpath , 'w') as f:
 			      (eshell/alias "gd" "magit-diff-unstaged")
 			      (eshell/alias "gds" "magit-diff-staged")
 			      (eshell/alias "d" "dired $1")
-;;			      (eshell/alias "cdO" (concat cd " ~/OneDrive"))
+			      ;;			      (eshell/alias "cdO" (concat cd " ~/OneDrive"))
 			      (eshell/alias "ll" "ls -la")))
 
 
@@ -1406,33 +1515,39 @@ with open(fpath , 'w') as f:
   :defer t
   :hook (eshell-banner-load . eshell-info-banner-update-banner))
 
+(use-package eshell-syntax-highlighting
+  :straight (eshell-syntax-highlighting :type git 
+					:host github 
+					:repo "akreisher/eshell-syntax-highlighting")
+  :after eshell-mode
+  :ensure t ;; Install if not already installed.
+  :config
+  ;; Enable in all Eshell buffers.
+  (eshell-syntax-highlighting-global-mode +1))
+
 
 ;;;https://karthinks.com/software/jumping-directories-in-eshell/
 (defun eshell/z (&optional regexp)
-    "Navigate to a previously visited directory in eshell, or to
+  "Navigate to a previously visited directory in eshell, or to
 any directory proferred by `consult-dir'."
-    (let ((eshell-dirs (delete-dups
-                        (mapcar 'abbreviate-file-name
-                                (ring-elements eshell-last-dir-ring)))))
-      (cond
-       ((and (not regexp) (featurep 'consult-dir))
-        (let* ((consult-dir--source-eshell `(:name "Eshell"
-                                             :narrow ?e
-                                             :category file
-                                             :face consult-file
-                                             :items ,eshell-dirs))
-               (consult-dir-sources (cons consult-dir--source-eshell
-                                          consult-dir-sources)))
-          (eshell/cd (substring-no-properties
-                      (consult-dir--pick "Switch directory: ")))))
-       (t (eshell/cd (if regexp (eshell-find-previous-directory regexp)
-                            (completing-read "cd: " eshell-dirs)))))))
+  (let ((eshell-dirs (delete-dups
+                      (mapcar 'abbreviate-file-name
+                              (ring-elements eshell-last-dir-ring)))))
+    (cond
+     ((and (not regexp) (featurep 'consult-dir))
+      (let* ((consult-dir--source-eshell `(:name "Eshell"
+						 :narrow ?e
+						 :category file
+						 :face consult-file
+						 :items ,eshell-dirs))
+             (consult-dir-sources (cons consult-dir--source-eshell
+                                        consult-dir-sources)))
+        (eshell/cd (substring-no-properties
+                    (consult-dir--pick "Switch directory: ")))))
+     (t (eshell/cd (if regexp (eshell-find-previous-directory regexp)
+                     (completing-read "cd: " eshell-dirs)))))))
 
-(defun eshell/clear ()
-  "clear the eshell buffer."
-  (interactive)
-  (let ((inhibit-read-only t))
-    (erase-buffer)))
+
 
 ;;Path to Shell
 (use-package exec-path-from-shell
@@ -1441,7 +1556,7 @@ any directory proferred by `consult-dir'."
 				  :repo "purcell/exec-path-from-shell")
   :init (exec-path-from-shell-initialize))
 
-(defalias 'eshell/v 'eshell-exec-visual)
+;; (defalias 'eshell/v 'eshell-exec-visual)
 
 
 ;; (use-package shell-pop
@@ -1535,17 +1650,17 @@ any directory proferred by `consult-dir'."
 		       :type git
 		       :repo "https://codeberg.org/ideasman42/emacs-run-stuff.git"))
 
-(setq comint-output-filter-functions
-      (remove 'ansi-color-process-output comint-output-filter-functions))
+;; (setq comint-output-filter-functions
+      ;; (remove 'ansi-color-process-output comint-output-filter-functions))
 
-(add-hook 'shell-mode-hook
-          (lambda ()
-            ;; Disable font-locking in this buffer to improve performance
-            (font-lock-mode -1)
-            ;; Prevent font-locking from being re-enabled in this buffer
-            (make-local-variable 'font-lock-function)
-            (setq font-lock-function (lambda (_) nil))
-            (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
+;; (add-hook 'shell-mode-hook
+;;           (lambda ()
+;;             ;; Disable font-locking in this buffer to improve performance
+;;             (font-lock-mode -1)
+;;             ;; Prevent font-locking from being re-enabled in this buffer
+;;             (make-local-variable 'font-lock-function)
+;;             (setq font-lock-function (lambda (_) nil))
+;;             (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
 
 
 ;; (use-package native-complete
@@ -1619,8 +1734,8 @@ any directory proferred by `consult-dir'."
 ;;;;;;E-Lisp;;;;;;;;
 
 ;;Hash Table for elisp
-(use-package ht
-  :straight (ht :type git :host github :repo "Wilfred/ht.el"))
+;; (use-package ht
+;;   :straight (ht :type git :host github :repo "Wilfred/ht.el"))
 
 ;;Elisp -Formatter
 (use-package elisp-autofmt
@@ -1654,14 +1769,14 @@ any directory proferred by `consult-dir'."
     (:map elpy-mode-map
           ("C-M-n" . elpy-nav-forward-block)
           ("C-M-p" . elpy-nav-backward-block))
-    :hook ((elpy-mode . flycheck-mode)
-           (elpy-mode . (lambda ()
-                          (set (make-local-variable 'company-backends)
-                               '((elpy-company-backend :with company-yasnippet))))))
+    ;; :hook ((elpy-mode . flycheck-mode)
+    ;;        (elpy-mode . (lambda ()
+    ;;                       (set (make-local-variable 'company-backends)
+    ;;                            '((elpy-company-backend :with company-yasnippet))))))
     :init
     (elpy-enable)
     :config
-    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    ;; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     ; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
     (setq elpy-shell-echo-output nil)
     (setq elpy-rpc-python-command "python3")
@@ -1775,8 +1890,6 @@ any directory proferred by `consult-dir'."
   :init (setq inferior-lisp-program "sbcl"))
 
 
-
-
 ;;Rust
 ;;------
 ;; (use-package rust-mode
@@ -1797,7 +1910,17 @@ any directory proferred by `consult-dir'."
 	rustic-spinner-type 'progress-bar)
   ;; comment to disable rustfmt on save
   (setq rustic-format-on-save t)
-  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook)
+  :general (kilo-leader-key
+	     ;; :keymaps 'rustic-mode-map
+	     "r"   '(:ignore t                 :which-key "Rust Cargo")
+	     "rr"  '(rustic-cargo-run          :which-key "Cargo Run")
+	     "rb"  '(rustic-cargo-build        :which-key "Cargo Build")
+	     "rt"  '(rustic-cargo-current-test :which-key "Run Test at Point")
+	     "rT"  '(rustic-cargo-test         :which-key "Cargo Test")
+	     "rd"  '(rustic-cargo-doc          :which-key "Cargo Doc")
+	     "ra"  '(rustic-cargo-add          :which-key "Cargo Add")
+	     "rm"  '(rustic-cargo-rm           :which-key "Cargo Remove")))
 
 (defun rk/rustic-mode-hook ()
   ;; so that run C-c C-c C-r works without having to confirm, but don't try to
@@ -2107,63 +2230,100 @@ any directory proferred by `consult-dir'."
 ;;   (lsp-treemacs-sync-mode 1))
 
 
-;;+----------------------+
-;;|   Org-Mode Support   |
-;;+----------------------+
-(straight-use-package '(org :type built-in))
+;;+------------------------+
+;;|   `Org-Mode-Support'   |
+;;+------------------------+
+;; (straight-use-package '(org :type built-in))
+
+
+;; Use newest org
+;; (straight-use-package 'org)
+(use-package org
+  :straight t
+  ;; :init  (setq org-directory (expand-file-name "org" kilo/oneDrive)
+	       ;; org-default-notes-file (concat org-directory "/notes.org"))
+  :bind ("C-c c" . org-capture)
+  :hook ((org-mode . variable-pitch-mode)
+	 (org-mode . visual-line-mode))
+  :custom ;; Tweak font sizes
+  (org-directory (expand-file-name "org" kilo/oneDrive))
+  (org-default-notes-file (concat org-directory "/notes.org"))
+  (setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
+                                     (header-line (:height 4.0) variable-pitch)
+                                     (org-document-title (:height 1.75) org-document-title)
+                                     (org-code (:height 1.55) org-code)
+                                     (org-verbatim (:height 1.55) org-verbatim)
+                                     (org-block (:height 1.25) org-block)
+                                     (org-block-begin-line (:height 0.7) org-block)))
+  
+  ;; Add frame borders and window dividers
+  (modify-all-frames-parameters
+   '((right-divider-width . 40)
+     (internal-border-width . 40)))
+  (dolist (face '(window-divider
+                  window-divider-first-pixel
+                  window-divider-last-pixel))
+    (face-spec-reset-face face)
+    (set-face-foreground face (face-attribute 'default :background)))
+  (set-face-background 'fringe (face-attribute 'default :background))
+  :config (setq org-startup-indented t ;; Enable `org-indent-mode' by default
+		;; https://github.com/jakebox/jake-emacs/blob/main/jake-emacs/init.org
+		org-latex-listings t
+		org-latex-compiler "xelatex"
+		org-export-with-broken-links t
+		org-export-with-smart-quotes t
+		org-export-backends '(ascii beamer html latex md odt)
+		;; Edit settings
+		org-auto-align-tags nil
+		org-tags-column 0
+		org-catch-invisible-edits 'show-and-error
+		org-special-ctrl-a/e t
+		org-insert-heading-respect-content t
+		;; Org styling, hide markup etc.
+		org-hide-emphasis-markers t
+		org-pretty-entities t
+		org-ellipsis "…"
+
+		;; Agenda styling
+		org-agenda-tags-column 0
+		org-agenda-block-separator ?─
+		org-agenda-time-grid
+		'((daily today require-timed)
+		  (800 1000 1200 1400 1600 1800 2000)
+		  " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+		org-agenda-current-time-string
+		"⭠ now ─────────────────────────────────────────────────"))
+;;; https://github.com/minad/org-modern
+
 
 (straight-use-package '(org-contrib :includes ob-ebnf
 				    ob-arduino
 				    org-annotate-file))
 
+(defun kilo/create-notes-file ()
+ "Create an org file in ~/notes/."
+ (interactive)
+ (let ((name (read-string "Filename: ")))
+   (expand-file-name (format "%s.org"
+			       name) "/home/aviik/Downloads/temp/")))
 
 
-(with-eval-after-load 'org       
-  (setq org-startup-indented t) ; Enable `org-indent-mode' by default
-  (variable-pitch-mode 1)
-  (setq evil-auto-indent nil)
-  (add-hook 'org-mode-hook #'visual-line-mode))
-
-;; Tweak font sizes
-(setq-local face-remapping-alist '((default (:height 1.5) variable-pitch)
-                                   (header-line (:height 4.0) variable-pitch)
-                                   (org-document-title (:height 1.75) org-document-title)
-                                   (org-code (:height 1.55) org-code)
-                                   (org-verbatim (:height 1.55) org-verbatim)
-                                   (org-block (:height 1.25) org-block)
-                                   (org-block-begin-line (:height 0.7) org-block)))
 
 
-(defun my/org-mode-visual-fill ()
-  (setq visual-fill-column-width 110
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
 
-(use-package visual-fill-column
-  :straight (visual-fill-column :type git
-				:host nil
-				:repo "https://codeberg.org/joostkremers/visual-fill-column")
-  :defer t
-  :hook (org-mode . my/org-mode-visual-fill))
+(setq org-capture-templates
+      '(("n"				;;`org-capture' binding + n
+	 "Notes"                        ;; Description   
+	 entry                          ;; 
+	 (file kilo/create-notes-file)
+	 "#+TITLE%?\n  %U")
 
+	;; ("d" "Demo Template" entry)
+	("t" "Todo" entry (file+headline "gtd.org" "Tasks")
+         "* TODO %?\n  %i\n  %a")
+        ("j" "Journal" entry (file+datetree "journal.org")
+         "* %?\nEntered on %U\n  %i\n  %a")))
 
-(use-package org-bullets
-  :straight (org-bullets :type git :host github :repo "sabof/org-bullets")
-  :hook (org-mode . org-bullets-mode))
-
-
-;; (use-package evil-org
-;;   :straight (evil-org :type git :host github :repo "Somelauw/evil-org-mode")
-;;   :after org
-;;   :hook (org-mode . (lambda () evil-org-mode))
-;;   :config  (require 'evil-org-agenda)
-;;            (evil-org-agenda-set-keys))
-
-;;https://github.com/tecosaur/org-pandoc-import
-(use-package org-pandoc-import
-  :straight (:host github
-             :repo "tecosaur/org-pandoc-import"
-             :files ("*.el" "filters" "preprocessors")))
 
 ;; Notes / Tasks / TODOs
 
@@ -2184,6 +2344,57 @@ any directory proferred by `consult-dir'."
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "DOING(i)" "PENDING(p)" "MEETING(m)" "|" "DONE(d)" "CANCELED(c)")))
+;; (with-eval-after-load 'org       
+;;   (setq org-startup-indented t)	 ; Enable `org-indent-mode' by default
+;;   (variable-pitch-mode 1)
+;;   ;; (setq evil-auto-indent nil)
+;;   (add-hook 'org-mode-hook #'visual-line-mode))
+
+
+
+
+
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (emacs-lisp . t)
+   (haskell . t)
+   (calc . t)
+   (ledger . t)
+   (ditaa . t)
+   (plantuml . t)
+   (dot . t)))
+
+
+
+(use-package visual-fill-column
+  :straight (visual-fill-column :type git
+				:host nil
+				:repo "https://codeberg.org/joostkremers/visual-fill-column")
+  :defer t
+  :hook (org-mode . kilo/org-mode-visual-fill))
+
+
+(use-package org-bullets
+  :straight (org-bullets :type git :host github :repo "sabof/org-bullets")
+  :hook (org-mode . org-bullets-mode))
+
+
+;; (use-package evil-org
+;;   :straight (evil-org :type git :host github :repo "Somelauw/evil-org-mode")
+;;   :after org
+;;   :hook (org-mode . (lambda () evil-org-mode))
+;;   :config  (require 'evil-org-agenda)
+;;            (evil-org-agenda-set-keys))
+
+;;https://github.com/tecosaur/org-pandoc-import
+(use-package org-pandoc-import
+  :straight (:host github
+             :repo "tecosaur/org-pandoc-import"
+             :files ("*.el" "filters" "preprocessors")))
+
+
 
 
 
@@ -2202,9 +2413,80 @@ any directory proferred by `consult-dir'."
                   ("\\subsection{%s}" . "\\subsection*{%s}")
                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 
-(setq org-latex-listings t)
+
+;;+--------------------------------------+
+;;|   `Notes-Management-with-Org-Mode'   |
+;;+--------------------------------------+
+;; https://blog.jethro.dev/posts/how_to_take_smart_notes_org/
+
+(use-package org-roam
+  :straight (org-roam :type git
+		      :host github
+		      :repo "org-roam/org-roam"		    
+		      :files ("extensions/*" "*.el" "out"))
+  :custom
+  (org-roam-directory (expand-file-name "notes" org-directory))
+  (org-roam-completion-everywhere t)
+  (org-roam-capture-templates
+   '(("m" "main" plain
+      "%?"
+      :if-new (file+head "main/${slug}.org"
+                         "#+title: ${title}\n")
+      :immediate-finish t
+      :unnarrowed t)
+     ("r" "reference" plain "%?"
+      :if-new
+      (file+head "reference/${title}.org" "#+title: ${title}\n")
+      :immediate-finish t
+      :unnarrowed t)
+     ("a" "article" plain "%?"
+      :if-new
+      (file+head "articles/${title}.org" "#+title: ${title}\n#+filetags: :article:\n")
+      :immediate-finish t
+      :unnarrowed t)))
+
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
+  :config
+  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol))
 
 
+
+
+(use-package org-roam-ui
+  :straight  (org-roam-ui :host github
+			  :repo "org-roam/org-roam-ui"
+			  :branch "main"
+			  :files ("*.el" "out"))
+  :after org-roam
+  ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+  ;;         a hookable mode anymore, you're advised to pick something yourself
+  ;;         if you don't care about startup time, use
+  ;;  :hook (after-init . org-roam-ui-mode)
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+
+
+(use-package org-roam-bibtex
+    :straight (org-roam-bibtex :type git 
+			       :host github 
+			       :repo "org-roam/org-roam-bibtex"
+			       :files ("*.el" "out"))
+  :after org-roam
+  :config
+  (require 'org-ref)) 
 
 
 ;;+------------------------------+
@@ -2220,6 +2502,26 @@ any directory proferred by `consult-dir'."
   :after ox)
 
 
+;; Populates only the EXPORT_FILE_NAME property in the inserted heading.
+(with-eval-after-load 'org-capture
+  (defun org-hugo-new-subtree-post-capture-template ()
+    "Returns `org-capture' template string for new Hugo post.
+See `org-capture-templates' for more information."
+    (let* ((title (read-from-minibuffer "Post Title: ")) ;Prompt to enter the post title
+           (fname (org-hugo-slug title)))
+      (mapconcat #'identity
+                 `(
+                   ,(concat "* TODO " title)
+                   ":PROPERTIES:"
+                   ,(concat ":EXPORT_FILE_NAME: " fname)
+                   ":END:"
+                   "%?\n")          ;Place the cursor here finally
+                 "\n")))
+)
+
+
+
+
 ;;;Presentations with Org-Reveal
 ;;;https://github.com/yjwen/org-reveal
 (use-package ox-reveal
@@ -2227,7 +2529,15 @@ any directory proferred by `consult-dir'."
 
 
 
-
+(straight-use-package '(auctex :source el-get
+                        :files ("*.el" "*.info" "dir"
+                                "doc" "etc" "images" "latex" "style")))
+;; See the :load bits of
+;; https://github.com/dimitri/el-get/blob/master/recipes/auctex.rcp,
+;; which are not supported by straight.el as of this writing.  Without
+;; these you will get built-in Emacs LaTeX modes, not AUCTeX.
+(require 'tex-site)
+(require 'preview-latex)
 
 
 ;;(when (bound-and-true-p aviik/for-org) (load-theme 'nano-light))
@@ -2235,6 +2545,10 @@ any directory proferred by `consult-dir'."
 ;;(require 'nano-help)
 
 ;;Mode line controlled by power line
+
+
+
+
 
 
 
@@ -2247,11 +2561,11 @@ any directory proferred by `consult-dir'."
   :straight (doom-modeline :type git :host github :repo "seagle0128/doom-modeline")
   :hook (after-init . doom-modeline-mode)
   :config
-   (setq doom-modeline-buffer-file-name-style 'buffer-name)
+  (setq doom-modeline-buffer-file-name-style 'buffer-name)
   ;; (set-face-attribute 'doom-modeline nil :family "Fira Code" :height 100
   ;; ;;                    'doom-modeline-inactive nil :family "Fira Code" :height 100)
   ;; 		      )
-   (set-face-attribute 'doom-modeline-evil-insert-state nil :foreground "orange"))
+  (set-face-attribute 'doom-modeline-evil-insert-state nil :foreground "orange"))
 ;;(menu-bar-mode -1)
 
 
@@ -2314,6 +2628,53 @@ any directory proferred by `consult-dir'."
    (shackle-default-rule nil))
   :config (shackle-mode))
 
+(setq tab-always-indent 'complete)     ; Enable indentation+completion using the TAB key.
+
+
+;;Line Numbering ;; Disable line numbers for some modes
+(global-display-line-numbers-mode t)
+(dolist (mode '(text-mode
+		org-mode
+		dievish-mode
+		;; vundo-1
+                term-mode-hook
+		vterm-mode-hook
+		compilation
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-number-mode 0))))
+
+
+
+(setq wwi-subject-alist '(("VFX Theory - II"         "FMAV 2101")
+			  ("VFX Theory - III"        "FMAV 2102")
+			  ("VFX Practical - II"      "FMAV 2103")
+			  ("Night Shoot Project"     "FMAV 2104")
+			  ("Filmmaking Basics I"     "FMBG 1101")
+			  ("Basic Compositing"       "FMBV 2107")
+			  ("Introduction to Houdini" "ANB3 2109")
+			  ("Dynamics in Houdini"     "ANB3 2110")
+			  ) )
+
+(defun wwi-commands ()
+  "A wwi related addon"
+  (interactive)
+  ((defvar wwi-subjects-get-choice (let (completing-read "My Prompt: " '("VFX Theory - II"
+									 "VFX Theory - III"
+									 "VFX Practical - II"
+									 "Night Shoot Project"
+									 "Filmmaking Basics I"
+									 "Basic Compositing"
+									 "Introduction to Houdini"
+									 "Dynamics in Houdini"
+									 ) nil nil))))
+  (message (asscoc current-wwi-selected current-wwi-selected))
+  )
+
+;; (use-package wwi-commands
+;;   :straight (wwi-commands :type nil
+;; 			  :local-repo "~/.cache/emacs/scripts/el_wwi"))
 
 
 (custom-set-variables
@@ -2322,7 +2683,7 @@ any directory proferred by `consult-dir'."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("a138ec18a6b926ea9d66e61aac28f5ce99739cf38566876dc31e29ec8757f6e2" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "a137529f2b83537fda674b1723043f0e5fcac21f9d0b5ea4aa64443c281bac2b" "f0eb51d80f73b247eb03ab216f94e9f86177863fb7e48b44aacaddbfe3357cf1" default)))
+   '("2e05569868dc11a52b08926b4c1a27da77580daa9321773d92822f7a639956ce" "a138ec18a6b926ea9d66e61aac28f5ce99739cf38566876dc31e29ec8757f6e2" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "a137529f2b83537fda674b1723043f0e5fcac21f9d0b5ea4aa64443c281bac2b" "f0eb51d80f73b247eb03ab216f94e9f86177863fb7e48b44aacaddbfe3357cf1" default)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
