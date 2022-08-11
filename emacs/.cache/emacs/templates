@@ -88,7 +88,8 @@ c-mode :when (re-search-backward "^\\S-*$" (line-beginning-position) 'noerror)
 
 org-mode
 
-(title "#+title: " p n "#+author: KiloKon" n "#+language: en" n n)
+(title "#+title: " p n "#+author: Aviik Chakraborty" n "#+email: avik.c@whistlingwoods.net" n "#+language: en" n n)
+(beamer "#+TITLE: " p n "#+AUTHOR: Aviik Chakraborty" n "#+EMAIL: avik.c@whistlingwoods.net" n "#+DATE: " p n "#+DESCRIPTION: " p n "#+KEYWORDS: " p n "#+LANGUAGE:  en" n "#+OPTIONS:   H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t" n "#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc" n "#+EXPORT_SELECT_TAGS: export" n "#+EXPORT_EXCLUDE_TAGS: noexport" n "#+HTML_LINK_UP: " p n "#+HTML_LINK_HOME: " n "#+BEAMER_THEME: Pittsburgh" n "#+BEAMER_COLOR_THEME: default" n)
 (quote "#+begin_quote" n> r> n> "#+end_quote")
 (example "#+begin_example" n> r> n> "#+end_example")
 (center "#+begin_center" n> r> n> "#+end_center")

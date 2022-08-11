@@ -1,4 +1,4 @@
-;;--------------
+;; ;--------------
 ;; ┏━┓╋┏┳━━━┳━┓┏┳━━━┳━━━┳━━┳━┓┏┓
 ;; ┃┃┃╋┃┃┏━┓┣┓┃┃┃┏━┓┃┏━┓┣┫┣┻┓┃┃┃
 ;; ┃┃┗┓┃┃┃╋┃┃┃┗┛┃┃╋┃┣┛╋┃┃┃┃╋┃┗┛┃
@@ -29,7 +29,9 @@
 (defvar kilo/backup-dir (expand-file-name "backups" user-emacs-directory))
 (defvar kilo/oneDrive (expand-file-name "OneDrive" (getenv "HOME")))
 (defconst kilo-key "<VoidSymbol>") 	;Using Capslock as VoidSymbol via Kmonad
-
+(defvar kilo-win-env
+  (getenv
+   (if (equal system-type 'windows-nt) "USERNAME" "USER")))
 
 ;;+----------------+
 ;;|  `Interface'   |
@@ -73,14 +75,14 @@
   (insert (completing-read "Yank:" kill-ring)))
 
 ;;;;http://chopmo.dk/2016/10/27/emacs-highlighting-current-word.html
-;;;;(require 'hi-lock)
+;; (require 'hi-lock)
 (defun aviik/toggle-mark-word-at-point ()
   (interactive)
   (if hi-lock-interactive-patterns
       (unhighlight-regexp (car (car hi-lock-interactive-patterns)))
     (highlight-symbol-at-point)))
 
-;;https://www.emacswiki.org/emacs/CopyingWholeLines
+;; https://www.emacswiki.org/emacs/CopyingWholeLines
 (defun aviik/quick-copy-line ()
   (interactive)
   (let ((beg (line-beginning-position 1))
@@ -90,7 +92,7 @@
       (kill-new (buffer-substring beg end))))
   (beginning-of-line 2))
 
-;;https://github.com/magnars/.emacs.d/blob/master/defuns/file-defuns.el
+;; https://github.com/magnars/.emacs.d/blob/master/defuns/file-defuns.el
 (defun aviik/copy-current-file-path ()
   "Add current file path to kill ring. Limits the filename to project root if possible."
   (interactive)
@@ -145,9 +147,9 @@
 
 (setq enable-recursive-minibuffers t)
 
-;;+-----------------+
-;;|   `Super-Key'   |
-;;+-----------------+
+;; +-----------------+
+;; |   `Super-Key'   |
+;; +-----------------+
 
 (setq w32-pass-lwindow-to-system nil)
 (setq w32-lwindow-modifier 'super) ; Left Windows key
@@ -155,9 +157,9 @@
 
 
 
-;;+----------------------+
-;;|   'Elisp-Learning'   |
-;;+----------------------+
+;; +----------------------+
+;; |   'Elisp-Learning'   |
+;; +----------------------+
 ;; Learnin @ Xah Lee
 (cond
  ((string-equal system-type "windows-nt")
@@ -191,12 +193,12 @@
     ;; Terminal mode
     (message "I'm in terminal mode")
     (message "Unable to load graphic mode setup"))
-;;This gets multiple choices
-;;(completing-read "My Prompt: " '("red" "green" "blue") nil nil)
+;; This gets multiple choices
+;; (completing-read "My Prompt: " '("red" "green" "blue") nil nil)
 
-;;+----------------------+
-;;|  'File-Management'   |
-;;+----------------------+
+;; +----------------------+
+;; |  'File-Management'   |
+;; +----------------------+
 ;; This org babel line comes on top of file management
 ;; (org-babel-load-file (concat user-emacs-directory "conf.org"))
 
@@ -222,43 +224,43 @@
 
 
 
-;https://www.emacswiki.org/emacs/backup-each-save.el
-;;(load "~/.emacs.d/scripts")
+;; https://www.emacswiki.org/emacs/backup-each-save.el
+;; (load "~/.emacs.d/scripts")
 (add-to-list 'load-path (expand-file-name "scripts" user-emacs-directory))
 (require 'backup-each-save)
 (add-hook 'after-save-hook 'backup-each-save)
 
 
 
-;;Snippets Directory
+;; Snippets Directory
 (defvar kilo-snippet-dir (expand-file-name "snippets" user-emacs-directory))
 
 
 
-;;History
+;; History
 (savehist-mode)
-;;Recent Files
+;; Recent Files
 (recentf-mode t)
 (add-hook 'kill-emacs-hook #'recentf-cleanup)
-;;+-------------------------------+
-;;|   `Version-Greater-Than--28'   |
-;;+-------------------------------+
+;; +-------------------------------+
+;; |   `Version-Greater-Than--28'   |
+;; +-------------------------------+
 (if (> emacs-major-version 28)
     (setq read-extended-command-predicate
 	  #'command-completion-default-include-p))
 
-;;+-----------------------+
-;;|   `Sexp-Selection'    |
-;;+-----------------------+
+;; +-----------------------+
+;; |   `Sexp-Selection'    |
+;; +-----------------------+
 (delete-selection-mode 1)           ;; Replace region when inserting text
 (global-subword-mode 1)             ;; Iterate through CamelCase words
 
 
-;;+----------------+
-;;|   `Defaults'   |
-;;+----------------+
-;;Default Settings
-;;----------------
+;; +----------------+
+;; |   `Defaults'   |
+;; +----------------+
+;; Default Settings
+;; ----------------
 (setq visible-bell 1                    ; Annoying Ding off
       ring-bell-function 'ignore
       inhibit-startup-screen t
@@ -735,33 +737,6 @@
 
 
 
-;; (use-package dired-x
-;;   :straight (:type built-in)
-;;   :after dired)
-
-;; (use-package dired-single
-;;   :straight (dired-single :type git
-;; 			  :host github
-;; 			  :repo "crocket/dired-single")
-;;   :after dired
-;;   :general
-;;   (dired-mode-map
-;;    :states 'normal
-;;    "h" 'dired-single-up-directory
-;;    "l" 'dired-single-buffer
-;;    "q" 'kill-current-buffer))
-
-;; (use-package all-the-icons-dired
-;;   :straight (all-the-icons-dired :type git
-;; 				 :host github
-;; 				 :repo "jtbm37/all-the-icons-dired")
-;;   :if (display-graphic-p)
-;;   :hook (dired-mode . (lambda () (interactive)
-;;                         (unless (file-remote-p default-directory)
-;;                           (all-the-icons-dired-mode)))))
-
-
-
 (use-package zoxide
   :straight (zoxide :type git
 		    :host gitlab
@@ -790,11 +765,30 @@ with open(fpath , 'w') as f:
    :shell-util "python"
    :shell-args "-c"))
 
+;;+---------------------+
+;;|   `Env-Variables'   |
+;;+---------------------+
+(use-package direnv
+    :straight (direnv :type git 
+                :host github 
+                :repo "wbolster/emacs-direnv")
+  :config
+  (direnv-mode))
+
+;;+-------------------+
+;;|   `File-Rights'   |
+;;+-------------------+
+;; (use-package sudo-edit
+;;   :straight (sudo-edit :type git :host github :repo "nflath/sudo-edit"))
+
+
+
+
 
 (use-package embark
   :straight (embark :type git :host github :repo "oantolin/embark")
   :bind
-  (("C-." . embark-act)       ;; pick some comfortable binding
+  (("C-." . embark-act)	;; pick some comfortable binding
    ("C-c ." . embark-dwim)
    ("C-s-e" . embark-export)
    ("C-h b" . embark-bindings))
@@ -1216,7 +1210,7 @@ targets."
              ;; cape-dict	      ; Complete word from dictionary at point
              cape-line ; Complete current line from other lines in buffer
              cape-symbol	  ; Elisp symbol
-             ;; cape-ispell	  ; Complete word at point with Ispell
+             cape-ispell	  ; Complete word at point with Ispell
              ;; Complete with Dabbrev at point
              cape-dabbrev)
   :custom
@@ -1225,7 +1219,7 @@ targets."
   (add-hook 'text-mode-hook
             (lambda ()
               (setq-local completion-at-point-functions
-                          (list (cape-super-capf #'cape-dabbrev #'cape-file #'cape-history ))))))
+                          (list (cape-super-capf #'cape-dabbrev #'cape-ispell #'cape-symbol #'cape-file #'cape-history ))))))
   ;; :init
   ;; ;; Add completion-at-point-functions, used by completion-at-point.
   ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
@@ -1340,15 +1334,20 @@ targets."
   (lsp-rust-analyzer-display-closure-return-type-hints t)
   (lsp-rust-analyzer-display-parameter-hints nil)
   (lsp-rust-analyzer-display-reborrow-hints nil)
+  (lsp-diagnostics-provider :capf)
+  (lsp-headerline-breadcrumb-enable t)
+  (lsp-headerline-breadcrumb-segments '(project file symbols))
+  (lsp-lens-enable nil)
+  (lsp-disabled-clients '((python-mode . pyls)))
   :config
   (setq rustic-lsp-server 'rust-analyzer)
   :general (kilo-leader-key
-	    ;; :keymaps 'lsp-mode-map
-	    "ld" '(xref-find-definitions   :which-key "Find Definitions")
-	    "lr" '(xref-find-references    :which-key "Find References")
-	    "lq" '(lsp-workspace-restart   :which-key "Restart Lsp")
-	    "lx" '(lsp-workspace-shutdown  :which-key "Kill Lsp Server")
-	    "la" '(lsp-execute-code-action :which-key "Execute Code Action")))
+	     ;; :keymaps 'lsp-mode-map
+	     "ld" '(xref-find-definitions   :which-key "Find Definitions")
+	     "lr" '(xref-find-references    :which-key "Find References")
+	     "lq" '(lsp-workspace-restart   :which-key "Restart Lsp")
+	     "lx" '(lsp-workspace-shutdown  :which-key "Kill Lsp Server")
+	     "la" '(lsp-execute-code-action :which-key "Execute Code Action")))
 
 (use-package lsp-ui
   :straight (lsp-ui :type git
@@ -1431,7 +1430,45 @@ targets."
 
 ;; (add-to-list 'eglot-server-programs
 ;; 	     `
-
+;;+-----------------+
+;;|   `Debugging'   |
+;;+-----------------+
+(use-package dap-mode
+  ;; :straight t
+  :straight (dap-mode :type git
+		      :host github
+		      :repo "emacs-lsp/dap-mode"
+		      :files ("*.el"))
+  ;; :general (aviik/leadr-key-def
+  ;; 	     "C-c C-d" '(dap-hydra :"Dap-Hydra"))
+  :commands dap-debug
+  :hook
+  ((dap-mode . corfu-mode)
+   (dap-ui-repl-mode . (lambda () (setq-local truncate-lines t))))
+  :config
+  (setq dap-auto-configure-features '(sessions locals controls tooltip))
+  (dap-ui-mode 1)
+  (dap-ui-controls-mode 1)
+  (dap-tooltip-mode 1)
+  (require 'dap-ui)
+  ;; :straight dap-mode
+  ;; :after (dap-mode))
+  (require 'dap-cpptools)
+  ;; :straight dap-mode
+  ;; :after (dap-mode))
+  (require 'dap-hydra)
+  ;; (require 'dap-python)
+  (require 'dap-lldb)
+  ;; :straight dap-mode
+  ;; :after (dap-mode))
+  (require 'dap-gdb-lldb)
+  (dap-register-debug-template "Rust::LLDB Run Configuration"
+			       (list :type "lldb"
+				     :request "launch"
+				     :name "LLDB::Run"
+				     :gdbpath "rust-lldb"
+				     :target nil
+				     :cwd nil)))
 
 ;;+--------------------------+
 ;;|   `Parenthesis-System'   |
@@ -1442,9 +1479,9 @@ targets."
 (straight-use-package 'smartparens)
 (require 'smartparens-config)
 
-;; Always start smartparens mode in js-mode.
+;; Always start smartparens mode in rust-mode, python-mode.
 (add-hook 'rustic-mode-hook #'smartparens-mode)
-
+(add-hook 'python-mode-hook #'smartparens-mode)
 ;;+-----------------------------------------+
 ;;|   Garbage Collection & Parser Priming   |
 ;;+-----------------------------------------+
@@ -1556,42 +1593,6 @@ any directory proferred by `consult-dir'."
 				  :repo "purcell/exec-path-from-shell")
   :init (exec-path-from-shell-initialize))
 
-;; (defalias 'eshell/v 'eshell-exec-visual)
-
-
-;; (use-package shell-pop
-;;   :straight (shell-pop :type git :host github :repo "kyagi/shell-pop-el")
-;;   :bind (("C-c s b" . pop-bash))
-;;   :config (
-;; 	   (defun pop-bash ()
-;; 	     (shell-pop-shell-type (quote ("ansi-term" "*ansi-term*" (lambda nil (ansi-term shell-pop-term-shell)))))
-;; 	     (shell-pop-term-shell "/bin/bash")
-;; 	     (shell-pop-window-size 30)
-;; 	     (shell-pop-full-span t)
-;; 	     (shell-pop-window-position "bottom")
-;; 	     (shell-pop-autocd-to-working-dir t)
-;; 	     (shell-pop-restore-window-configuration t)
-;; 	     (shell-pop-cleanup-buffer-at-process-exit t))))
-
-
-
-
-
-
-;; (use-package eshell-toggle
-;;   :straight (eshell-toggle :type git
-;; 			   :host github
-;; 			   :repo "4DA/eshell-toggle")
-;;   :custom
-;;   (eshell-toggle-size-fraction 3)
-;;   (eshell-toggle-use-projectile-root nil)
-;;   ;; (eshell-toggle-use-projectile-root t)
-;;   (eshell-toggle-run-command nil)
-;;   ;;(eshell-toggle-init-function #'eshell-toggle-init-ansi-term)
-;;   :bind
-;;   ("s-`" . eshell-toggle))
-
-
 
 
 
@@ -1650,36 +1651,6 @@ any directory proferred by `consult-dir'."
 		       :type git
 		       :repo "https://codeberg.org/ideasman42/emacs-run-stuff.git"))
 
-;; (setq comint-output-filter-functions
-      ;; (remove 'ansi-color-process-output comint-output-filter-functions))
-
-;; (add-hook 'shell-mode-hook
-;;           (lambda ()
-;;             ;; Disable font-locking in this buffer to improve performance
-;;             (font-lock-mode -1)
-;;             ;; Prevent font-locking from being re-enabled in this buffer
-;;             (make-local-variable 'font-lock-function)
-;;             (setq font-lock-function (lambda (_) nil))
-;;             (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
-
-
-;; (use-package native-complete
-;;   :straight (native-complete :type git
-;; 			     :host github
-;; 			     :repo "CeleritasCelery/emacs-native-shell-complete"))
-;; (add-hook 'shell-mode-hook (lambda () (setq comint-prompt-regex "^.+[$%>] ")))
-;; (with-eval-after-load 'shell
-;;   (native-complete-setup-bash))
-;;  :hook (eshell-mode . esh-autosuggest-mode))
-
-;; (use-package esh-autosuggest
-;;   :straight (esh-autosuggest :type git
-;; 			     :host github
-;; 			     :repo "dieggsy/esh-autosuggest")
-;;   :hook (eshell-mode . esh-autosuggest-mode))
-
-
-
 ;;Prodigy
 
 (use-package prodigy
@@ -1719,6 +1690,15 @@ any directory proferred by `consult-dir'."
 ;; 		([C-tab] . bicycle-cycle)
 ;; 		([S-tab] . bicycle-cycle-global)))
 
+;;+---------------------+
+;;|   `View-Asm-Code'   |
+;;+---------------------+
+(use-package rmsbolt
+  :straight (rmsbolt :type git :host gitlab :repo "jgkamat/rmsbolt"))
+
+
+
+
 ;;+----------------------------------+
 ;;|   Programming Language Support   |
 ;;+----------------------------------+
@@ -1748,96 +1728,168 @@ any directory proferred by `consult-dir'."
     :type git
     :repo "https://codeberg.org/ideasman42/emacs-elisp-autofmt.git"))
 
-(use-package lispy
-  :straight (lispy :type git :host github :repo "abo-abo/lispy")
-  :hook ((emacs-lisp-mode
-	  lisp-mode
-	  geiser-repl) . lispy-mode))
 
-(use-package lispyville
-  :straight (lispyville :type git :host github :repo "noctuid/lispyville")
-  :hook (lispy-mode . lispyville-mode))
+
+;; (use-package lispyville
+;;   :straight (lispyville :type git :host github :repo "noctuid/lispyville")
+;;   :hook (lispy-mode . lispyville-mode))
 
 
 
 ;;;;;;;;Python;;;;;;;;;;
+(use-package python-mode
+  :straight (:type built-in)
+  :hook (python-mode . lsp-deferred)
+  :custom
+  ;; NOTE: Set these if Python 3 is called "python3" on your system!
+  ;; (python-shell-interpreter "python3")
+  ;; (dap-python-executable "python3")
+  (dap-python-debugger 'debugpy)
+  :config
+  (require 'dap-python))
 
+
+
+
+;; (use-package lsp-jedi
+;;   :straight (lsp-jedi :type git 
+;;                       :host github 
+;;                       :repo "fredcamps/lsp-jedi")
+
+;;   :after lsp)
+
+(use-package lsp-pyright
+  :straight t
+  :hook (python-mode . (lambda ()
+                        (require 'lsp-pyright)
+                        (lsp-deferred))))
+
+;; (add-hook 'python-mode-hook 'dap-python)
 ;; https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a
-(use-package elpy
-    :straight t
-    :bind
-    (:map elpy-mode-map
-          ("C-M-n" . elpy-nav-forward-block)
-          ("C-M-p" . elpy-nav-backward-block))
-    ;; :hook ((elpy-mode . flycheck-mode)
-    ;;        (elpy-mode . (lambda ()
-    ;;                       (set (make-local-variable 'company-backends)
-    ;;                            '((elpy-company-backend :with company-yasnippet))))))
-    :init
-    (elpy-enable)
-    :config
-    ;; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-    ; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
-    (setq elpy-shell-echo-output nil)
-    (setq elpy-rpc-python-command "python3")
-    (setq elpy-rpc-timeout 2))
+;; (use-package elpy
+;;   :straight (elpy :type git
+;; 		  :host github
+;; 		  :repo "jorgenschaefer/elpy")
+;;   :bind
+;;   (:map elpy-mode-map
+;;         ("C-M-n" . elpy-nav-forward-block)
+;;         ("C-M-p" . elpy-nav-backward-block))
+;;   ;; :hook ((elpy-mode . flycheck-mode)
+;;   ;;        (elpy-mode . (lambda ()
+;;   ;;                       (set (make-local-variable 'company-backends)
+;;   ;;                            '((elpy-company-backend :with company-yasnippet))))))
+;;   :init
+;;   (elpy-enable)
+;;   :config
+;;   ;; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+;; 					; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
+;;   (setq elpy-shell-echo-output nil)
+;;   (setq elpy-rpc-python-command "python3")
+;;   (setq elpy-rpc-timeout 2)
+;;   (setq python-shell-interpreter "ipython"
+;;       python-shell-interpreter-args "-i --simple-prompt"))
 
-(use-package buftra
-  :straight (:host github :repo "humitos/buftra.el"))
+;; (when (load "flycheck" t t)
+;;   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+;;   (add-hook 'elpy-mode-hook 'flycheck-mode))
 
-(use-package py-pyment
-    :straight (:host github :repo "humitos/py-cmd-buffer.el")
-    :config
-    (setq py-pyment-options '("--output=numpydoc")))
 
-(use-package py-isort
-    :straight (:host github :repo "humitos/py-cmd-buffer.el")
-    :hook (python-mode . py-isort-enable-on-save)
-    :config
-    (setq py-isort-options '("--lines=88" "-m=3" "-tc" "-fgw=0" "-ca")))
+(use-package python-pytest
+  :straight (python-pytest :type git
+			   :host github
+			   :repo "wbolster/emacs-python-pytest")
+  :after (python-mode))
 
-(use-package py-autoflake
-    :straight (:host github :repo "humitos/py-cmd-buffer.el")
-    :hook (python-mode . py-autoflake-enable-on-save)
-    :config
-    (setq py-autoflake-options '("--expand-star-imports")))
 
-(use-package py-docformatter
-    :straight (:host github :repo "humitos/py-cmd-buffer.el")
-    :hook (python-mode . py-docformatter-enable-on-save)
-    :config
-    (setq py-docformatter-options '("--wrap-summaries=88" "--pre-summary-newline")))
+(add-hook 'python-mode-hook
+          (lambda ()
+            (when-let ((r (locate-dominating-file default-directory ".pyroot")))
+              (setq python-pytest-executable
+                    (concat "PYTHONPATH=" r " " "pytest")))))
+
+;; (use-package pyinspect
+;;   :straight (pyinspect :type git
+;; 		       :host github
+;; 		       :repo "it-is-wednesday/pyinspect.el")
+;;   :after (python-mode)
+;;   :bind (:map python-mode-map
+;; 	      ("C-c i" . pyinspect-inspect-at-point)))
+
+
+
+;; (use-package buftra
+;;   :straight (:host github :repo "humitos/buftra.el"))
+
+;; (use-package py-pyment
+;;     :straight (:host github :repo "humitos/py-cmd-buffer.el")
+;;     :config
+;;     (setq py-pyment-options '("--output=numpydoc")))
+
+(use-package python-isort
+  :straight (python-isort :host github :repo "wyuenho/emacs-python-isort")
+  :hook (python-mode . python-isort-on-save-mode)
+  ;; :config
+  ;; (setq py-isort-options '("--lines=88" "-m=3" "-tc" "-fgw=0" "-ca"))
+  )
+
+;; (use-package py-autoflake
+;;     :straight (:host github :repo "humitos/py-cmd-buffer.el")
+;;     :hook (python-mode . py-autoflake-enable-on-save)
+;;     :config
+;;     (setq py-autoflake-options '("--expand-star-imports")))
+
+;; (use-package py-docformatter
+;;     :straight (:host github :repo "humitos/py-cmd-buffer.el")
+;;     :hook (python-mode . py-docformatter-enable-on-save)
+;;     :config
+;;     (setq py-docformatter-options '("--wrap-summaries=88" "--pre-summary-newline")))
 
 (use-package blacken
-    :straight t
-    :hook (python-mode . blacken-mode)
-    :config
-    (setq blacken-line-length '88))
+  :straight t
+  :hook (python-mode . blacken-mode)
+  :config
+  (setq blacken-line-length '79))
 
-(use-package python-docstring
-    :straight t
-    :hook (python-mode . python-docstring-mode))
+;; (use-package python-docstring
+;;     :straight t
+;;     :hook (python-mode . python-docstring-mode))
 
-;; (use-package pyenv
-;;     :straight (:host github :repo "aiguofer/pyenv.el")
-;;     :config
-;;     (setq pyenv-use-alias 't)
-;;     (setq pyenv-modestring-prefix " ")
-;;     (setq pyenv-modestring-postfix nil)
-;;     (setq pyenv-set-path nil)(global-pyenv-mode)
-;;     (defun pyenv-update-on-buffer-switch (prev curr)
-;;       (if (string-equal "Python" (format-mode-line mode-name nil nil curr))
-;;           (pyenv-use-corresponding)))
-;;     (add-hook 'switch-buffer-functions 'pyenv-update-on-buffer-switch))
+;;https://blog.fredrikmeyer.net/2020/08/26/emacs-python-venv.html
+;;https://ddavis.io/posts/emacs-python-lsp/
+;;https://github.com/aiguofer/pyenv.el
+(use-package pyenv
+  :straight (:type git :host github :repo "aiguofer/pyenv.el")
+  :init
+  (setq pyenv-installation-dir "/usr")
+  :config
+  (global-pyenv-mode)
+  (setq pyenv-modestring-prefix " ")
+  (setq pyenv-use-alias 't)
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python")))))
+;;   (setq pyenv-installation-dir "pyenv")
+;;   (setq pyenv-use-alias 't)
+;;   (setq pyenv-modestring-prefix " ")
+;;   (setq pyenv-modestring-postfix nil)
+;;   (setq pyenv-set-path nil)(global-pyenv-mode)
+;;   (defun pyenv-update-on-buffer-switch (prev curr)
+;;     (if (string-equal "Python" (format-mode-line mode-name nil nil curr))
+;;         (pyenv-use-corresponding)))
+;;   (add-hook 'switch-buffer-functions 'pyenv-update-on-buffer-switch))
 
 
-;; (use-package python
-;;   :straight (:type built-in)
-;;   :hook (inferior-python-mode . fix-python-password-entry)
-;;   :config
-;;   (setq python-shell-interpreter "jupyter-console"
-;;         python-shell-interpreter-args "--simple-prompt"
-;;         python-shell-prompt-detect-failure-warning nil)
+(use-package python
+  :straight (:type built-in)
+;  :hook (inferior-python-mode . fix-python-password-entry)
+  :config
+  (setq python-shell-interpreter "/opt/hfs19.5.303/bin/hython"
+        ;; python-shell-interpreter-args "--simple-prompt"
+        python-shell-prompt-detect-failure-warning nil))
 ;;   (add-to-list 'python-shell-completion-native-disabled-interpreters
 ;;                "jupyter-console")
 ;;   (add-to-list 'python-shell-completion-native-disabled-interpreters
@@ -1867,9 +1919,10 @@ any directory proferred by `consult-dir'."
 
 
 
-;;C/C++
-
-
+;; For C/C++ development.
+;; (add-to-list 'eglot-server-programs '((c-mode c++-mode). ("ccls")))
+;; (add-hook 'c-mode-hook 'eglot-ensure)
+;; (add-hook 'c++-mode-hook 'eglot-ensure)
 
 
 ;; (use-package ccls
@@ -1882,15 +1935,33 @@ any directory proferred by `consult-dir'."
 
 
 ;;Common Lisp
-(use-package slime
-  :straight (slime :type git
-		   :host github
-		   :repo "slime/slime")
-  :commands (slime)
-  :init (setq inferior-lisp-program "sbcl"))
+;; (use-package slime
+;;   :straight (slime :type git
+;; 		   :host github
+;; 		   :repo "slime/slime")
+;;   :commands (slime)
+;;   :init (setq inferior-lisp-program "sbcl"))
+
+(use-package sly
+  :straight (sly :type git :host github :repo "joaotavora/sly")
+  :init (setq inferior-lisp-program "sbcl")
+  :bind (:map sly-mode-map
+	      ("s-h" . sly-documentation-lookup)))
+
+;; (use-package sly-autoloads
+;;   :straight (sly-autoloads :type git :host github :repo "joaotavora/sly"))
 
 
-;;Rust
+(use-package lispy
+  :straight (lispy :type git :host github :repo "abo-abo/lispy")
+  :hook ((emacs-lisp-mode
+	  sly-mrepl-mode
+	  lisp-mode
+	  geiser-repl) . lispy-mode)
+  :bind (("C-)" . lispy-slurp)
+	 ("C-(" . lispy-barf)))
+
+;;`Rust'
 ;;------
 ;; (use-package rust-mode
 ;;   :straight (rust-mode :type git :host github :repo "rust-lang/rust-mode"))
@@ -1912,7 +1983,7 @@ any directory proferred by `consult-dir'."
   (setq rustic-format-on-save t)
   (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook)
   :general (kilo-leader-key
-	     ;; :keymaps 'rustic-mode-map
+	     :keymaps 'rustic-mode-map
 	     "r"   '(:ignore t                 :which-key "Rust Cargo")
 	     "rr"  '(rustic-cargo-run          :which-key "Cargo Run")
 	     "rb"  '(rustic-cargo-build        :which-key "Cargo Build")
@@ -1981,8 +2052,7 @@ any directory proferred by `consult-dir'."
   ;;         '(haskell-process-auto-import-loaded-modules t)
   ;;         '(haskell-process-log t)))
   :bind (:map haskell-mode-map
-	      ("C-c h" . hoogle)
-	      )
+	      ("C-c h" . hoogle))
   :hook ((haskell-mode . interactive-haskell-mode)
 	 (haskell-mode . (lambda ()
                            (set (make-local-variable 'company-backends)
@@ -2047,56 +2117,60 @@ any directory proferred by `consult-dir'."
 
 
 
-;;+-----------------+
-;;|   `Debugging'   |
-;;+-----------------+
-(use-package dap-mode
-  ;; :straight t
-  :straight (dap-mode :type git
-		      :host github
-		      :repo "emacs-lsp/dap-mode")
-  ;; :general (aviik/leadr-key-def
-  ;; 	     "C-c C-d" '(dap-hydra :"Dap-Hydra"))
-  :commands dap-debug
-  :hook
-  ((dap-mode . corfu-mode)
-   (dap-ui-repl-mode . (lambda () (setq-local truncate-lines t))))
-  :config
-  (setq dap-auto-configure-features '(sessions locals controls tooltip))
-  (dap-ui-mode 1)
-  (dap-ui-controls-mode 1)
-  (dap-tooltip-mode 1)
 
+
+  ;; https://github.com/WebFreak001/code-debug
+					; (require 'dap-gdb-lldb)
+  ;; :straight dap-mode
+  ;; :after (dap-mode)
+  ;; :custom (dap-gdb-lldb-setup))
+  
+  ;; (dolist (mode '(c-mode-common rust-mode))
+  ;;   (let ((mode-hook (intern (concat (symbol-name mode) "-hook"))))
+  ;;     (add-hook mode-hook
+  ;;               (lambda ()
+  ;;                 (use-package dap-gdb-lldb
+  ;;                   :custom
+  ;;                   (dap-gdb-lldb-path
+  ;;                    (car
+  ;;                     (last
+  ;;                      (file-expand-wildcards
+  ;;                       (concat
+  ;;                        dap-utils-extension-path
+  ;;                        "/webfreak.debug-*")))))
+  ;;                   (dap-gdb-lldb-debug-program
+  ;;                    `("node" ,(concat dap-gdb-lldb-path "/out/src/gdb.js"))))))))
+  ;;)
   ;; (use-package dap-ui
   ;;   :straight dap-mode
   ;;   :after (dap-mode))
-    (use-package dap-cpptools
-    :straight dap-mode
-    :after (dap-mode))
+  ;; (use-package dap-cpptools
+  ;;   :straight dap-mode
+  ;;   :after (dap-mode))
   
-  (use-package dap-lldb
-    :straight dap-mode
-    :after (dap-mode))
+  ;; (use-package dap-lldb
+  ;;   :straight dap-mode
+  ;;   :after (dap-mode))
 
-  ;; https://github.com/WebFreak001/code-debug
-  (use-package dap-gdb-lldb
-    :straight dap-mode
-    :after (dap-mode)
-    :custom (dap-gdb-lldb-setup))
-  (dap-register-debug-template "Rust::LLDB Run Configuration"
-			       (list :type "lldb"
-				     :request "launch"
-				     :name "LLDB::Run"
-				     :gdbpath "rust-lldb"
-				     :target nil
-				     :cwd nil))
-  (dap-register-debug-template "Rust::GDB Run Configuration"
-                               (list :type "gdb"
-                                     :request "launch"
-                                     :name "GDB::Run"
-				     :gdbpath "rust-gdb"
-                                     :target nil
-                                     :cwd nil)))
+  ;; ;; https://github.com/WebFreak001/code-debug
+  ;; (use-package dap-gdb-lldb
+  ;;   :straight dap-mode
+  ;;   :after (dap-mode)
+  ;;   :custom (dap-gdb-lldb-setup))
+  ;; (dap-register-debug-template "Rust::LLDB Run Configuration"
+  ;; 			       (list :type "lldb"
+  ;; 				     :request "launch"
+  ;; 				     :name "LLDB::Run"
+  ;; 				     :gdbpath "rust-lldb"
+  ;; 				     :target nil
+  ;; 				     :cwd nil))
+  ;; (dap-register-debug-template "Rust::GDB Run Configuration"
+  ;;                              (list :type "gdb"
+  ;;                                    :request "launch"
+  ;;                                    :name "GDB::Run"
+  ;; 				     :gdbpath "rust-gdb"
+  ;;                                    :target nil
+  ;;                                    :cwd nil)))
   ;; (use-package dap-cpptools
   ;;   :straight dap-mode)
   ;;   ;; (use-package dap-ui
@@ -2119,13 +2193,13 @@ any directory proferred by `consult-dir'."
 ;;+---------------+
 ;;|   `Project'   |
 ;;+---------------+
-;; (use-package projectile
-;;   :straight (projectile :type git
-;; 			:host github :repo "bbatsov/projectile")
-;;   )
-;; (projectile-mode +1)
-;; (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-;; (setq projectile-require-project-root nil)
+(use-package projectile
+  :straight (projectile :type git
+			:host github :repo "bbatsov/projectile")
+  )
+(projectile-mode +1)
+(define-key projectile-mode-map (kbd "M-p") 'projectile-command-map)
+(setq projectile-require-project-root nil)
 
 
 
@@ -2199,9 +2273,9 @@ any directory proferred by `consult-dir'."
   :config
   (progn
     (setq treemacs-workspace-switch-cleanup t)))
-(use-package treemacs-evil
-  :straight t
-  :after (treemacs evil))
+;; (use-package treemacs-evil
+;;   :straight t
+;;   :after (treemacs evil))
 
 (use-package treemacs-icons-dired
   :straight t
@@ -2241,10 +2315,16 @@ any directory proferred by `consult-dir'."
 (use-package org
   :straight t
   ;; :init  (setq org-directory (expand-file-name "org" kilo/oneDrive)
-	       ;; org-default-notes-file (concat org-directory "/notes.org"))
+  ;; org-default-notes-file (concat org-directory "/notes.org"))
   :bind ("C-c c" . org-capture)
-  :hook ((org-mode . variable-pitch-mode)
-	 (org-mode . visual-line-mode))
+  :hook (
+	 ((org-mode . flyspell-mode)
+	  (org-mode . visual-line-mode)
+	  (org-mode . variable-pitch-mode)))
+  ;; :hook ((org-mode . variable-pitch-mode)
+  ;; 	 (org-mode . visual-line-mode)
+  ;; 	 ;; (org-mode . flyspell)
+  ;; 	 )
   :custom ;; Tweak font sizes
   (org-directory (expand-file-name "org" kilo/oneDrive))
   (org-default-notes-file (concat org-directory "/notes.org"))
@@ -2265,7 +2345,7 @@ any directory proferred by `consult-dir'."
                   window-divider-last-pixel))
     (face-spec-reset-face face)
     (set-face-foreground face (face-attribute 'default :background)))
-  (set-face-background 'fringe (face-attribute 'default :background))
+  (set-face-background 'fringe (face-attribute 'default :background))  
   :config (setq org-startup-indented t ;; Enable `org-indent-mode' by default
 		;; https://github.com/jakebox/jake-emacs/blob/main/jake-emacs/init.org
 		org-latex-listings t
@@ -2294,6 +2374,21 @@ any directory proferred by `consult-dir'."
 		org-agenda-current-time-string
 		"⭠ now ─────────────────────────────────────────────────"))
 ;;; https://github.com/minad/org-modern
+
+(use-package flyspell-correct
+      :straight (flyspell-correct :type git 
+                  :host github 
+                  :repo "d12frosted/flyspell-correct")
+
+    :after flyspell
+    :bind (:map flyspell-mode-map ("C-:" . flyspell-correct-wrapper)))
+
+
+(use-package flyspell-correct-popup
+  :straight (flyspell-correct-popup :type git 
+				    :host github 
+				    :repo "d12frosted/flyspell-correct")
+  :after flyspell-correct)
 
 
 (straight-use-package '(org-contrib :includes ob-ebnf
@@ -2343,7 +2438,15 @@ any directory proferred by `consult-dir'."
 ;;     can be ignored. May include a note on why it’s been cancelled. 
 
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "DOING(i)" "PENDING(p)" "MEETING(m)" "|" "DONE(d)" "CANCELED(c)")))
+      '((sequence "TODO(t)" "WIP(w)" "PENDING(p)" "REVIEW(r)" "|" "DONE(d)" "CANCELED(c)")))
+
+(setq org-todo-keyword-faces
+      '(("TODO" . org-warning)
+        ("WIP" . "yellow")
+        ("PENDING" . "purple")
+        ("REVIEW" . "orange")
+        ("DONE" . "green")
+        ("CANCELED" .  "red")))
 ;; (with-eval-after-load 'org       
 ;;   (setq org-startup-indented t)	 ; Enable `org-indent-mode' by default
 ;;   (variable-pitch-mode 1)
@@ -2378,7 +2481,9 @@ any directory proferred by `consult-dir'."
 
 (use-package org-bullets
   :straight (org-bullets :type git :host github :repo "sabof/org-bullets")
-  :hook (org-mode . org-bullets-mode))
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 
 ;; (use-package evil-org
@@ -2490,7 +2595,7 @@ any directory proferred by `consult-dir'."
 
 
 ;;+------------------------------+
-;;|   Publishing with Org Mode   |
+;;|   `Org-Mode'-``Publishing'   |
 ;;+------------------------------+
 ;;;Hugo
 ;;;Ox-hugo
@@ -2520,6 +2625,14 @@ See `org-capture-templates' for more information."
 )
 
 
+;;+---------------------------------+
+;;|   `Org-Mode': `Presentations'   |
+;;+---------------------------------+
+(use-package org-tree-slide
+  :straight (org-tree-slide :type git :host github :repo "takaxp/org-tree-slide")
+  )
+
+
 
 
 ;;;Presentations with Org-Reveal
@@ -2546,11 +2659,15 @@ See `org-capture-templates' for more information."
 
 ;;Mode line controlled by power line
 
+;;+--------------------------------------+
+;;|   `Org-Mode':`Outside-of-Org-Mode'   |
+;;+--------------------------------------+
 
-
-
-
-
+(use-package outshine
+  :straight (outshine :type git
+		      :host github
+		      :repo "alphapapa/outshine")
+  :hook (emacs-lisp-mode . outshine-mode))
 
 
 ;;+------------------+
@@ -2559,6 +2676,7 @@ See `org-capture-templates' for more information."
 
 (use-package doom-modeline
   :straight (doom-modeline :type git :host github :repo "seagle0128/doom-modeline")
+  :init (defvar outline-minor-mode-prefix "\M-#")
   :hook (after-init . doom-modeline-mode)
   :config
   (setq doom-modeline-buffer-file-name-style 'buffer-name)
@@ -2617,8 +2735,9 @@ See `org-capture-templates' for more information."
        ("*Buffer List*" :select t :same t)
        ;;       ("\\*Pp Eval" :regexp t :same nil :select t :other t) 
        ;;       ("*Messages*" :same nil :other t :select t :inhibit-window-quit t)
-       ("*Help*" :other t :select nil :same nil :align bottom :size 0.5)
+       ("*Help*" :other t :select nil :same nil :align 'below :size 0.5)
        ;; slime
+       ("\\*sly-mrepl*" :reqxp t :select t :align 'below :size 0.3 )
        ("*slime-source*" :select nil :same nil :other t)
        ("*slime-description*" :select nil :other t :inhibit-window-quit t)
        ("\\*slime-repl" :regexp t :same nil :select nil :other t)
@@ -2633,17 +2752,21 @@ See `org-capture-templates' for more information."
 
 ;;Line Numbering ;; Disable line numbers for some modes
 (global-display-line-numbers-mode t)
-(dolist (mode '(text-mode
-		org-mode
+(dolist (mode '(text-mode-hook
+		org-mode-hook
 		dievish-mode
 		;; vundo-1
+		sly-mrepl-mode-hook
                 term-mode-hook
 		vterm-mode-hook
 		compilation
                 shell-mode-hook
                 treemacs-mode-hook
                 eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-number-mode 0))))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+
+
 
 
 
@@ -2657,20 +2780,22 @@ See `org-capture-templates' for more information."
 			  ("Dynamics in Houdini"     "ANB3 2110")
 			  ) )
 
-(defun wwi-commands ()
-  "A wwi related addon"
-  (interactive)
-  ((defvar wwi-subjects-get-choice (let (completing-read "My Prompt: " '("VFX Theory - II"
-									 "VFX Theory - III"
-									 "VFX Practical - II"
-									 "Night Shoot Project"
-									 "Filmmaking Basics I"
-									 "Basic Compositing"
-									 "Introduction to Houdini"
-									 "Dynamics in Houdini"
-									 ) nil nil))))
-  (message (asscoc current-wwi-selected current-wwi-selected))
-  )
+
+
+;; (defun wwi-commands ()
+;;   "A wwi related addon"
+;;   (interactive)
+;;   ((defvar wwi-subjects-get-choice (let (completing-read "My Prompt: " '("VFX Theory - II"
+;; 									 "VFX Theory - III"
+;; 									 "VFX Practical - II"
+;; 									 "Night Shoot Project"
+;; 									 "Filmmaking Basics I"
+;; 									 "Basic Compositing"
+;; 									 "Introduction to Houdini"
+;; 									 "Dynamics in Houdini"
+;; 									 ) nil nil))))
+;;   (message (asscoc current-wwi-selected current-wwi-selected))
+;;   )
 
 ;; (use-package wwi-commands
 ;;   :straight (wwi-commands :type nil
@@ -2683,7 +2808,13 @@ See `org-capture-templates' for more information."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("2e05569868dc11a52b08926b4c1a27da77580daa9321773d92822f7a639956ce" "a138ec18a6b926ea9d66e61aac28f5ce99739cf38566876dc31e29ec8757f6e2" "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "a137529f2b83537fda674b1723043f0e5fcac21f9d0b5ea4aa64443c281bac2b" "f0eb51d80f73b247eb03ab216f94e9f86177863fb7e48b44aacaddbfe3357cf1" default)))
+   '("2e05569868dc11a52b08926b4c1a27da77580daa9321773d92822f7a639956ce"
+     "a138ec18a6b926ea9d66e61aac28f5ce99739cf38566876dc31e29ec8757f6e2"
+     "afa47084cb0beb684281f480aa84dab7c9170b084423c7f87ba755b15f6776ef"
+     "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644"
+     "a137529f2b83537fda674b1723043f0e5fcac21f9d0b5ea4aa64443c281bac2b"
+     "f0eb51d80f73b247eb03ab216f94e9f86177863fb7e48b44aacaddbfe3357cf1"
+     default)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
