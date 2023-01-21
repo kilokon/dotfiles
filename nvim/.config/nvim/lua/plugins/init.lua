@@ -1,0 +1,10 @@
+require 'plugins.plugins'
+require 'plugins.treesitter'
+require 'plugins.colors'
+require 'plugins.telescope'
+require 'plugins.lualine'
+require 'plugins.spectare'
+require 'plugins.lsp'
+require 'plugins.fidget'
+require 'plugins.toggle_term'
+--require("plugins.nullls")

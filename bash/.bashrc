@@ -1,48 +1,71 @@
+#
+# ~/.bashrc
+#
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
 
-
+    
 PS1='[\u@\h \W]\$ '
 . "$HOME/.cargo/env"
 
-# Application cache if not stated elsewhere.
-script_dir="${XDG_CACHE_HOME:-$HOME/.scripts}/bash"
-[ -f "${script_dir}/aliases" ] && source "${script_dir}/aliases"
-[ -f "${script_dir}/functions" ] && source "${script_dir}/functions"
 
-export PATH=$PATH:"${script_dir}/surf_scripts"
+export SCRIPT_DIR="$HOME/.scripts/bash"
 
+export EDITOR="emacsclient -c"
 
+export DOTFILES_DIR="$HOME/.dotfiles/"
 
-## sumneko-lua installed from instructions at 
-## https://jdhao.github.io/2021/08/12/nvim_sumneko_lua_conf/
-export PATH="$HOME/tools/lua-language-server/bin:$PATH"
-eval "$(starship init bash)"
+export DEV="$HOME/Dev/"
+# If not running interactively, don't do anything
+if [[ -n "$PS1" ]] ; then
+
+    # ignore ls, bg, fg, exit commands
+    export HISTIGNORE="ls:[bf]g:exit"
+
+        # don't put duplicate lines in the history. See bash(1) for more options
+    # don't overwrite GNU Midnight Commander's setting of `ignorespace'.
+    HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
+    # ... or force ignoredups and ignorespace
+    HISTCONTROL=ignoreboth
+
+    # append to the history file, don't overwrite it
+    shopt -s histappend
+
+    # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+
+    # check the window size after each command and, if necessary,
+    # update the values of LINES and COLUMNS.
+    shopt -s checkwinsize
+    
+    #  scripts directory append.
+    [ -f "${script_dir}/aliases" ] && source "${script_dir}/aliases"
+    [ -f "${script_dir}/functions" ] && source "${script_dir}/functions"
+    
+    [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+    eval "$(starship init bash)"
+    eval "$(zoxide init bash)"
+
+fi # end of 'if [[ -n "$PS1" ]] ; then'
 
 
 GPG_TTY=$(tty)
 export GPG_TTY
 
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 
-eval "$(zoxide init bash)"
 
-[ -f "/home/aviik/.ghcup/env" ] && source "/home/aviik/.ghcup/env" # ghcup-env
-
-source ~/.bash_completion/alacritty
 
 
 # Load pyenv automatically by appending
-
-
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
-
-source /home/aviik/.config/broot/launcher/bash/br
-
-
-
+# nvm appending
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Exract anything with ex
 ex ()

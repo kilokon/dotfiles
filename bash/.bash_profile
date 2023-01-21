@@ -13,10 +13,12 @@
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
-export PATH=~/dev/exercism:$PATH
-export PATH=$PATH:/usr/local/go/bin
-export EDITOR="emacsclient -c"
-export DOTFILES_DIR="$HOME/.dotfiles/"
+
+#export PATH=~/dev/exercism:$PATH
+#export PATH=$PATH:/usr/local/go/bin
+# export EDITOR="emacsclient -c"
+
+# export DOTFILES_DIR="$HOME/.dotfiles/"
 
 
 #LC_ALL=C
@@ -25,9 +27,12 @@ export DOTFILES_DIR="$HOME/.dotfiles/"
 #kmonad ~/.dotfiles/kmonad/.config/kmonad/ansi_qwerty_circle_87keys.kbd
 # Load pyenv automatically by appending
 # the following the
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+
+# . "$HOME/.cargo/env"
+
+# export PYENV_ROOT="$HOME/.pyenv"
+# command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init -)"
 
 
-source /home/aviik/.config/broot/launcher/bash/br
+# source /home/aviik/.config/broot/launcher/bash/br

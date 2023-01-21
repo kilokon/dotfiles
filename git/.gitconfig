@@ -1,7 +1,7 @@
 [user]
-	name = aviikc
-        email = aviik.chakraborty@gmail.com
-	signingKey = D4DE1B98493F0375
+	signingkey = 50236ED81379935B
+	name = kilokon
+	email = kilo.kon@outlook.com
 [pull]
         rebase = true
 [init]
@@ -48,3 +48,5 @@
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
+[commit]
+	gpgsign = true
