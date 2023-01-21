@@ -22,7 +22,7 @@ alias pl="ps aux | grep"
 alias k="kill -9"
 #alias kmo="kmonad $DOTFILES/kmonad/.config/kmonad/ansi_qwerty_circle_87keys.kbd"
 
-
+set -gx GPG_TTY (tty)
 
 starship init fish | source
 zoxide init fish | source
