@@ -1,0 +1,39 @@
+#! /bin/bash
+
+# pgrep -x sxhkd > /dev/null || sxhkd &
+
+$HOME/.config/bspwm/startup.sh &
+
+
+# Truncate a couple of common commands that are used herein.
+_bs() {
+	bspc config "$@"
+}
+
+_check() {
+	command -v "$1" > /dev/null
+}
+
+
+
+
+
+bspc monitor DP-0 -d I II III IV V VI VII
+bspc monitor HDMI-0 -d I II III IV V VI VII
+
+
+_bs border_width         2
+_bs window_gap          12
+
+_bs split_ratio          0.52
+_bs borderless_monocle   true
+_bs gapless_monocle      true
+_bc focus_follows_pointer  true
+_bc pointer_modifier mod4
+_bc pointer_action1 move
+_bc pointer_action2 resize_slide
+_bc pointer_action3 resize_corner
+#_bc remove_disabled_monitors true
+#_bc merge_overlapping_monitors true
+
+

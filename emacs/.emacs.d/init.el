@@ -1,3 +1,4 @@
+
 ;; ;--------------
 ;; ┏━┓╋┏┳━━━┳━┓┏┳━━━┳━━━┳━━┳━┓┏┓
 ;; ┃┃┃╋┃┃┏━┓┣┓┃┃┃┏━┓┃┏━┓┣┫┣┻┓┃┃┃
@@ -74,7 +75,7 @@
   (interactive)
   (insert (completing-read "Yank:" kill-ring)))
 
-;;;;http://chopmo.dk/2016/10/27/emacs-highlighting-current-word.html
+;;;http://chopmo.dk/2016/10/27/emacs-highlighting-current-word.html
 ;; (require 'hi-lock)
 (defun aviik/toggle-mark-word-at-point ()
   (interactive)
@@ -416,7 +417,7 @@
 ;;+-----------------------------------+
 (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :weight 'light :height 100)
 (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font" :weight 'light :height 120)
-(set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :weight 'light :height 1.1)
+;; (set-face-attribute 'variable-pitch nil :font "Iosevka Aile" :weight 'light :height 1.1)
 
 
 
@@ -2642,15 +2643,15 @@ See `org-capture-templates' for more information."
 
 
 
-(straight-use-package '(auctex :source el-get
-                        :files ("*.el" "*.info" "dir"
-                                "doc" "etc" "images" "latex" "style")))
+;; (straight-use-package '(auctex :source el-get
+;;                         :files ("*.el" "*.info" "dir"
+;;                                 "doc" "etc" "images" "latex" "style")))
 ;; See the :load bits of
 ;; https://github.com/dimitri/el-get/blob/master/recipes/auctex.rcp,
 ;; which are not supported by straight.el as of this writing.  Without
 ;; these you will get built-in Emacs LaTeX modes, not AUCTeX.
-(require 'tex-site)
-(require 'preview-latex)
+;; (require 'tex-site)
+;; (require 'preview-latex)
 
 
 ;;(when (bound-and-true-p aviik/for-org) (load-theme 'nano-light))
