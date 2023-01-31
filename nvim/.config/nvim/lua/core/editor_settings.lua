@@ -1,5 +1,5 @@
 local providers = {
-        loaded_node_provider = 0,
+        -- loaded_node_provider = 0,
         loaded_perl_provider = 0,
         loaded_ruby_provider = 0,
 }
@@ -9,39 +9,62 @@ for ii, jj in pairs(providers) do
 end
 
 local options = {
-	-- Using wider tabs
-	number = true,
-	shiftwidth = 8,
-	softtabstop = 8,
-	tabstop = 8,
-	expandtab = true,
+        -- Using wider tabs
+        number = true,
+        relativenumber = true,
+        shiftwidth = 8,
+        softtabstop = 8,
+        tabstop = 8,
+        expandtab = true,
+        smartindent = true,
+        breakindent = true,
+        signcolumn = 'yes',
 
-	-- backup & autosave
-	-- 'backup' 'writebackup'	action	~
-	-- off	     off	no backup made
-	-- off	     on		backup current file, deleted afterwards (default)
-	-- on	     off	delete old backup, backup current file
-	-- on	     on		delete old backup, backup current file
-	backup = false,
-	writebackup = false,
-	swapfile = false,
+        -- backup & autosave
+        -- 'backup' 'writebackup'	action	~
+        -- off	     off	no backup made
+        -- off	     on		backup current file, deleted afterwards (default)
+        -- on	     off	delete old backup, backup current file
+        -- on	     on		delete old backup, backup current file
+        backup = false,
+        writebackup = false,
+        swapfile = false,
 
-	-- mouse
-	mouse = "a",
-	scrolloff = 2,
+        completeopt = { "menuone", "noselect" }, -- Options for insert mode completion
+        copyindent = true, -- Copy the previous indentation on autoindenting
+        cursorline = true, -- Highlight the text line of the cursor
+        pumheight = 10, -- Height of the pop up menu
+        -- mouse
+        mouse = "a",
+        scrolloff = 7, -- Minimal number of screen lines to keep above and below the cursor
 
-	-- ui
-	numberwidth = 4,
+        -- ui
+        numberwidth = 4,
 
-	-- text
-	encoding = "utf-8",
+        -- text
+        list       = true,
+        listchars  = { tab = '▸ ', trail = '·' },
+        encoding   = "utf-8",
         ignorecase = true,
-        clipboard = "unnamedplus",
+        clipboard  = "unnamedplus",
         --hover
-        --hover_with_actions = true, 
+        --hover_with_actions = true,
+        cmdheight  = 0 -- use 2 for Wider command height
 }
 
 for k, v in pairs(options) do
-	vim.opt[k] = v
+        vim.opt[k] = v
 end
 
+local g = {
+        highlighturl_enabled = true, -- highlight URLs by default
+        autopairs_enabled = true, -- enable autopairs at start
+        diagnostics_enabled = true, -- enable diagnostics at start
+        status_diagnostics_enabled = true, -- enable diagnostics in statusline
+        icons_enabled = true, -- disable icons in the UI (disable if no nerd font is available)
+        ui_notifications_enabled = true, -- disable notifications when toggling UI elements
+}
+
+for kk, vv in pairs(g) do
+        vim.g[kk] = vv
+end

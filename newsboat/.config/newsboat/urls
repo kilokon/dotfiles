@@ -1,0 +1,29 @@
+"query:.          ---YouTube Linux---:tags # \"YouTube\""
+https://www.youtube.com/feeds/videos.xml?channel_id=UCUyeluBRhGPCW4rPe_UvBZQ "Linux" "YouTube"                              #ThePrimeagen
+https://www.youtube.com/feeds/videos.xml?channel_id=UCd3dNckv1Za2coSaHGHl5aA "Linux" "YouTube"                              #TJ
+https://www.youtube.com/feeds/videos.xml?channel_id=UCoSvlWS5XcwaSzIcbuJ-Ysg "Notion" "Youtube" #Notion
+
+https://www.youtube.com/feeds/videos.xml?channel_id=UCJLZe_NoiG0hT7QCX_9vmqw "General" "Youtube" #IDIDATHING
+
+
+"query:.          ---YouTube Linux---:tags # \"RUST\""
+https://www.youtube.com/feeds/videos.xml?channel_id=UC_iD0xppBwwsrM9DegC5cQQ "RUST" #Jon Gjengset
+https://www.youtube.com/feeds/videos.xml?channel_id=UCmBgC0JN41HjyjAXfkdkp-Q "RUST" #Doug Milford
+https://www.youtube.com/feeds/videos.xml?channel_id=UCT1-XRVnJA-wws2bfbLbFcQ "RUST" #Brooks Builds
+https://www.youtube.com/feeds/videos.xml?channel_id=UCjREVt2ZJU8ql-NC9Gu-TJw "RUST" #Code_to_the_Moon
+
+
+
+
+"query:.          ---Photography---:tags # \"Photography\""
+https://www.youtube.com/feeds/videos.xml?channel_id=UC8Pksdbj37CdE00kmE7Z1dw "Photography" #Adorama
+
+
+"query:.          ---Reddit---:tags # \"Reddit\""
+https://www.reddit.com/r/bash.rss "Reddit" "linux bash"
+
+
+"query:.          ---Blogs---:tags # \"Blog\""
+https://this-week-in-neovim.org/rss "Blog" "Neovim"
+https://www.archlinux.org/feeds/news/ "Blog" "linux"
+

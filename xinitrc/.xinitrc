@@ -51,7 +51,7 @@ fi
 feh --bg-fill ~/.config/wallpapers/Zephyrus\ Duo\ 15\ x\ MDJ_top\ screen.jpg &
 picom &
 redshift &
-setxkbmap -option caps:capslock 
+setxkbmap -option caps:none 
 exec i3
 
  # twm &

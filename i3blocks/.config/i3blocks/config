@@ -22,8 +22,101 @@ separator_block_width=15
 # label=wifi:
 # INTERFACE=wlan0
 # interval=60
+# [title_icon]
+# full_text=  
+# separator=false
+# separator_block_width=0
+# #
+# # [title]
+# command=bash $HOME/.config/i3/windowtitle.sh
+# interval=2
+# separator=false
+# separator_block_width=0
+[gpu-load]
+command=$SCRIPT_DIR/i3blocks/gpu-load
+label=GPU 
+interval=10
+min_width=GPU 100% 100% 100%
+GPU_BRAND=NVIDIA
+T_WARN=70
+T_CRIT=90
 
 
+[memory]
+command=$SCRIPT_DIR/i3blocks/memory
+label=MEM
+interval=30
+
+[memory]
+command=$SCRIPT_DIR/i3blocks/memory
+label=SWAP
+instance=swap
+interval=30
+
+[disk]
+command=$SCRIPT_DIR/i3blocks/disk
+LABEL= SYS: 
+DIR=/dev/nvme0n1p2
+interval=30
+
+[disk]
+command=$SCRIPT_DIR/i3blocks/disk
+LABEL=HOME: 
+DIR=/dev/nvme0n1p3
+interval=30
+
+[volume-pulseaudio]
+command=$SCRIPT_DIR/i3blocks/volume-pulseaudio
+interval=once
+signal=1
+MIXER=[determined automatically]
+SCONTROL=[determined automatically]
+##exposed format variables: ${SYMB}, ${VOL}, ${INDEX}, ${NAME}
+#LONG_FORMAT="${SYMB} ${VOL}% [${INDEX}:${NAME}]"
+SHORT_FORMAT="${SYMB} ${VOL}% [${INDEX}]"
+AUDIO_HIGH_SYMBOL='  '
+AUDIO_MED_THRESH=50
+AUDIO_MED_SYMBOL='  '
+AUDIO_LOW_THRESH=0
+AUDIO_LOW_SYMBOL='  '
+AUDIO_DELTA=5
+DEFAULT_COLOR="#ffffff"
+MUTED_COLOR="#a0a0a0"
+USE_ALSA_NAME=0
+USE_DESCRIPTION=0
+## SUBSCRIBE=1 requires interval=persist and always uses LONG_FORMAT
+SUBSCRIBE=0
+
+
+#
+#
+# [aur-update]
+# command=$SCRIPT_DIR/i3blocks/aur-update
+# markup=pango
+# format=json
+# interval=43200
+# UPDATE_COLOR=red
+# QUIET=1
+# IGNORE=root vidyodesktop
+
+#CACHE_UPDATES=0
+#FORCE_IPV4=1
+
+[pacman-updates]
+command=$SCRIPT_DIR/i3blocks/arch-update 
+markup=pango
+interval=3600
+#LABEL=Updates:
+QUIET=true
+WATCH=^linux.* ^pacman.*
+BASE_COLOR=#5fff5f
+UPDATE_COLOR=#FFFF85
+AUR=false
+LABEL= 
+
+# [click_apps]
+# full_text=  
+# command=wezterm
 
 [time]
 command=date '+%Y-%m-%d %H:%M:%S'

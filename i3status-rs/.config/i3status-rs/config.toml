@@ -1,0 +1,54 @@
+[theme]
+theme = "srcery"
+
+[icons]
+icons = "awesome"
+
+[[block]]
+block = "cpu"
+interval = 1
+
+[[block]]
+block = "disk_space"
+path = "/"
+info_type = "available"
+alert_unit = "GB"
+interval = 20
+warning = 20.0
+alert = 10.0
+format = "$icon: $available.eng(2) "
+
+[[block]]
+block = "disk_space"
+path = "/home"
+info_type = "available"
+alert_unit = "GB"
+interval = 20
+warning = 20.0
+alert = 10.0
+format = "$icon: $available.eng(2) "
+
+[[block]]
+block = "memory"
+format = " $icon $mem_total_used_percents.eng(2) "
+format_alt = " $icon_swap $swap_used_percents.eng(2) "
+
+[[block]]
+block = "sound"
+[[block.click]]
+button = "left"
+cmd = "pavucontrol"
+
+[[block]]
+block = "pacman"
+interval = 600
+format = "{pacman} updates available"
+format_singular = "{pacman} update available"
+format_up_to_date = "system up to date"
+critical_updates_regex = "(linux|linux-lts|linux-zen)"
+
+
+[[block]]
+block = "time"
+interval = 5
+format = " %a %d/%m %R "

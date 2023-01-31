@@ -1,0 +1,7 @@
+feh --bg-fill ~/.config/wallpapers/Zephyrus\ Duo\ 15\ x\ MDJ_top\ screen.jpg &
+picom &
+redshift &
+#! /bin/sh
+sxhkd &
+# setxkbmap -option caps:none 
+exec bspwm

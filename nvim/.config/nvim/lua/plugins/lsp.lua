@@ -1,58 +1,193 @@
 -- Reserve space for diagnostic icons
-vim.opt.signcolumn = 'yes'
+-- vim.opt.signcolumn = 'yes'
 
 local lsp = require('lsp-zero')
+
 lsp.preset('recommended')
 
 lsp.ensure_installed({
         -- Replace these with whatever servers you want to install
         'rust_analyzer',
+        'clangd',
         'pyright',
-        --  'eslint',
+        'openscad_lsp',
+        'taplo',
+        'bashls',
+        'eslint',
+        'emmet_ls',
+        'arduino_language_server',
         'sumneko_lua',
 })
+
+-- require("lsp-format").setup {}
 
 lsp.set_preferences({
         init_options = { documentFormatting = true },
 })
+
+
+local ELLIPSIS_CHAR = '…'
+local MAX_LABEL_WIDTH = 25
+-- local MAX_KIND_WIDTH = 14
+
+local get_ws = function(max, len)
+        return (" "):rep(max - len)
+end
+local menu_icon = {
+        Text = "   (Text) ",
+        Method = "   (Method)",
+        Function = "   (Function)",
+        Constructor = "   (Constructor)",
+        Field = " ﴲ  (Field)",
+        Variable = "[] (Variable)",
+        Class = "   (Class)",
+        Interface = " ﰮ  (Interface)",
+        Module = "   (Module)",
+        Property = " 襁 (Property)",
+        Unit = "   (Unit)",
+        Value = "   (Value)",
+        Enum = " 練 (Enum)",
+        Keyword = "   (Keyword)",
+        Snippet = "   (Snippet)",
+        Color = "   (Color)",
+        File = "   (File)",
+        Reference = "   (Reference)",
+        Folder = "   (Folder)",
+        EnumMember = "   (EnumMember)",
+        Constant = " ﲀ  (Constant)",
+        Struct = " ﳤ  (Struct)",
+        Event = "   (Event)",
+        Operator = "   (Operator)",
+        TypeParameter = "   (TypeParameter)",
+}
+
+local cmp_format = function(entry, item)
+        local content = item.abbr
+        -- local kind_symbol = symbols[item.kind]
+        -- item.kind = kind_symbol .. get_ws(MAX_KIND_WIDTH, #kind_symbol)
+
+        if #content > MAX_LABEL_WIDTH then
+                item.abbr = vim.fn.strcharpart(content, 0, MAX_LABEL_WIDTH) .. ELLIPSIS_CHAR
+        else
+                item.abbr = content .. get_ws(MAX_LABEL_WIDTH, #content)
+        end
+        item.kind = menu_icon[item.kind]
+        --item.kind = item.kind[1]
+        local strings = vim.split(item.kind, "%s", { trimempty = true })
+        item.kind = " " .. (strings[1] or "") .. " "
+        item.menu = ({
+                nvim_lsp = 'λ',
+                luasnip = '⋗',
+                buffer = 'Ω',
+                path = '🖫',
+                nvim_lua = 'Π',
+        })[entry.source.name]
+
+        return item
+end
+
+local compare = require('cmp.config.compare')
+lsp.setup_nvim_cmp({
+        -- entries = { max_item_count = 12 },
+        sources = {
+                { name = 'path' },
+                { name = 'fuzzy_buffer' },
+                { name = 'nvim_lsp', keyword_length = 3 },
+                { name = 'buffer', keyword_length = 3 },
+                { name = 'luasnip', keyword_length = 2 },
+        },
+        formatting = {
+                -- changing the order of fields so the icon is the first
+                fields = { 'kind', 'abbr', 'menu' },
+                format = cmp_format,
+
+                -- here is where the change happens
+                -- format = function(entry, item)
+                --         local menu_icon = {
+                --                 nvim_lsp = 'λ',
+                --                 luasnip = '⋗',
+                --                 buffer = 'Ω',
+                --                 path = '🖫',
+                --                 nvim_lua = 'Π',
+                --         }
+                --
+                --         item.menu = menu_icon[entry.source.name]
+                --         return item
+                -- end,
+        },
+        -- max_item_count = 12,
+        preselect = 'none',
+        completion = {
+                completeopt = 'menu,menuone,noinsert,noselect',
+                -- winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
+                -- col_offset = -3,
+                -- side_padding = 0,
+        },
+        window = {
+                completion = { -- rounded border; thin-style scrollbar
+                        border = 'rounded',
+                        scrollbar = '║',
+                },
+        },
+        sorting = {
+                priority_weight = 2,
+                comparators = {
+                        require('cmp_fuzzy_buffer.compare'),
+                        compare.offset,
+                        compare.exact,
+                        compare.score,
+                        compare.recently_used,
+                        compare.kind,
+                        compare.sort_text,
+                        compare.length,
+                        compare.order,
+                }
+        },
+
+})
+
 -- don't initialize this language server
 -- we will use rust-tools to setup rust_analyzer
 lsp.skip_server_setup({ 'rust_analyzer' })
 
 lsp.on_attach(function(client, bufnr)
         require("lsp-format").on_attach(client)
-        local opts = { buffer = bufnr, remap = false }
+        local opts = { buffer = bufnr }
+        local bind = vim.keymap.set
 
-        vim.keymap.set("n", "gd", function()
-                vim.lsp.buf.definition()
-        end, opts)
-        vim.keymap.set("n", "K", function()
-                vim.lsp.buf.hover()
-        end, opts)
-        vim.keymap.set("n", "<leader>ws", function()
-                vim.lsp.buf.workspace_symbol()
-        end, opts)
-        vim.keymap.set("n", "<leader>of", function()
-                vim.diagnostic.open_float()
-        end, opts)
-        vim.keymap.set("n", "[d", function()
-                vim.diagnostic.goto_next()
-        end, opts)
-        vim.keymap.set("n", "]d", function()
-                vim.diagnostic.goto_prev()
-        end, opts)
-        vim.keymap.set("n", "<leader>ca", function()
-                vim.lsp.buf.code_action()
-        end, opts)
-        vim.keymap.set("n", "<leader>rf", function()
-                vim.lsp.buf.references()
-        end, opts)
-        vim.keymap.set("n", "<leader>rn", function()
-                vim.lsp.buf.rename()
-        end, opts)
-        vim.keymap.set("i", "<C-h>", function()
-                vim.lsp.buf.signature_help()
-        end, opts)
+        bind('n', '<leader>r', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+        -- local opts = { buffer = bufnr, remap = false }
+        --
+        -- vim.keymap.set("n", "gd", function()
+        --         vim.lsp.buf.definition()
+        -- end, opts)
+        -- vim.keymap.set("n", "K", function()
+        --         vim.lsp.buf.hover()
+        -- end, opts)
+        -- vim.keymap.set("n", "<leader>ws", function()
+        --         vim.lsp.buf.workspace_symbol()
+        -- end, opts)
+        -- vim.keymap.set("n", "<leader>of", function()
+        --         vim.diagnostic.open_float()
+        -- end, opts)
+        -- vim.keymap.set("n", "[d", function()
+        --         vim.diagnostic.goto_next()
+        -- end, opts)
+        -- vim.keymap.set("n", "]d", function()
+        --         vim.diagnostic.goto_prev()
+        -- end, opts)
+        -- vim.keymap.set("n", "<leader>ca", function()
+        --         vim.lsp.buf.code_action()
+        -- end, opts)
+        -- vim.keymap.set("n", "<leader>rf", function()
+        --         vim.lsp.buf.references()
+        -- end, opts)
+        -- vim.keymap.set("n", "<leader>rn", function()
+        --         vim.lsp.buf.rename()
+        -- end, opts)
+        -- vim.keymap.set("i", "<C-h>", function()
+        --         vim.lsp.buf.signature_help()
+        -- end, opts)
         print('Greetings from on_attach')
 end)
 
@@ -65,6 +200,7 @@ lsp.configure('pyright', {
                         silent = true,
                         noremap = true,
                 })
+                -- require("lsp-format").on_attach(client)
         end,
         settings = {
                 pyright = {
@@ -78,28 +214,57 @@ lsp.configure('pyright', {
                 },
         },
 })
--- Pass arguments to a language server
--- lsp.configure('sumneko_lua', {
---         on_attach = function(client, bufnr)
---                 print('hello sumneko')
---         end,
---         settings = {
---                 completions = {
---                         completeFunctionCalls = true
---                 }
---         }
--- })
---
--- Configure lua language server for neovim
+--Pass arguments to a language server
+lsp.configure('sumneko_lua', {
+        on_attach = function(client, bufnr)
+                print('hello sumneko')
+                -- require("lsp-format").on_attach(client)
+        end,
+        settings = {
+                Lua = {
+                        diagnostics = {
+                                globals = { 'vim' }
+                        }
+                },
+                completions = {
+                        completeFunctionCalls = true
+                }
+        }
+})
+
+--Configure lua language server for neovim
 lsp.nvim_workspace()
 
 lsp.setup()
-
+vim.diagnostic.config({
+        virtual_text = true,
+        signs = true,
+        update_in_insert = false,
+        underline = true,
+        severity_sort = false,
+        float = true,
+})
 -- Initialize rust_analyzer with rust-tools
 local rust_lsp = lsp.build_options('rust_analyzer', {})
 
+local extension_path = vim.env.HOME .. '/.vscode-oss/extensions/vadimcn.vscode-lldb-1.8.1-universal/'
+local codelldb_path = extension_path .. 'adapter/codelldb'
+local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
 require('rust-tools').setup({
-        server = rust_lsp,
+        server = { rust_lsp,
+                on_attach = function(_, bufnr)
+                        local rt = require "rust-tools"
+                        -- Hover actions
+                        vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+                        -- Code action groups
+                        vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+                        -- Rust Runables
+                        vim.keymap.set("n", "rr", rt.runnables.runnables, { buffer = bufnr })
+                        -- Rust Cargo Open
+                        vim.keymap.set("n", "rc", rt.open_cargo_toml.open_cargo_toml, { buffer = bufnr })
+
+                end,
+        },
         tools = {
                 autoSetHints = true,
                 --hover_with_actions = true,
@@ -118,7 +283,24 @@ require('rust-tools').setup({
                         right_align_padding = 7,
                         highlight = "Comment",
                 },
+                hover_actions = {
+                        border = {
+                                { "╭", "FloatBorder" },
+                                { "─", "FloatBorder" },
+                                { "╮", "FloatBorder" },
+                                { "│", "FloatBorder" },
+                                { "╯", "FloatBorder" },
+                                { "─", "FloatBorder" },
+                                { "╰", "FloatBorder" },
+                                { "│", "FloatBorder" },
+                        },
+                        auto_focus = true,
+                },
         },
+        dap = {
+                adapter = require('rust-tools.dap').get_codelldb_adapter(
+                        codelldb_path, liblldb_path)
+        }
 
 })
 
