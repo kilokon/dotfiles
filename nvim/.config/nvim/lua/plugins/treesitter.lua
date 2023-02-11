@@ -85,6 +85,9 @@ require'nvim-treesitter.configs'.setup {
       -- and should return true of false
       include_surrounding_whitespace = true,
     },
+        tree_setter = {
+        enable = true
+    },
   },
     playground = {
     enable = true,

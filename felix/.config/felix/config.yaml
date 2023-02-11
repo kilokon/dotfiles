@@ -1,7 +1,7 @@
 # (Optional)
 # Default exec command when opening file.
 # If not set, will default to $EDITOR.
-# default: nvim
+default: nvim
 
 # (Optional)
 # key (the command you want to use when opening file): [values] (extensions)

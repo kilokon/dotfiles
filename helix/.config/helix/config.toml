@@ -1,0 +1,38 @@
+theme = "tokyonight_storm"
+
+[editor]
+line-number = "relative"
+mouse = false
+completion-trigger-len = 3
+#auto-info = false
+bufferline = "multiple"
+gutters = ["diff", "spacer", "line-numbers", "spacer", "diagnostics"]
+
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+hidden = false
+
+[editor.lsp]
+display-messages = true
+
+
+[editor.whitespace.render]
+space = "all"
+tab = "all"
+newline = "none"
+
+
+[editor.whitespace.characters]
+space = "·"
+nbsp = "⍽"
+tab = "→"
+newline = "⏎"
+tabpad = "·"  # Tabs will look like "→···" (depending on tab width)
+
+[keys.normal]
+esc = ["collapse_selection", "keep_primary_selection"]

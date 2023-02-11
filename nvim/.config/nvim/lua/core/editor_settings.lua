@@ -1,12 +1,4 @@
-local providers = {
-        -- loaded_node_provider = 0,
-        loaded_perl_provider = 0,
-        loaded_ruby_provider = 0,
-}
-
-for ii, jj in pairs(providers) do
-        vim.g[ii] = jj
-end
+-- loaded_node_provider = 0,
 
 local options = {
         -- Using wider tabs
@@ -33,7 +25,7 @@ local options = {
         completeopt = { "menuone", "noselect" }, -- Options for insert mode completion
         copyindent = true, -- Copy the previous indentation on autoindenting
         cursorline = true, -- Highlight the text line of the cursor
-        pumheight = 10, -- Height of the pop up menu
+        pumheight = 12, -- Height of the pop up menu
         -- mouse
         mouse = "a",
         scrolloff = 7, -- Minimal number of screen lines to keep above and below the cursor
@@ -63,6 +55,8 @@ local g = {
         status_diagnostics_enabled = true, -- enable diagnostics in statusline
         icons_enabled = true, -- disable icons in the UI (disable if no nerd font is available)
         ui_notifications_enabled = true, -- disable notifications when toggling UI elements
+        loaded_perl_provider = 0,
+        loaded_ruby_provider = 0,
 }
 
 for kk, vv in pairs(g) do

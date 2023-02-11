@@ -61,6 +61,33 @@ local menu_icon = {
         TypeParameter = "   (TypeParameter)",
 }
 
+local kind_icons = {
+    ["Class"] = "🅒 ",
+    ["Interface"] = "🅘 ",
+    ["TypeParameter"] = "🅣 ",
+    ["Struct"] = "🅢",
+    ["Enum"] = "🅔 ",
+    ["Unit"] = "🅤 ",
+    ["EnumMember"] = "🅔 ",
+    ["Constant"] = "🅒 ",
+    ["Field"] = "🅕 ",
+    ["Property"] = " ",
+    ["Variable"] = "🅥 ",
+    ["Reference"] = "🅡 ",
+    ["Function"] = "🅕 ",
+    ["Method"] = "🅜 ",
+    ["Constructor"] = "🅒 ",
+    ["Module"] = "🅜 ",
+    ["File"] = "🅕 ",
+    ["Folder"] = "🅕 ",
+    ["Keyword"] = "🅚 ",
+    ["Operator"] = "🅞 ",
+    ["Snippet"] = "🅢 ",
+    ["Value"] = "🅥 ",
+    ["Color"] = "🅒 ",
+    ["Event"] = "🅔 ",
+    ["Text"] = "🅣 ",
+}
 local cmp_format = function(entry, item)
         local content = item.abbr
         -- local kind_symbol = symbols[item.kind]
@@ -71,31 +98,62 @@ local cmp_format = function(entry, item)
         else
                 item.abbr = content .. get_ws(MAX_LABEL_WIDTH, #content)
         end
-        item.kind = menu_icon[item.kind]
-        --item.kind = item.kind[1]
-        local strings = vim.split(item.kind, "%s", { trimempty = true })
-        item.kind = " " .. (strings[1] or "") .. " "
-        item.menu = ({
-                nvim_lsp = 'λ',
-                luasnip = '⋗',
-                buffer = 'Ω',
-                path = '🖫',
-                nvim_lua = 'Π',
-        })[entry.source.name]
-
+        item.menu = item.kind
+        item.kind = kind_icons[item.kind] or " "
         return item
 end
 
-local compare = require('cmp.config.compare')
+-- local cmp_format = function(entry, item)
+--         local content = item.abbr
+--         -- local kind_symbol = symbols[item.kind]
+--         -- item.kind = kind_symbol .. get_ws(MAX_KIND_WIDTH, #kind_symbol)
+--
+--         if #content > MAX_LABEL_WIDTH then
+--                 item.abbr = vim.fn.strcharpart(content, 0, MAX_LABEL_WIDTH) .. ELLIPSIS_CHAR
+--         else
+--                 item.abbr = content .. get_ws(MAX_LABEL_WIDTH, #content)
+--         end
+--         item.kind = menu_icon[item.kind]
+--         --item.kind = item.kind[1]
+--         local strings = vim.split(item.kind, "%s", { trimempty = true })
+--         item.kind = " " .. (strings[1] or "") .. " "
+--         item.menu = ({
+--                 nvim_lsp = 'λ',
+--                 luasnip = '⋗',
+--                 buffer = 'Ω',
+--                 path = '🖫',
+--                 nvim_lua = 'Π',
+--         })[entry.source.name]
+--
+--         return item
+-- end
+local cmp = require('cmp')
+-- local compare = require('cmp.config.compare')
 lsp.setup_nvim_cmp({
         -- entries = { max_item_count = 12 },
         sources = {
+                { name = 'nvim_lsp' },
                 { name = 'path' },
                 { name = 'fuzzy_buffer' },
-                { name = 'nvim_lsp', keyword_length = 3 },
-                { name = 'buffer', keyword_length = 3 },
+                { name = "crates" },
+                { name = 'buffer', keyword_length = 4 },
                 { name = 'luasnip', keyword_length = 2 },
         },
+        		mapping = {
+		["<C-n>"] = cmp.mapping(
+				cmp.mapping.select_next_item(),
+				{ "i", "c" }
+			),
+		["<C-p>"] = cmp.mapping(
+				cmp.mapping.select_prev_item(),
+				{ "i", "c" }
+			),
+		['<up>'] = vim.NIL,
+	        ['<down>'] = vim.NIL,
+	        ['<Tab>'] = vim.NIL,
+                ['<S-Tab>'] = vim.NIL,
+                ['<CR>'] = vim.NIL,
+	},
         formatting = {
                 -- changing the order of fields so the icon is the first
                 fields = { 'kind', 'abbr', 'menu' },
@@ -131,17 +189,21 @@ lsp.setup_nvim_cmp({
         },
         sorting = {
                 priority_weight = 2,
-                comparators = {
-                        require('cmp_fuzzy_buffer.compare'),
-                        compare.offset,
-                        compare.exact,
-                        compare.score,
-                        compare.recently_used,
-                        compare.kind,
-                        compare.sort_text,
-                        compare.length,
-                        compare.order,
-                }
+                -- comparators = {
+                --         require('cmp_fuzzy_buffer.compare'),
+                --         compare.offset,
+                --         compare.exact,
+                --         compare.score,
+                --         compare.recently_used,
+                --         compare.kind,
+                --         compare.sort_text,
+                --         compare.length,
+                --         compare.order,
+                -- }
+        },
+        experimental = {
+                native_menu = false,
+                ghost_text = true,
         },
 
 })
@@ -150,49 +212,18 @@ lsp.setup_nvim_cmp({
 -- we will use rust-tools to setup rust_analyzer
 lsp.skip_server_setup({ 'rust_analyzer' })
 
-lsp.on_attach(function(client, bufnr)
-        require("lsp-format").on_attach(client)
+lsp.on_attach(function(_, bufnr)
+        -- require("lsp-format").on_attach(client)
         local opts = { buffer = bufnr }
         local bind = vim.keymap.set
 
         bind('n', '<leader>r', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-        -- local opts = { buffer = bufnr, remap = false }
-        --
-        -- vim.keymap.set("n", "gd", function()
-        --         vim.lsp.buf.definition()
-        -- end, opts)
-        -- vim.keymap.set("n", "K", function()
-        --         vim.lsp.buf.hover()
-        -- end, opts)
-        -- vim.keymap.set("n", "<leader>ws", function()
-        --         vim.lsp.buf.workspace_symbol()
-        -- end, opts)
-        -- vim.keymap.set("n", "<leader>of", function()
-        --         vim.diagnostic.open_float()
-        -- end, opts)
-        -- vim.keymap.set("n", "[d", function()
-        --         vim.diagnostic.goto_next()
-        -- end, opts)
-        -- vim.keymap.set("n", "]d", function()
-        --         vim.diagnostic.goto_prev()
-        -- end, opts)
-        -- vim.keymap.set("n", "<leader>ca", function()
-        --         vim.lsp.buf.code_action()
-        -- end, opts)
-        -- vim.keymap.set("n", "<leader>rf", function()
-        --         vim.lsp.buf.references()
-        -- end, opts)
-        -- vim.keymap.set("n", "<leader>rn", function()
-        --         vim.lsp.buf.rename()
-        -- end, opts)
-        -- vim.keymap.set("i", "<C-h>", function()
-        --         vim.lsp.buf.signature_help()
-        -- end, opts)
+
         print('Greetings from on_attach')
 end)
 
 lsp.configure('pyright', {
-        on_attach = function(client, bufnr)
+        on_attach = function(_, bufnr)
                 -- custom_attach(client, bufnr)
                 -- 'Organize imports' keymap for pyright only
                 vim.keymap.set("n", "<Leader>ii", "<cmd>PyrightOrganizeImports<CR>", {
@@ -237,7 +268,7 @@ lsp.nvim_workspace()
 
 lsp.setup()
 vim.diagnostic.config({
-        virtual_text = true,
+        virtual_text = false,
         signs = true,
         update_in_insert = false,
         underline = true,

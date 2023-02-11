@@ -62,7 +62,7 @@ return {
                 --         action = wezterm.action({ RotatePanes = "CounterClockwise" }),
                 -- },
                 {
-                        key = "r",
+                        key = "P",
                         mods = "LEADER",
                         action = wezterm.action({
                                 RotatePanes = "Clockwise",
@@ -83,11 +83,11 @@ return {
                                 SwitchWorkspaceRelative = 1,
                         }),
                 },
-                {
-                        key = "P",
-                        mods = "CTRL",
-                        action = wezterm.action({ SwitchWorkspaceRelative = -1 }),
-                },
+                -- {
+                --         key = "P",
+                --         mods = "CTRL",
+                --         action = wezterm.action({ SwitchWorkspaceRelative = -1 }),
+                -- },
         },
         key_tables = {
                 -- Defines the keys that are active in our resize-pane mode.

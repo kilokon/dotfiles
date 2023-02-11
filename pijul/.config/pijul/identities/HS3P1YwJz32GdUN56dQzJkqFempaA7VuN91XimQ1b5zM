@@ -1,0 +1,10 @@
+{
+  "public_key": {
+    "version": 0,
+    "algorithm": "Ed25519",
+    "signature": "3ixAZgXwSuSRzPfL7YAfqQt7hzgode2hSzFbqWEkT2JKD87u4NhQTEiD6rZeP3sAM3F1tDnQLUQQBnYn2jyPL5cx",
+    "key": "HS3P1YwJz32GdUN56dQzJkqFempaA7VuN91XimQ1b5zM"
+  },
+  "login": "daisy",
+  "last_modified": 1676135765
+}

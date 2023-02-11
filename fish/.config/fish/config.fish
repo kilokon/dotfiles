@@ -18,6 +18,8 @@ alias cd..="cd .."
 alias cd...="cd ../.."
 alias cd....="cd ../../.."
 alias dev="cd $HOME/Dev/"
+# alias hx="helix"
+
 
 alias nvdot="nvim ~/.dotfiles/"
 #alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
@@ -30,6 +32,7 @@ set -gx GPG_TTY (tty)
 
 starship init fish | source
 zoxide init fish | source
+direnv hook fish | source
 ###############
 
 

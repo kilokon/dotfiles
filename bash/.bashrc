@@ -15,6 +15,9 @@ export EDITOR="emacsclient -c"
 
 export DOTFILES_DIR="$HOME/.dotfiles/"
 
+#export PATH="$HOME/repos/neovim/build/bin:$PATH"
+
+
 export DEV="$HOME/Dev/"
 # If not running interactively, don't do anything
 if [[ -n "$PS1" ]] ; then
@@ -45,6 +48,7 @@ if [[ -n "$PS1" ]] ; then
 
     eval "$(starship init bash)"
     eval "$(zoxide init bash)"
+    eval "$(direnv hook bash)"
 
 fi # end of 'if [[ -n "$PS1" ]] ; then'
 

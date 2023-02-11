@@ -15,7 +15,7 @@ map("n", "qq", '<cmd>lua require("core.smart_quit")()<CR>')
 map("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", opts)
 
 --Remap space as leader key
--- map("", "<Space>", "<Nop>", opts)
+map("n", "<Space>", "<Nop>", opts)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -28,7 +28,7 @@ map("v", "<A-k>", ":m .-2<CR>==", opts)
 -- map("v", "p", '"_dP', opts)
 
 -- Map Esc to kk
-map("i", "kk", "<Esc>")
+map("i", "jk", "<Esc>")
 
 -- vv to generate new vertical split
 map("", "vv", "<C-w>v")
@@ -42,6 +42,10 @@ map("v", "<", "<gv", opts)
 map("v", ">", ">gv", opts)
 
 -- Save file with ctrl-s in inser mode
-map("i", "<C-s>", "<c-o>:w<cr>")
+-- map("i", "<C-s>", "<c-o>:w<cr>")
 
 -- Undo in inser mode
+--
+
+map("n", "gt", "<cmd>:tabnext<cr>", opts)
+map("n", "gT", "<cmd>:tabnext<cr>", opts)

@@ -51,7 +51,7 @@ return require('packer').startup(function(use)
         use { 'nvim-lualine/lualine.nvim' }
 
         -- Tabline
-        use "romgrk/barbar.nvim"
+        -- use "romgrk/barbar.nvim"
 
         -- Treesitter
         use {
@@ -62,7 +62,7 @@ return require('packer').startup(function(use)
         use 'nvim-treesitter/playground'
         use 'nvim-treesitter/nvim-treesitter-textobjects'
         use 'nvim-treesitter/nvim-treesitter-refactor'
-
+        use 'TornaxO7/tree-setter'
         -- LSP , CMP, SNIPPETS, MASON
         use {
                 'VonHeikemen/lsp-zero.nvim',
@@ -90,8 +90,9 @@ return require('packer').startup(function(use)
         -- FZF CMP
         use { 'tzachar/cmp-fuzzy-buffer', requires = { 'tzachar/fuzzy.nvim' } }
 
-        -- Formatting
-        use "lukas-reineke/lsp-format.nvim"
+        -- Formatting & Linting
+        -- use "lukas-reineke/lsp-format.nvim"
+        -- use 'ttibsi/pre-commit.nvim'
 
         --UI for nvim-lsp progress
         use 'j-hui/fidget.nvim'

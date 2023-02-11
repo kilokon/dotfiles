@@ -33,19 +33,19 @@ block = "memory"
 format = " $icon $mem_total_used_percents.eng(2) "
 format_alt = " $icon_swap $swap_used_percents.eng(2) "
 
-[[block]]
-block = "sound"
-[[block.click]]
-button = "left"
-cmd = "pavucontrol"
+# [[block]]
+# block = "sound"
+# [[block.click]]
+# button = "left"
+# cmd = "pavucontrol"
 
-[[block]]
-block = "pacman"
-interval = 600
-format = "{pacman} updates available"
-format_singular = "{pacman} update available"
-format_up_to_date = "system up to date"
-critical_updates_regex = "(linux|linux-lts|linux-zen)"
+# [[block]]
+# block = "pacman"
+# interval = 600
+# format = "{pacman} updates available"
+# format_singular = "{pacman} update available"
+# format_up_to_date = "system up to date"
+# critical_updates_regex = "(linux|linux-lts|linux-zen)"
 
 
 [[block]]
