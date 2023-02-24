@@ -39,6 +39,13 @@ exec --no-startup-id nm-applet
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
+gaps outer 7px
+gaps inner 7px
+
+
+for_window [class="wezterm"] border pixel 3
+for_window [class="firefox"] border pixel 3
+for_window [class = "microsoft-edge-dev"] border pixel 3
 # move tiling windows via drag & drop by left-clicking into the title bar,
 # or left-clicking anywhere into the window while holding the floating modifier.
 tiling_drag modifier titlebar
@@ -155,6 +162,9 @@ bindsym $mod+Shift+c reload
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+bindsym $mod+Shift+w exec "feh --bg-fill --randomize ~/.config/wallpapers/* ~/.config/wallpapers/*" 
+
 
 # resize window (you can also use the mouse for that)
 mode "resize" {

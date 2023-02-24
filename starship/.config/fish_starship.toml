@@ -1,4 +1,5 @@
-
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
 
 #my right format
 right_format = "$time"

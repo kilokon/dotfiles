@@ -48,4 +48,4 @@ map("v", ">", ">gv", opts)
 --
 
 map("n", "gt", "<cmd>:tabnext<cr>", opts)
-map("n", "gT", "<cmd>:tabnext<cr>", opts)
+-- map("n", "gT", "<cmd>:tabnext<cr>", opts)

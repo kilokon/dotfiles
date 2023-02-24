@@ -46,6 +46,9 @@ return require('packer').startup(function(use)
 
         -- Colors
         use 'folke/tokyonight.nvim'
+        
+        -- shade active inactive window
+        use 'sunjon/Shade.nvim'
 
         -- Status Line
         use { 'nvim-lualine/lualine.nvim' }
@@ -106,7 +109,8 @@ return require('packer').startup(function(use)
         use 'mfussenegger/nvim-dap'
         -- rust
         use 'simrat39/rust-tools.nvim'
-
+        use 'Canop/nvim-bacon'
+        
         --superCollider
         use {
                 'davidgranstrom/scnvim',

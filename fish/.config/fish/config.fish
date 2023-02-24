@@ -14,6 +14,7 @@ alias tree="exa --tree"
 alias lfancy="exa --icons"
 alias ef="exec fish"
 alias eb="exec bash"
+alias ez="exec zsh"
 alias cd..="cd .."
 alias cd...="cd ../.."
 alias cd....="cd ../../.."
@@ -27,7 +28,7 @@ alias nvdot="nvim ~/.dotfiles/"
 alias pl="ps aux | grep"
 alias k="kill -9"
 #alias kmo="kmonad $DOTFILES/kmonad/.config/kmonad/ansi_qwerty_circle_87keys.kbd"
-
+set STARSHIP_CONFIG "~/.config/fish_starship.toml"
 set -gx GPG_TTY (tty)
 
 starship init fish | source
@@ -47,3 +48,4 @@ load_nvm > /dev/stderr
 
   # Restart your shell for the changes to take effect.
 #set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; set -gx PATH $HOME/.cabal/bin $PATH /home/aviik/.ghcup/bin # ghcup-env
+# pijul alias --shell=fish | source
