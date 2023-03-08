@@ -2,8 +2,8 @@
 	name = kilokon
         email = kilo.kon@outlook.com
         signingkey = 50236ED81379935B
-[commit]
-	gpgsign = true
+; [commit]
+	; gpgsign = true
 [pull]
         rebase = true
 [init]

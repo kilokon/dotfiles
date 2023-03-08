@@ -38,7 +38,7 @@ return require('packer').startup(function(use)
         use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
         use 'jvgrootveld/telescope-zoxide' -- Telescope Zoxide
 
-
+        use 'stevearc/resession.nvim'
 
 
         --Buffer Navigation
@@ -46,15 +46,18 @@ return require('packer').startup(function(use)
 
         -- Colors
         use 'folke/tokyonight.nvim'
-        
-        -- shade active inactive window
-        use 'sunjon/Shade.nvim'
+        use 'rebelot/kanagawa.nvim'
 
+        -- shade active inactive window
+        -- -- use 'sunjon/Shade.nvim'
+        --
         -- Status Line
         use { 'nvim-lualine/lualine.nvim' }
 
-        -- Tabline
-        -- use "romgrk/barbar.nvim"
+        -- Buffer Line
+        use 'noib3/nvim-cokeline'
+
+
 
         -- Treesitter
         use {
@@ -91,10 +94,10 @@ return require('packer').startup(function(use)
         }
 
         -- FZF CMP
-        use { 'tzachar/cmp-fuzzy-buffer', requires = { 'tzachar/fuzzy.nvim' } }
+        -- use { 'tzachar/cmp-fuzzy-buffer', requires = { 'tzachar/fuzzy.nvim' } }
 
         -- Formatting & Linting
-        -- use "lukas-reineke/lsp-format.nvim"
+        use "lukas-reineke/lsp-format.nvim"
         -- use 'ttibsi/pre-commit.nvim'
 
         --UI for nvim-lsp progress
@@ -103,6 +106,12 @@ return require('packer').startup(function(use)
         -- Diagonastics list and troubleshoot
         use 'folke/trouble.nvim'
 
+        -- inlay-hints
+        use 'simrat39/inlay-hints.nvim'
+
+        -- A code outline window for skimming and quick navigation
+        use 'stevearc/aerial.nvim'
+
         -- use 'jose-elias-alvarez/null-ls.nvim'
 
         -- Debugging Code
@@ -110,7 +119,8 @@ return require('packer').startup(function(use)
         -- rust
         use 'simrat39/rust-tools.nvim'
         use 'Canop/nvim-bacon'
-        
+        use 'Saecki/crates.nvim'
+
         --superCollider
         use {
                 'davidgranstrom/scnvim',
@@ -128,12 +138,7 @@ return require('packer').startup(function(use)
         }
 
         -- parens
-        use {
-                "windwp/nvim-autopairs",
-                config = function()
-                        require("nvim-autopairs").setup {}
-                end
-        }
+        use "windwp/nvim-autopairs"
 
         -- Git workflow
         use {
@@ -149,4 +154,18 @@ return require('packer').startup(function(use)
 
         -- Speed up loading Lua modules in Neovim to improve startup time.
         use 'lewis6991/impatient.nvim'
+
+        -- Which Key
+        use {
+                "folke/which-key.nvim",
+                config = function()
+                        vim.o.timeout = true
+                        vim.o.timeoutlen = 300
+                        require("which-key").setup {
+                                -- your configuration comes here
+                                -- or leave it empty to use the default settings
+                                -- refer to the configuration section below
+                        }
+                end
+        }
 end)

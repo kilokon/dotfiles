@@ -4,8 +4,8 @@
   output (uinput-sink "KMonad Output"
           "sleep 1 && setxkbmap -option caps:none")
   cmp-seq ralt
-  cmp-seq-delay 5
-  fallthrough false
+;;  cmp-seq-delay 5
+  fallthrough true
   allow-cmd true
 )
 

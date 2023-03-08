@@ -1,7 +1,11 @@
 local wezterm = require("wezterm")
 
 local set_environment_variables = {}
+local act = wezterm.action
 
+wezterm.on('update-right-status', function(window, pane)
+        window:set_right_status(window:active_workspace())
+end)
 return {
         default_prog = { "/usr/bin/fish" },
         set_environment_variables = set_environment_variables,
@@ -17,13 +21,42 @@ return {
         disable_default_key_bindings = true,
         leader = { key = "VoidSymbol", mods = "", timeout_milliseconds = 3000 },
         keys = {
-                { key = "C", mods = "CTRL", action = wezterm.action.Copy },
+                { key = "C", mods = "CTRL",       action = wezterm.action.Copy },
                 { key = "v", mods = "SHIFT|CTRL", action = wezterm.action.Paste },
-                { key = "k", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Up" })},
-                { key = "j", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Down" })},
-                { key = "h", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Left" })},
-                { key = "l", mods = "LEADER", action = wezterm.action({ ActivatePaneDirection = "Right" })},
-                        -- },
+                { key = "k", mods = "LEADER",     action = wezterm.action({ ActivatePaneDirection = "Up" }) },
+                { key = "j", mods = "LEADER",     action = wezterm.action({ ActivatePaneDirection = "Down" }) },
+                { key = "h", mods = "LEADER",     action = wezterm.action({ ActivatePaneDirection = "Left" }) },
+                { key = "l", mods = "LEADER",     action = wezterm.action({ ActivatePaneDirection = "Right" }) },
+                { key = 'l', mods = 'LEADER',     action = wezterm.action.ShowLauncher }, -- },
+                {
+                        key = 'y',
+                        mods = "LEADER",
+                        action = act.SwitchToWorkspace {
+                                name = 'default',
+                        },
+                },
+                -- Switch to a monitoring workspace, which will have `top` launched into it
+                {
+                        key = 'u',
+                        mods = "LEADER",
+                        action = act.SwitchToWorkspace {
+                                name = 'monitoring',
+                                spawn = {
+                                        args = { 'top' },
+                                },
+                        },
+                },
+                -- Create a new workspace with a random name and switch to it
+                { key = 'i', mods = "LEADER",     action = act.SwitchToWorkspace },
+                -- Show the launcher in fuzzy selection mode and have it list all workspaces
+                -- and allow activating one.
+                {
+                        key = 'v',
+                        mods = "LEADER",
+                        action = act.ShowLauncherArgs {
+                                flags = 'FUZZY|WORKSPACES',
+                        },
+                },
                 {
                         key = "r",
                         mods = "LEADER",
@@ -124,7 +157,7 @@ return {
                                 key = "UpArrow",
                                 action = wezterm.action({ AdjustPaneSize = { "Up", 1 } }),
                         },
-                        { key = "k", action = wezterm.action({ AdjustPaneSize = { "Up", 1 } }) },
+                        { key = "k",      action = wezterm.action({ AdjustPaneSize = { "Up", 1 } }) },
 
                         {
                                 key = "DownArrow",
