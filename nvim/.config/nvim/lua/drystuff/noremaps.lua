@@ -1,5 +1,12 @@
 local M = {}
-
+M.keyremap = function(mode, lhs, rhs, opts)
+        -- local function map(mode, lhs, rhs, opts)
+        local options = { noremap = true, silent = true }
+        if opts then
+                options = vim.tbl_extend("force", options, opts)
+        end
+        return vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+end
 
 M.map_options = function(tag)
         local opts_tags = { "n", "v" }

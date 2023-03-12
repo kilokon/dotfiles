@@ -16,6 +16,13 @@ map("n", "<Space>", "<Nop>", opts)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- For Wezterm Navigation
+map("n", "C-h", "<Nop>", opts)
+map("n", "C-j", "<Nop>", opts)
+map("n", "C-k", "<Nop>", opts)
+map("n", "C-l", "<Nop>", opts)
+
+
 --smartquit
 map("n", "qq", '<cmd>lua require("core.smart_quit")()<CR>')
 

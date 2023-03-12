@@ -7,7 +7,7 @@ wezterm.on('update-right-status', function(window, pane)
         window:set_right_status(window:active_workspace())
 end)
 return {
-        default_prog = { "/usr/bin/fish" },
+        default_prog = { "/usr/bin/zsh" },
         set_environment_variables = set_environment_variables,
         -- font = wezterm.font("JetBrains Mono"),
         font = wezterm.font("Source Code Pro"),
@@ -28,45 +28,33 @@ return {
                 { key = "h", mods = "LEADER",     action = wezterm.action({ ActivatePaneDirection = "Left" }) },
                 { key = "l", mods = "LEADER",     action = wezterm.action({ ActivatePaneDirection = "Right" }) },
                 { key = 'l', mods = 'LEADER',     action = wezterm.action.ShowLauncher }, -- },
+                { key = 'y', mods = "LEADER",     action = act.SwitchToWorkspace { name = 'default' }, },
                 {
-                        key = 'y',
-                        mods = "LEADER",
-                        action = act.SwitchToWorkspace {
-                                name = 'default',
+                        key = '%',
+                        mods = 'CTRL|SHIFT|ALT',
+                        action = wezterm.action.SplitPane {
+                                direction = 'Left',
+                                command = { args = { 'top' } },
+                                size = { Percent = 50 },
                         },
                 },
                 -- Switch to a monitoring workspace, which will have `top` launched into it
                 {
                         key = 'u',
                         mods = "LEADER",
-                        action = act.SwitchToWorkspace {
-                                name = 'monitoring',
-                                spawn = {
-                                        args = { 'top' },
-                                },
-                        },
+                        action = act.SwitchToWorkspace { name = 'monitoring', spawn = {
+                                args = { 'top' }, }, },
                 },
                 -- Create a new workspace with a random name and switch to it
-                { key = 'i', mods = "LEADER",     action = act.SwitchToWorkspace },
+                { key = 'i', mods = "LEADER", action = act.SwitchToWorkspace },
                 -- Show the launcher in fuzzy selection mode and have it list all workspaces
                 -- and allow activating one.
-                {
-                        key = 'v',
-                        mods = "LEADER",
-                        action = act.ShowLauncherArgs {
-                                flags = 'FUZZY|WORKSPACES',
-                        },
-                },
+                { key = 'v', mods = "LEADER", action = act.ShowLauncherArgs { flags = 'FUZZY|WORKSPACES', }, },
                 {
                         key = "r",
                         mods = "LEADER",
                         action = wezterm.action({
-                                ActivateKeyTable = {
-                                        name = "resize_pane",
-                                        one_shot = false,
-                                        replace_current = true,
-                                },
-                        }),
+                                ActivateKeyTable = { name = "resize_pane", one_shot = false, replace_current = true, }, }),
                 },
                 {
                         key = "a",
@@ -75,25 +63,25 @@ return {
                                 ActivateKeyTable = {
                                         name = "activate_pane",
                                         timeout_milliseconds = 1000,
-                                        one_shot = false,
+                                        one_shot = true,
                                         replace_current = false,
                                 },
                         }),
                 },
-                {
-                        key = "|",
-                        mods = "LEADER|SHIFT",
-                        action = wezterm.action({
-                                SplitHorizontal = { domain = "CurrentPaneDomain" },
-                        }),
-                },
-                {
-                        key = "-",
-                        mods = "LEADER",
-                        action = wezterm.action({
-                                SplitVertical = { domain = "CurrentPaneDomain" },
-                        }),
-                },
+                -- {
+                --         key = "|",
+                --         mods = "LEADER|SHIFT",
+                --         action = wezterm.action({
+                --                 SplitHorizontal = { domain = "CurrentPaneDomain" },
+                --         }),
+                -- },
+                -- {
+                --         key = "-",
+                --         mods = "LEADER",
+                --         action = wezterm.action({
+                --                 SplitVertical = { domain = "CurrentPaneDomain" },
+                --         }),
+                -- },
                 -- {
                 --         key = "b",
                 --         mods = "LEADER",
@@ -101,7 +89,7 @@ return {
                 -- },
                 {
                         key = "P",
-                        mods = "LEADER",
+                        mods = "CTRL|ALT",
                         action = wezterm.action({
                                 RotatePanes = "Clockwise",
                         }),

@@ -39,7 +39,9 @@ direnv hook fish | source
 
 load_nvm > /dev/stderr
 
-
+if not set -q $WEZTERM_PANE
+  set -x NVIM_LISTEN_ADDRESS "/tmp/nvim$WEZTERM_PANE"
+end
 # Load pyenv automatically by appending
 # the following to ~/.config/fish/config.fish:
 

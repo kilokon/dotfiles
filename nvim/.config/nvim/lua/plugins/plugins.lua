@@ -38,6 +38,11 @@ return require('packer').startup(function(use)
         use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
         use 'jvgrootveld/telescope-zoxide' -- Telescope Zoxide
 
+        -- Leap & flit (f/F/t/T motions on steroids, building on the Leap interface.)
+        use "ggandor/leap.nvim"
+        use "ggandor/flit.nvim"
+
+        -- Save Nvim Sessions
         use 'stevearc/resession.nvim'
 
 
@@ -92,6 +97,9 @@ return require('packer').startup(function(use)
                         { 'rafamadriz/friendly-snippets' },
                 },
         }
+
+        -- Use LSP Diagonastics
+        use 'jose-elias-alvarez/null-ls.nvim'
 
         -- FZF CMP
         -- use { 'tzachar/cmp-fuzzy-buffer', requires = { 'tzachar/fuzzy.nvim' } }
@@ -154,6 +162,9 @@ return require('packer').startup(function(use)
 
         -- Speed up loading Lua modules in Neovim to improve startup time.
         use 'lewis6991/impatient.nvim'
+
+        --Nu Shell
+        use 'LhKipp/nvim-nu'
 
         -- Which Key
         use {
