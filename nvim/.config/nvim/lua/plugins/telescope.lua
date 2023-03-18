@@ -39,7 +39,7 @@ tel.setup {
                                 -- ["<C-h>"] = "which_key"
                         },
                         n = {
-                                    ["<esc>"] = require("telescope.actions").close,
+                                ["<esc>"] = require("telescope.actions").close,
                         }
                 }
         },
@@ -58,7 +58,7 @@ tel.setup {
                 --   extension_config_key = value,
                 -- }
                 -- please take a look at the readme of the extension you want to configure
-                    ["ui-select"] = {
+                ["ui-select"] = {
                         require("telescope.themes").get_dropdown {
                                 -- even more opts
                         }
@@ -82,12 +82,12 @@ tel.setup {
                         -- disables netrw and use telescope-file-browser in its place
                         -- hijack_netrw = true,
                         mappings = {
-                                    ["i"] = {
-                                            ["<c-t>"] = trouble.open_with_trouble,
+                                ["i"] = {
+                                        ["<c-t>"] = trouble.open_with_trouble,
                                         -- your custom insert mode mappings
                                 },
-                                    ["n"] = {
-                                            ["<c-t>"] = trouble.open_with_trouble,
+                                ["n"] = {
+                                        ["<c-t>"] = trouble.open_with_trouble,
                                         -- your custom normal mode mappings
                                 },
                         },
@@ -107,19 +107,19 @@ tel.setup {
                                                 print("Update to (" .. selection.z_score .. ") " .. selection.path)
                                         end
                                 },
-                                    ["<C-s>"] = {
+                                ["<C-s>"] = {
                                         before_action = function(_) print("before C-s") end,
                                         action = function(selection)
                                                 vim.cmd("edit " .. selection.path)
                                         end
                                 },
                                 -- Opens the selected entry in a new split
-                                    ["<C-q>"] = { action = z_utils.create_basic_command("split") },
+                                ["<C-q>"] = { action = z_utils.create_basic_command("split") },
                         },
                 }
         }
 }
-
+require("telescope").load_extension("ui-select")
 
 
 local wk = require("which-key")

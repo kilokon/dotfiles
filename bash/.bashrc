@@ -99,3 +99,4 @@ ex ()
 
 
 
+eval "$(pyenv virtualenv-init -)"

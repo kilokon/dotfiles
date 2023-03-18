@@ -318,12 +318,20 @@
 
 
 
-;;+-----------------------+
-;;|   `Time' and `Date'   |
-;;+-----------------------+
-;;https://github.com/alphapapa/ts.el
-(use-package ts
-  :straight (ts :type git :host github :repo "alphapapa/ts.el"))
+;;; ;+-----------------------+
+;; ;;|   `Time' and `Date'   |
+;; ;;+-----------------------+
+;; ;;https://github.com/alphapapa/ts.el
+;; (use-package ts
+;;   :straight (ts :type git :host github :repo "alphapapa/ts.el"))
+;; emacs-evil/evil")
+;;   )
+
+(use-package evil
+  :straight (evil :type git :host github :repo "emacs-evil/evil")
+  :init (evil-mode 1)
+  )
+
 
 
 
@@ -511,19 +519,19 @@
 ;;|   `Key-Controls'   |
 ;;+--------------------+
 ;;Unset a few keys
-(-map (lambda (x) (unbind-key x)) '("C-x C-d" ;; list-directory
-                                    "C-z"     ;; suspend-frame
-                                    "C-x C-z" ;; again
-                                    "M-o"     ;; facemenu-mode
-				    "C-a"
-                                    ;; "<mouse-2>" ;; pasting with mouse-wheel click
-                                    ;; "<C-wheel-down>" ;; text scale adjust
-                                    ;; "<C-wheel-up>" ;; ditto
-                                    "s-n"     ;; make-frame
-                                    "C-x C-q" ;; read-only-mode
-				    "M-m"
-				    "C-/"
-                                    ))
+;; (-map (lambda (x) (unbind-key x)) '("C-x C-d" ;; list-directory
+;;                                     "C-z"     ;; suspend-frame
+;;                                     "C-x C-z" ;; again
+;;                                     "M-o"     ;; facemenu-mode
+;; 				    "C-a"
+;;                                     ;; "<mouse-2>" ;; pasting with mouse-wheel click
+;;                                     ;; "<C-wheel-down>" ;; text scale adjust
+;;                                     ;; "<C-wheel-up>" ;; ditto
+;;                                     "s-n"     ;; make-frame
+;;                                     "C-x C-q" ;; read-only-mode
+;; 				    "M-m"
+;; 				    "C-/"
+;;                                     ))
 
 (use-package which-key
   :straight (which-key :type git :host github :repo "justbur/emacs-which-key")
@@ -970,83 +978,12 @@ targets."
 
 (use-package orderless
   :straight (orderless :type git :host github :repo "oantolin/orderless")
-  ;; :init
-  ;; ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
-  ;; ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  ;; (setq completion-styles '(orderless basic)
-  ;;       completion-category-defaults nil
-  ;;       completion-category-overrides '((file (styles partial-completion))))
   :config
   (setq completion-styles '(orderless)
         completion-category-defaults nil
         completion-category-overrides nil
         completion-ignore-case t))
   
- ;;  (setq completion-styles '(orderless flex)
-;;         completion-category-overrides '((eglot (styles . (orderless flex)))))
-;;   (defvar +orderless-dispatch-alist
-;;     '((?% . char-fold-to-regexp)
-;;       (?! . orderless-without-literal)
-;;       (?`. orderless-initialism)
-;;       (?= . orderless-literal)
-;;       (?~ . orderless-flex)))
-;;   (defun +orderless-dispatch (pattern index _total)
-;;     (cond
-;;      ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
-;;      ((string-suffix-p "$" pattern)
-;;       `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
-;;      ;; File extensions
-;;      ((and
-;;        ;; Completing filename or eshell
-;;        (or minibuffer-completing-file-name
-;; 	   (derived-mode-p 'eshell-mode))
-;;        ;; File extension
-;;        (string-match-p "\\`\\.." pattern))
-;;       `(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
-;;      ;; Ignore single !
-;;      ((string= "!" pattern) `(orderless-literal . ""))
-;;      ;; Prefix and suffix
-;;      ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
-;; 	  (cons (cdr x) (substring pattern 1))
-;; 	(when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
-;; 	  (cons (cdr x) (substring pattern 0 -1)))))))
-
-;;   ;; Define orderless style with initialism by default
-;;   (orderless-define-completion-style +orderless-with-initialism
-;;     (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
-
-;;   ;; Certain dynamic completion tables (completion-table-dynamic)
-;;   ;; do not work properly with orderless. One can add basic as a fallback.
-;;   ;; Basic will only be used when orderless fails, which happens only for
-;;   ;; these special tables.
-;;   (setq completion-styles '(orderless basic)
-;; 	completion-category-defaults nil
-;; ;;; Enable partial-completion for files.
-;; ;;; Either give orderless precedence or partial-completion.
-;; ;;; Note that completion-category-overrides is not really an override,
-;; ;;; but rather prepended to the default completion-styles.
-;; 	;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
-;; 	completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
-;; 					;; enable initialism by default for symbols
-;; 					(command (styles +orderless-with-initialism))
-;; 					(variable (styles +orderless-with-initialism))
-;; 					(symbol (styles +orderless-with-initialism)))
-;; 	orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
-;; 	orderless-style-dispatchers '(+orderless-dispatch)))
-
-;; ;;; For Corfu
-;; (defun orderless-fast-dispatch (word index total)
-;;   (and (= index 0) (= total 1) (length< word 4)
-;;        `(orderless-regexp . ,(concat "^" (regexp-quote word)))))
-
-;; (orderless-define-completion-style orderless-fast
-;;   (orderless-dispatch '(orderless-fast-dispatch))
-;;   (orderless-matching-styles '(orderless-literal orderless-regexp)))
-
-
-
-
 ;; Enable richer annotations using the Marginalia package
 (use-package marginalia
   :straight (marginalia :type git :host github :repo "minad/marginalia")
@@ -1175,34 +1112,6 @@ targets."
 
 
 
-;; (use-package corfu-doc
-;;   ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
-;;   :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
-;;   :bind (:map corfu-map
-;; 	      ;; This is a manual toggle for the documentation window.
-;; 	      ([remap corfu-show-documentation] . corfu-doc-toggle) ; Remap the default doc command
-;; 	      ;; Scroll in the documentation window
-;; 	      ("M-n" . corfu-doc-scroll-up)
-;; 	      ("M-p" . corfu-doc-scroll-down))
-;;   :hook (corfu-mode . corfu-doc-mode)
-;;   :custom
-;;   (corfu-doc-delay 0.1)
-;;   (corfu-doc-hide-threshold 10)
-;;   (corfu-doc-max-width 60)
-;;   (corfu-doc-max-height 10)
-
-;;   ;; NOTE 2022-02-05: I've also set this in the `corfu' use-package to be
-;;   ;; extra-safe that this is set when corfu-doc is loaded. I do not want
-;;   ;; documentation shown in both the echo area and in the `corfu-doc' popup.
-;;   ;; (corfu-echo-documentation nil)
-;;   :config
-;;   ;; NOTE 2022-02-05: This is optional. Enabling the mode means that every corfu
-;;   ;; popup will have corfu-doc already enabled. This isn't desirable for me
-;;   ;; since (i) most of the time I do not need to see the documentation and (ii)
-;;   ;; when scrolling through many candidates, corfu-doc makes the corfu popup
-;;   ;; considerably laggy when there are many candidates. Instead, I rely on
-;;   ;; manual toggling via `corfu-doc-toggle'.
-;;   (corfu-doc-mode))
 
 
 
@@ -1229,18 +1138,6 @@ targets."
             (lambda ()
               (setq-local completion-at-point-functions
                           (list (cape-super-capf #'cape-dabbrev #'cape-ispell #'cape-symbol #'cape-file #'cape-history ))))))
-  ;; :init
-  ;; ;; Add completion-at-point-functions, used by completion-at-point.
-  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  ;; (add-to-list 'completion-at-point-functions #'cape-file)
-  ;; (add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;; :bind (("C-c p p" . completion-at-point)
-  ;; 	 ("C-c p d" . cape-dabbrev)
-  ;; 	 ("C-c p f" . cape-file)
-  ;; 	 ("C-c p s" . cape-symbol)
-  ;; 	 ("C-c p i" . cape-ispell))
-  ;; :config
-  ;; (setq completion-category-overrides '((eglot (styles orderless)))))
 
 
 
@@ -1604,10 +1501,6 @@ any directory proferred by `consult-dir'."
 
 
 
-
-
-
-
 (use-package vterm
   :straight (vterm :type git
 		   :host github
@@ -1628,30 +1521,6 @@ any directory proferred by `consult-dir'."
   :config (setq vterm-toggle-fullscreen-p nil
 ;;		vterm-toggle-hide-method nil
 		vterm-toggle-reset-window-configration-after-exit 'kill-window-only))
-;;
-;; (add-to-list 'display-buffer-alist
-;;              '((lambda (buffer-or-name _)
-;;                    (let ((buffer (get-buffer buffer-or-name)))
-;;                      (with-current-buffer buffer
-;;                        (or (equal major-mode 'vterm-mode)
-;;                            (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
-;;                 ;;(display-buffer-reuse-window display-buffer-at-bottom)
-;;                 (display-buffer-reuse-window display-buffer-in-direction)
-;;                 ;;display-buffer-in-direction/direction/dedicated iss added in emacs27
-;;                 (direction . bottom)
-;;                 (dedicated . t) ;dedicated is supported in emacs27
-;;                 (reusable-frames . visible)
-;;                 (window-height . 0.3)))
-
-;;(remove-hook 'vterm-mode-hook 'evil-mode)
-
-;; (use-package eshell-vterm
-;;   :straight (eshell-vterm :type git
-;; 			  :host github
-;; 			  :repo "iostapyshyn/eshell-vterm")
-;;   :after eshell
-;;   :config
-;;   (eshell-vterm-mode))
 
 ;;Runstuff
 (use-package run-stuff
@@ -1680,24 +1549,6 @@ any directory proferred by `consult-dir'."
 (require 'tree-sitter)
 (require 'tree-sitter-langs)
 
-
-;; (use-package tree-sitter
-  
-;;   :hook (sh-mode . tree-sitter-hl-mode))
-
-
-;; ;((require 'tree-sitter)
-;; (use-package tree-sitter-langs)
-
-;;(global-tree-sitter-mode)
-;; (use-package bicycle
-;;   :straight (bicycle :type git
-;; 		     :host github
-;; 		     :repo "tarsius/bicycle")
-;;   :after outline
-;;   :bind (:map outline-minor-mode-map
-;; 		([C-tab] . bicycle-cycle)
-;; 		([S-tab] . bicycle-cycle-global)))
 
 ;;+---------------------+
 ;;|   `View-Asm-Code'   |
@@ -1899,29 +1750,6 @@ any directory proferred by `consult-dir'."
   (setq python-shell-interpreter "/opt/hfs19.5.303/bin/hython"
         ;; python-shell-interpreter-args "--simple-prompt"
         python-shell-prompt-detect-failure-warning nil))
-;;   (add-to-list 'python-shell-completion-native-disabled-interpreters
-;;                "jupyter-console")
-;;   (add-to-list 'python-shell-completion-native-disabled-interpreters
-;;                "jupyter")
-
-;;    (defun fix-python-password-entry ()
-;;      (push
-;;       'comint-watch-for-password-prompt comint-output-filter-functions))
-
-;;    (defun my-setup-python (orig-fun &rest args)
-;;      "Use corresponding kernel"
-;;      (let* ((curr-python (car (split-string (pyenv/version-name) ":")))
-;;             (python-shell-buffer-name (concat "Python-" curr-python))
-;;             (python-shell-interpreter-args (if (bound-and-true-p djangonaut-mode)
-;;                                                "shell_plus -- --simple-prompt"
-;;                                              (concat "--simple-prompt --kernel=" curr-python)))
-;;             (python-shell-interpreter (if (bound-and-true-p djangonaut-mode)
-;;                                           "django-admin"
-;; 					python-shell-interpreter)))
-;;        (apply orig-fun args)))
-
-;;    (advice-add 'python-shell-get-process-name :around #'my-setup-python)
-;;    (advice-add 'python-shell-calculate-command :around #'my-setup-python))
 
 
 
@@ -2111,92 +1939,8 @@ any directory proferred by `consult-dir'."
 ;;|   `Syntax-Checkers'   |
 ;;+-----------------------+
 
-;; (use-package flymake
-;;   :straight (flymake :type git :host github :repo "flymake/emacs-flymake")
-;;   :config
-;;   (setq flymake-max-parallel-syntax-checks nil))
-
-;; (use-package flycheck
-;;   :straight (flycheck :type git :host github :repo "flycheck/flycheck")
-;;   )
-;; (use-package consult-flycheck
-;;   :straight (consult-flycheck :type git :host github :repo "minad/consult-flycheck")
-;;   :defer t
-;;   :after (consult flycheck))
 
 
-
-
-
-  ;; https://github.com/WebFreak001/code-debug
-					; (require 'dap-gdb-lldb)
-  ;; :straight dap-mode
-  ;; :after (dap-mode)
-  ;; :custom (dap-gdb-lldb-setup))
-  
-  ;; (dolist (mode '(c-mode-common rust-mode))
-  ;;   (let ((mode-hook (intern (concat (symbol-name mode) "-hook"))))
-  ;;     (add-hook mode-hook
-  ;;               (lambda ()
-  ;;                 (use-package dap-gdb-lldb
-  ;;                   :custom
-  ;;                   (dap-gdb-lldb-path
-  ;;                    (car
-  ;;                     (last
-  ;;                      (file-expand-wildcards
-  ;;                       (concat
-  ;;                        dap-utils-extension-path
-  ;;                        "/webfreak.debug-*")))))
-  ;;                   (dap-gdb-lldb-debug-program
-  ;;                    `("node" ,(concat dap-gdb-lldb-path "/out/src/gdb.js"))))))))
-  ;;)
-  ;; (use-package dap-ui
-  ;;   :straight dap-mode
-  ;;   :after (dap-mode))
-  ;; (use-package dap-cpptools
-  ;;   :straight dap-mode
-  ;;   :after (dap-mode))
-  
-  ;; (use-package dap-lldb
-  ;;   :straight dap-mode
-  ;;   :after (dap-mode))
-
-  ;; ;; https://github.com/WebFreak001/code-debug
-  ;; (use-package dap-gdb-lldb
-  ;;   :straight dap-mode
-  ;;   :after (dap-mode)
-  ;;   :custom (dap-gdb-lldb-setup))
-  ;; (dap-register-debug-template "Rust::LLDB Run Configuration"
-  ;; 			       (list :type "lldb"
-  ;; 				     :request "launch"
-  ;; 				     :name "LLDB::Run"
-  ;; 				     :gdbpath "rust-lldb"
-  ;; 				     :target nil
-  ;; 				     :cwd nil))
-  ;; (dap-register-debug-template "Rust::GDB Run Configuration"
-  ;;                              (list :type "gdb"
-  ;;                                    :request "launch"
-  ;;                                    :name "GDB::Run"
-  ;; 				     :gdbpath "rust-gdb"
-  ;;                                    :target nil
-  ;;                                    :cwd nil)))
-  ;; (use-package dap-cpptools
-  ;;   :straight dap-mode)
-  ;;   ;; (use-package dap-ui
-  ;;   ;; :straight dap-mode)
-  ;; (use-package dap-node
-  ;;   :straight dap-mode
-  ;;   :config (dap-node-setup))
-
-
-
-;; (dap-register-debug-template "Rust::LLDB Run Configuration"
-;; 			     (list :type "lldb"
-;; 				   :request "launch"
-;; 				   :name "LLDB::Run"
-;; 				   :gdbpath "rust-lldb"
-;; 				   :target nil
-;; 				   :cwd nil))
 
 
 ;;+---------------+
@@ -2228,89 +1972,9 @@ any directory proferred by `consult-dir'."
 
 
 
-;;+-----------------------+
-;;|   Emacs Development   |
-;;+-----------------------+
-
-;;The Bug Hunter
-(use-package bug-hunter
-  :straight (bug-hunter :type git :host github :repo "Malabarba/elisp-bug-hunter") 
-  ;; :general(aviik/leadr-key-def
-  ;; 	   "b" '(bug-hunter-init-file :which-key "Init File Debug"))
-  )
-
-
-(straight-use-package '(yodel :host github :repo "progfolio/yodel"))
-;; test model format
-;; (yodel
-;;   :post*
-;;   (yodel-file
-;;     :point "|"
-;;     :with* "test: |fail"
-;;     :then*
-;;     (kill-word 1)
-;;     (insert "pass")
-;;     (message "%s" (buffer-string))))
-
-(use-package polymode
-  :straight (polymode :type git :host github :repo "polymode/polymode"))
 
 
 
-;;+--------------+
-;;|   Treemacs   |
-;;+--------------+
-
-
-
-(use-package treemacs
-  ;; :straight (treemacs :type git
-  ;; 		      :host github
-  ;; 		      :repo "Alexander-Miller/treemacs"
-  ;; 		      :files (:defaults "src/*/*") ;;"src/elisp/*" "src/scripts/*")
-  ;; 		      :includes (treemacs-evil
-  ;; 				 treemacs-all-the-icons
-  ;; 				 treemacs-magit))
-  :defer t
-  :bind (("M-0"       . treemacs-select-window)
-         ("C-x t 1"   . treemacs-delete-other-windows)
-         ("C-x t t"   . treemacs)
-         ("C-x t d"   . treemacs-select-directory)
-         ("C-x t B"   . treemacs-bookmark)
-         ("C-x t C-t" . treemacs-find-file)
-         ("C-x t M-t" . treemacs-find-tag))
-  :config
-  (progn
-    (setq treemacs-workspace-switch-cleanup t)))
-;; (use-package treemacs-evil
-;;   :straight t
-;;   :after (treemacs evil))
-
-(use-package treemacs-icons-dired
-  :straight t
-  :hook (dired-mode . treemacs-icons-dired-enable-once))
-
-(use-package treemacs-magit
-  :straight t
-  :after (treemacs magit))
-  ;; :config
-  ;;  (general-define-key
-  ;;   :keymaps 'treemacs-mode-map
-  ;;   [mouse-1] #'treemacs-single-click-expand-action
-  ;;   "M-l" #'treemacs-root-down
-  ;;   "M-h" #'treemacs-root-up
-  ;;   "q" #'treemacs-quit)
-  ;;  (general-define-key
-  ;;   :keymaps 'treemacs-mode-map
-  ;;   :states '(normal emacs)
-  ;;   "q" 'treemacs-quit))
-
-;; (use-package lsp-treemacs
-;;   :straight (lsp-treemacs :type git :host github :repo "emacs-lsp/lsp-treemacs")
-;;   :after (lsp)
-;;   :commands (lsp-treemacs-errors-list)
-;;   :config
-;;   (lsp-treemacs-sync-mode 1))
 
 
 ;;+------------------------+

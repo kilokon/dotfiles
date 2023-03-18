@@ -23,7 +23,7 @@ local options = {
         -- completeopt = { "menuone", "noselect" }, -- Options for insert mode completion
         -- copyindent = true, -- Copy the previous indentation on autoindenting
         cursorline     = true, -- Highlight the text line of the cursor
-        pumheight      = 17, -- Height of the pop up menu
+        pumheight      = 17,   -- Height of the pop up menu
         -- mouse
         mouse          = "a",
         scrolloff      = 7, -- Minimal number of screen lines to keep above and below the cursor
@@ -52,14 +52,16 @@ for k, v in pairs(options) do
 end
 
 local g = {
-        highlighturl_enabled = true, -- highlight URLs by default
-        autopairs_enabled = true, -- enable autopairs at start
-        diagnostics_enabled = true, -- enable diagnostics at start
+        highlighturl_enabled = true,       -- highlight URLs by default
+        autopairs_enabled = true,          -- enable autopairs at start
+        diagnostics_enabled = true,        -- enable diagnostics at start
         status_diagnostics_enabled = true, -- enable diagnostics in statusline
-        icons_enabled = true, -- disable icons in the UI (disable if no nerd font is available)
-        ui_notifications_enabled = true, -- disable notifications when toggling UI elements
+        icons_enabled = true,              -- disable icons in the UI (disable if no nerd font is available)
+        ui_notifications_enabled = true,   -- disable notifications when toggling UI elements
         loaded_perl_provider = 0,
         loaded_ruby_provider = 0,
+        -- python_host_prog = "/home/aviik/.pyenv/versions/myenv/bin/python",
+        -- python3_host_prog = "/home/aviik/.pyenv/versions/myenv/bin/python"
 }
 
 

@@ -2,23 +2,62 @@
 -- vim.opt.signcolumn = 'yes'
 
 local lsp = require('lsp-zero')
+local navic = require("nvim-navic")
+
+navic.setup {
+        icons = {
+                File          = " ",
+                Module        = " ",
+                Namespace     = " ",
+                Package       = " ",
+                Class         = " ",
+                Method        = " ",
+                Property      = " ",
+                Field         = " ",
+                Constructor   = " ",
+                Enum          = "練",
+                Interface     = "練",
+                Function      = " ",
+                Variable      = " ",
+                Constant      = " ",
+                String        = " ",
+                Number        = " ",
+                Boolean       = "◩ ",
+                Array         = " ",
+                Object        = " ",
+                Key           = " ",
+                Null          = "ﳠ ",
+                EnumMember    = " ",
+                Struct        = " ",
+                Event         = " ",
+                Operator      = " ",
+                TypeParameter = " ",
+        },
+        highlight = false,
+        separator = " > ",
+        depth_limit = 0,
+        depth_limit_indicator = "..",
+        safe_output = true
+}
+
+
 
 lsp.preset('recommended')
 
 
 -- don't initialize this language server
 -- we will use rust-tools to setup rust_analyzer
-local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+--local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local luasnip = require("luasnip")
 local cmp = require('cmp')
-cmp.event:on(
-        'confirm_done',
-        cmp_autopairs.on_confirm_done()
-)
+--cmp.event:on(
+--        'confirm_done',
+--        cmp_autopairs.on_confirm_done()
+--)
 lsp.setup_nvim_cmp({
         preselect = 'none',
         mapping = {
-                    ["<Tab>"] = cmp.mapping(function(fallback)
+                ["<Tab>"] = cmp.mapping(function(fallback)
                         if cmp.visible() then
                                 cmp.select_next_item()
                         elseif luasnip.jumpable(1) then
@@ -27,7 +66,7 @@ lsp.setup_nvim_cmp({
                                 fallback()
                         end
                 end),
-                    ["<S-Tab>"] = cmp.mapping(function(fallback)
+                ["<S-Tab>"] = cmp.mapping(function(fallback)
                         if cmp.visible() then
                                 cmp.select_prev_item()
                         elseif luasnip.jumpable(-1) then
@@ -36,7 +75,7 @@ lsp.setup_nvim_cmp({
                                 fallback()
                         end
                 end),
-                    ["<cr>"] = cmp.mapping.confirm({
+                ["<cr>"] = cmp.mapping.confirm({
                         behavior = cmp.ConfirmBehavior.Replace,
                         select = false,
                 }),
@@ -67,6 +106,9 @@ local wk = require("which-key")
 
 lsp.skip_server_setup({ 'rust_analyzer' })
 lsp.on_attach(function(client, bufnr)
+        if client.server_capabilities.documentSymbolProvider then
+                navic.attach(client, bufnr)
+        end
         require("lsp-format").on_attach(client)
         local mapping = {
                 f = {
@@ -78,6 +120,7 @@ lsp.on_attach(function(client, bufnr)
                 l = {
                         name = "LSP",
                         a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
+                        f = { "<cmd> lua vim.lsp.buf.type_definition()<cr>", "Type Definition" },
                         k = { "<cmd>lua vim.lsp.signature_help()<cr>", "Signature" },
                         -- i = { "<cmd>LspInfo<cr>", "Info" },
                         -- I = { "<cmd>Mason<cr>", "Mason Info" },
@@ -116,6 +159,7 @@ lsp.on_attach(function(client, bufnr)
         vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
         vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+        vim.keymap.set('n', '<space>m', vim.lsp.buf.type_definition, bufopts)
         -- vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
         vim.keymap.set('n', "C-k", "<Nop>", bufopts)
         -- vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
@@ -172,18 +216,34 @@ end)
 --         }
 -- })
 
+
+
+
 --Configure lua language server for neovim
 lsp.nvim_workspace()
 
 lsp.setup()
 vim.diagnostic.config({
         virtual_text = false,
-        signs = true,
+        signs = false,     -- change this
         update_in_insert = false,
-        underline = true,
+        underline = false, -- change this
         severity_sort = false,
-        float = true,
+        float = false,     -- change this
 })
+
+
+
+local lua_lsp = lsp.build_options('lua_language_server', {})
+
+require("neodev").setup({
+        override = lua_lsp
+        -- add any options here, or leave empty to use the default settings
+})
+
+
+
+
 -- Initialize rust_analyzer with rust-tools
 local rust_lsp = lsp.build_options('rust_analyzer', {})
 
@@ -209,7 +269,7 @@ require('rust-tools').setup({
                 settings = {
                         -- to enable rust-analyzer settings visit:
                         -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
-                            ["rust-analyzer"] = {
+                        ["rust-analyzer"] = {
                                 -- enable clippy on save
                                 checkOnSave = {
                                         command = "clippy"

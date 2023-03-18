@@ -199,3 +199,4 @@ eval "$(starship init zsh)"
 #
 # # This will set the default prompt to the walters theme
 # prompt walters
+eval "$(pyenv virtualenv-init -)"

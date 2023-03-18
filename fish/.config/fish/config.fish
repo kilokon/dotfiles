@@ -34,6 +34,7 @@ set -gx GPG_TTY (tty)
 starship init fish | source
 zoxide init fish | source
 direnv hook fish | source
+
 ###############
 
 
@@ -45,7 +46,8 @@ end
 # Load pyenv automatically by appending
 # the following to ~/.config/fish/config.fish:
 
-# pyenv init - | source
+pyenv init - | source
+status --is-interactive; and pyenv virtualenv-init - | source
 ###########
 
   # Restart your shell for the changes to take effect.

@@ -13,7 +13,7 @@ return {
         font = wezterm.font("Source Code Pro"),
         -- font = wezterm.font("RobotoMono Nerd Font"),
         --font = wezterm.font("Comic Neue Angular"),
-        font_size = 12,
+        font_size = 13,
         color_scheme = "tokyonight-storm",
         hide_tab_bar_if_only_one_tab = true,
         window_background_opacity = 0.85,

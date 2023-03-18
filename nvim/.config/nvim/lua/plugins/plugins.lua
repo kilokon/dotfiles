@@ -38,6 +38,12 @@ return require('packer').startup(function(use)
         use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
         use 'jvgrootveld/telescope-zoxide' -- Telescope Zoxide
 
+        -- Mini independent Lua modules . The Swiss Army knife
+        use 'echasnovski/mini.nvim'
+
+        -- Comments
+        use 'JoosepAlviste/nvim-ts-context-commentstring'
+
         -- Leap & flit (f/F/t/T motions on steroids, building on the Leap interface.)
         use "ggandor/leap.nvim"
         use "ggandor/flit.nvim"
@@ -57,7 +63,14 @@ return require('packer').startup(function(use)
         -- -- use 'sunjon/Shade.nvim'
         --
         -- Status Line
-        use { 'nvim-lualine/lualine.nvim' }
+        -- use { 'nvim-lualine/lualine.nvim' }
+        use {
+                "SmiteshP/nvim-navic",
+                -- requires = "neovim/nvim-lspconfig"
+        }
+
+        --  indentation guides
+        use "lukas-reineke/indent-blankline.nvim"
 
         -- Buffer Line
         use 'noib3/nvim-cokeline'
@@ -101,6 +114,13 @@ return require('packer').startup(function(use)
         -- Use LSP Diagonastics
         use 'jose-elias-alvarez/null-ls.nvim'
 
+        use({
+                "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+                config = function()
+                        require("lsp_lines").setup()
+                end,
+        })
+
         -- FZF CMP
         -- use { 'tzachar/cmp-fuzzy-buffer', requires = { 'tzachar/fuzzy.nvim' } }
 
@@ -124,7 +144,11 @@ return require('packer').startup(function(use)
 
         -- Debugging Code
         use 'mfussenegger/nvim-dap'
-        -- rust
+
+        -- Lua
+        use "folke/neodev.nvim"
+
+        -- Rust
         use 'simrat39/rust-tools.nvim'
         use 'Canop/nvim-bacon'
         use 'Saecki/crates.nvim'
@@ -138,15 +162,15 @@ return require('packer').startup(function(use)
         }
 
         -- Commenting
-        use {
-                'numToStr/Comment.nvim',
-                config = function()
-                        require('Comment').setup()
-                end
-        }
+        -- use {
+        --         'numToStr/Comment.nvim',
+        --         config = function()
+        --                 require('Comment').setup()
+        --         end
+        -- }
 
         -- parens
-        use "windwp/nvim-autopairs"
+        --use "windwp/nvim-autopairs"
 
         -- Git workflow
         use {

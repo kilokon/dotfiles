@@ -285,7 +285,7 @@ let-env config = {
   edit_mode: emacs # emacs, vi
   shell_integration: true # enables terminal markers and a workaround to arrow keys stop working issue
   # true or false to enable or disable the welcome banner at startup
-  show_banner: true
+  show_banner: false
   render_right_prompt_on_last_line: false # true or false to enable or disable right prompt to be rendered on last line of the prompt.
 
   hooks: {
@@ -527,15 +527,37 @@ let-env config = {
   ]
 }
 
+
+#Additional Config Augmented from Nu Shell Scripts repo
+# use /home/aviik/.config/nushell/scripts/init.nu *
+
+def mkcd [name] {
+               ^mkdir ($name)
+               cd ($name)
+        }
+
+def cls [] {
+        ansi cls
+        ansi clsb
+        ansi home
+}
+
 use nu_alias_git.nu *
 use nu_alias_general.nu *
 use math_functions.nu *
-use nvim.nu *
+# use nvim.nu *
 # use ssh.nu *
-use ultimate_extractor.nu *
-use git.nu *
-use wordle.nu *
 
+# use git.nu *
+use wordle.nu *
+# use cargo_search.nu *
+# use clear_screen_buf.nu *
+# use pwd-short.nu *
+
+
+
+## Completions
+# use /home/aviik/.config/nushell/scripts/custom-completions/cargo/cargo-completions.nu *
 
 
 source ~/.cache/starship/init.nu
