@@ -10,124 +10,64 @@ autoload -U colors && colors
 
 # install zsh-autosuggestions and zsh-syntax-highlighting from aur/arch
 
-if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then 
-       . /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 
-fi        
-#        (( ! ${+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE} )) &&
-#        typeset -g ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
-#
-#        # Prefix to use when saving original versions of bound widgets
-#        (( ! ${+ZSH_AUTOSUGGEST_ORIGINAL_WIDGET_PREFIX} )) &&
-#        typeset -g ZSH_AUTOSUGGEST_ORIGINAL_WIDGET_PREFIX=autosuggest-orig-
-#
-#        # Strategies to use to fetch a suggestion
-#        # Will try each strategy in order until a suggestion is returned
-#        (( ! ${+ZSH_AUTOSUGGEST_STRATEGY} )) && {
-#         typeset -ga ZSH_AUTOSUGGEST_STRATEGY
-#         ZSH_AUTOSUGGEST_STRATEGY=(history)
-#         }
-#         
-#         # Widgets that clear the suggestion
-#         (( ! ${+ZSH_AUTOSUGGEST_CLEAR_WIDGETS} )) && {
-#                 typeset -ga ZSH_AUTOSUGGEST_CLEAR_WIDGETS
-#                 ZSH_AUTOSUGGEST_CLEAR_WIDGETS=(
-#                         history-search-forward
-#                         history-search-backward
-#                         history-beginning-search-forward
-#                         history-beginning-search-backward
-#                         history-substring-search-up
-#                         history-substring-search-down
-#                         up-line-or-beginning-search
-#                         down-line-or-beginning-search
-#                         up-line-or-history
-#                         down-line-or-history
-#                         accept-line
-#                         copy-earlier-word
-#                 )
-#         }
-#
-#         # Widgets that accept the entire suggestion
-#         (( ! ${+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS} )) && {
-#                 typeset -ga ZSH_AUTOSUGGEST_ACCEPT_WIDGETS
-#                 ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(
-#                         forward-char
-#                         end-of-line
-#                         vi-forward-char
-#                         vi-end-of-line
-#                         vi-add-eol
-#                 )
-#         }
-#
-#         # Widgets that accept the entire suggestion and exec:wute it
-#         (( ! ${+ZSH_AUTOSUGGEST_EXECUTE_WIDGETS} )) && {
-#                 typeset -ga ZSH_AUTOSUGGEST_EXECUTE_WIDGETS
-#                 ZSH_AUTOSUGGEST_EXECUTE_WIDGETS=(
-#                 )
-#         }
-#
-#
-#                 # Widgets that accept the suggestion as far as the cursor moves
-#                 (( ! ${+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS} )) && {
-#                 typeset -ga ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS
-#                 ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(
-#                         forward-word
-#                         emacs-forward-word
-#                         vi-forward-word
-#                         vi-forward-word-end
-#                         vi-forward-blank-word
-#                         vi-forward-blank-word-end
-#                         vi-find-next-char
-#                         vi-find-next-char-skip
-#                 )
-#         }
-#
-#         # Widgets that should be ignored (globbing supported but must be escaped)
-#         (( ! ${+ZSH_AUTOSUGGEST_IGNORE_WIDGETS} )) && {
-# 	typeset -ga ZSH_AUTOSUGGEST_IGNORE_WIDGETS
-# 	ZSH_AUTOSUGGEST_IGNORE_WIDGETS=(
-# 		orig-\*
-# 		beep
-# 		run-help
-# 		set-local-history
-# 		which-command
-# 		yank
-# 		yank-pop
-# 		zle-\*
-# 	)
-# }
-#
-#
-#         # Pty name for capturing completions for completion suggestion strategy
-#         (( ! ${+ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME} )) &&
-#         typeset -g ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME=zsh_autosuggest_completion_pty
-# fi
-#
-if [[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  . /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
 
+# Colors ==================================================================
 #------------------------------
-# History stuff
+
+source ~/repos/sourcing/F-Sy-H/F-Sy-H.plugin.zsh
+
+
+
+
+# History stuff =============================================
 #------------------------------
 HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
 
+setopt hist_ignore_dups  # Collapse two consecutive idential commands.
+setopt hist_find_no_dups  # Ignore duplicates when searching history.
+setopt share_history  # Share across concurrent sessions (append immediately, read from files, add timestamps).
+setopt hist_ignore_space  # Lines that begin with space are not recorded.
+setopt hist_verify  # Don't auto-execute selected history entry.
+setopt hist_ignore_all_dups  # If a history entry would be duplicate, delete older copies.
+
+# Comletion =====================================================
+# ------------------------------
+if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then 
+       . /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 
+fi        
+
 autoload -U compinit && compinit -u
 zstyle ':completion:*' menu select
 # Auto complete with case insenstivity
-zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+#zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path ~/.cache/zsh_completion
+# Make completion match at any part of the string (not just the beginning).
+# (Note this isn't fuzzy though; it looks for an exact match).
+zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
+# Shift tab to navigate backwards
+bindkey '^[[Z' reverse-menu-complete
+
 
 zmodload zsh/complist
 compinit
+
+
 _comp_options+=(globdots)		# Include hidden files.
 
-
+# Globals ========================================================
+# -----------------------------
 
 export EDITOR="nvim"
 export VISUAL="nvim"
 export STARSHIP_CONFIG=~/.config/zsh_starship.toml
 export BROWSER="microsoft-edge-dev"
+
+# Alias ===========================================================
+# -----------------------------
 
 alias zrc="$EDITOR ~.zshrc"
 alias grep='grep --color=auto'
@@ -190,13 +130,10 @@ man() {
 
 # Zoxide
 eval "$(zoxide init zsh)"
-# Starship prompt
 eval "$(starship init zsh)"
-
-# autoload -Uz compinit promptinit
-# compinit
-# promptinit
-#
-# # This will set the default prompt to the walters theme
-# prompt walters
 eval "$(pyenv virtualenv-init -)"
+
+source ~/repos/sourcing/zabb/zabb.plugin.zsh
+
+
+

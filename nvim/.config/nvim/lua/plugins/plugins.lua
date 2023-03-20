@@ -9,6 +9,8 @@ return require('packer').startup(function(use)
         -- Post-install/update hook with neovim command
         --  use { 'nvim-treesitter/nvim-treesitter' }
 
+        -- ui elements
+        use 'stevearc/dressing.nvim'
 
         -- Common Requirement
         use 'nvim-lua/plenary.nvim'
@@ -21,19 +23,20 @@ return require('packer').startup(function(use)
 
         -- Nvim Telescope
         use {
-                'nvim-telescope/telescope.nvim', tag = '0.1.1',
+                'nvim-telescope/telescope.nvim',
+                tag = '0.1.1',
                 -- or                            , branch = '0.1.x',
-                requires = { { 'nvim-lua/plenary.nvim' } }
+                requires = { { 'nvim-lua/plenary.nvim' } },
         }
         use { 'nvim-telescope/telescope-ui-select.nvim' }
         use {
-                "nvim-telescope/telescope-frecency.nvim",
+                'nvim-telescope/telescope-frecency.nvim',
                 -- config = function()
                 --         require "telescope".load_extension("frecency")
                 -- end,
-                requires = { "kkharji/sqlite.lua" }
+                requires = { 'kkharji/sqlite.lua' },
         }
-        use { "nvim-telescope/telescope-file-browser.nvim" }
+        use { 'nvim-telescope/telescope-file-browser.nvim' }
         -- Telescope Extensions
         use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
         use 'jvgrootveld/telescope-zoxide' -- Telescope Zoxide
@@ -45,12 +48,11 @@ return require('packer').startup(function(use)
         use 'JoosepAlviste/nvim-ts-context-commentstring'
 
         -- Leap & flit (f/F/t/T motions on steroids, building on the Leap interface.)
-        use "ggandor/leap.nvim"
-        use "ggandor/flit.nvim"
+        use 'ggandor/leap.nvim'
+        use 'ggandor/flit.nvim'
 
         -- Save Nvim Sessions
         use 'stevearc/resession.nvim'
-
 
         --Buffer Navigation
         use 'theprimeagen/harpoon'
@@ -65,17 +67,15 @@ return require('packer').startup(function(use)
         -- Status Line
         -- use { 'nvim-lualine/lualine.nvim' }
         use {
-                "SmiteshP/nvim-navic",
+                'SmiteshP/nvim-navic',
                 -- requires = "neovim/nvim-lspconfig"
         }
 
         --  indentation guides
-        use "lukas-reineke/indent-blankline.nvim"
+        use 'lukas-reineke/indent-blankline.nvim'
 
         -- Buffer Line
         use 'noib3/nvim-cokeline'
-
-
 
         -- Treesitter
         use {
@@ -114,18 +114,18 @@ return require('packer').startup(function(use)
         -- Use LSP Diagonastics
         use 'jose-elias-alvarez/null-ls.nvim'
 
-        use({
-                "https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+        use {
+                'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
                 config = function()
-                        require("lsp_lines").setup()
+                        require('lsp_lines').setup()
                 end,
-        })
+        }
 
         -- FZF CMP
         -- use { 'tzachar/cmp-fuzzy-buffer', requires = { 'tzachar/fuzzy.nvim' } }
 
         -- Formatting & Linting
-        use "lukas-reineke/lsp-format.nvim"
+        use 'lukas-reineke/lsp-format.nvim'
         -- use 'ttibsi/pre-commit.nvim'
 
         --UI for nvim-lsp progress
@@ -146,19 +146,31 @@ return require('packer').startup(function(use)
         use 'mfussenegger/nvim-dap'
 
         -- Lua
-        use "folke/neodev.nvim"
+        use 'folke/neodev.nvim'
 
         -- Rust
         use 'simrat39/rust-tools.nvim'
         use 'Canop/nvim-bacon'
         use 'Saecki/crates.nvim'
 
+        -- GlSl Viewer
+        use {
+                'timtro/glslView-nvim',
+                ft = 'glsl',
+                config = function()
+                        require('glslView').setup {
+                                exe_path = '/usr/local/bin/glslViewer',
+                                arguments = { '-l', '-w', '128', '-h', '256' },
+                        }
+                end,
+        }
+
         --superCollider
         use {
                 'davidgranstrom/scnvim',
                 config = function()
                         require('scnvim').setup()
-                end
+                end,
         }
 
         -- Commenting
@@ -192,15 +204,15 @@ return require('packer').startup(function(use)
 
         -- Which Key
         use {
-                "folke/which-key.nvim",
+                'folke/which-key.nvim',
                 config = function()
                         vim.o.timeout = true
                         vim.o.timeoutlen = 300
-                        require("which-key").setup {
+                        require('which-key').setup {
                                 -- your configuration comes here
                                 -- or leave it empty to use the default settings
                                 -- refer to the configuration section below
                         }
-                end
+                end,
         }
 end)
