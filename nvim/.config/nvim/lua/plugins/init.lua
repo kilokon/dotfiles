@@ -2,7 +2,8 @@ require 'plugins.plugins'
 require 'plugins.treesitter'
 require 'plugins.colors'
 require 'plugins.mini'
--- require 'plugins.navic'
+require 'plugins.navic'
+require 'plugins.lualine'
 --require 'plugins.indent_blankline'
 -- require 'plugins.ts_commentstring'
 require 'plugins.flit'
@@ -18,7 +19,6 @@ require 'plugins.harpoon'
 require 'plugins.gitsigns'
 require 'plugins.trouble'
 require 'plugins.crates'
-
 
 -- For Wezterm Navigation
 -- map("n", "C-h", "<Nop>", opts)

@@ -65,7 +65,7 @@ return require('packer').startup(function(use)
         -- -- use 'sunjon/Shade.nvim'
         --
         -- Status Line
-        -- use { 'nvim-lualine/lualine.nvim' }
+        use { 'nvim-lualine/lualine.nvim' }
         use {
                 'SmiteshP/nvim-navic',
                 -- requires = "neovim/nvim-lspconfig"
