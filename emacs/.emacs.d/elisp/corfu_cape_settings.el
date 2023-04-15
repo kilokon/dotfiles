@@ -42,13 +42,13 @@
               (corfu-mode))))
 
 
-(use-package dabbrev
-    ;; Swap M-/ and C-M-/
-  :bind (("M-/" . dabbrev-completion)
-         ("C-M-/" . dabbrev-expand))
-  ;; Other useful Dabbrev configurations.
-  :custom
-  (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+;; (use-package dabbrev
+;;     ;; Swap M-/ and C-M-/
+;;   :bind (("M-/" . dabbrev-completion)
+;;          ("C-M-/" . dabbrev-expand))
+;;   ;; Other useful Dabbrev configurations.
+;;   :custom
+;;   (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
 
 ;; Optionally use the `orderless' completion style.
@@ -76,4 +76,3 @@
 ;;   ;; Ensure that pcomplete does not write to the buffer
 ;;   ;; and behaves as a pure `completion-at-point-function'.
 ;;   (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify))
-
