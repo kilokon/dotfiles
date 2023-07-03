@@ -1,4 +1,12 @@
 ;; -*- lexical-binding: t -*-
+
+(require 'tree-sitter)
+(require 'tree-sitter-hl)
+(require 'tree-sitter-langs)
+(require 'tree-sitter-debug)
+(require 'tree-sitter-query)
+(global-tree-sitter-mode)
+
 (use-package undo-fu
   :config
   (global-unset-key (kbd "C-z"))

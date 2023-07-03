@@ -1,3 +1,40 @@
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (cc-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands (lsp lsp-deferred))
+
+;; (use-package lsp-mode
+;;   :commands
+;;   (lsp lsp-deferred)
+;;   ;; :hook
+;;    :init
+;;   (setq lsp-restart 'ignore)
+;;   (setq lsp-eldoc-enable-hover nil)
+;;   ;; (setq lsp-enable-file-watchers nil)
+;;   ;; (setq lsp-signature-auto-activate nil)
+;;   ;; (setq lsp-modeline-diagnostics-enable nil)
+;;   ;; (setq lsp-keep-workspace-alive nil)
+;;   (setq lsp-auto-execute-action nil)
+;;   (setq lsp-before-save-edits nil)
+;;   ;; (setq lsp-headerline-breadcrumb-enable nil)
+;;   ;; (setq lsp-diagnostics-provider :none)
+;;   )
+
+(use-package lsp-ui
+  :hook
+  (lsp-mode . lsp-ui-mode)
+  :init
+  (setq lsp-ui-doc-show-with-cursor nil)
+  (setq lsp-ui-doc-show-with-mouse nil)
+  (setq lsp-ui-peek-always-show t)
+  (setq lsp-ui-peek-fontify 'always))
+
+
 ;;(spinner "1.7.3")
 ;; (use-package spinner
   ;; :ensure t)
@@ -39,26 +76,26 @@
 ;; 	     ;; "lx" '(lsp-workspace-shutdown  :which-key "Kill Lsp Server")
 ;;   ;; "la" '(lsp-execute-code-action :which-key "Execute Code Action")
 ;;   )
-(use-package lsp-mode
-:custom
-(lsp-completion-provider :none) ;; we use Corfu!
+;; (use-package lsp-mode
+;; :custom
+;; (lsp-completion-provider :none) ;; we use Corfu!
 
-:init
-(defun my/orderless-dispatch-flex-first (_pattern index _total)
-(and (eq index 0) 'orderless-flex))
+;; :init
+;; (defun my/orderless-dispatch-flex-first (_pattern index _total)
+;; (and (eq index 0) 'orderless-flex))
 
-(defun my/lsp-mode-setup-completion ()
-(setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-'(orderless)))
+;; (defun my/lsp-mode-setup-completion ()
+;; (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+;; '(orderless)))
 
-;; Optionally configure the first word as flex filtered.
-(add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local)
+;; ;; Optionally configure the first word as flex filtered.
+;; (add-hook 'orderless-style-dispatchers #'my/orderless-dispatch-flex-first nil 'local)
 
-;; Optionally configure the cape-capf-buster.
-(setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point)))
+;; ;; Optionally configure the cape-capf-buster.
+;; (setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point)))
 
-:hook
-(lsp-completion-mode . my/lsp-mode-setup-completion))
+;; :hook
+;; (lsp-completion-mode . my/lsp-mode-setup-completion))
 ;; (use-package lsp-ui
 ;;   :commands lsp-ui-mode
 ;;   :bind

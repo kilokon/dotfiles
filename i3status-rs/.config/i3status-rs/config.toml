@@ -54,19 +54,33 @@ format = " $icon $pacman updates available "
 format_singular = " $icon $pacman update available "
 format_up_to_date = " $icon system up to date "
 critical_updates_regex = "(linux|linux-lts|linux-zen)"
+# aur_command = "paru -Qua"
+[[block.click]]
+# pop-up a menu showing the available updates. Replace wofi with your favourite menu command.
+button = "left"
+cmd = "fakeroot pacman -Qu --dbpath /tmp/checkup-db-i3statusrs/ | rofi -dmenu"
+[[block.click]]
+# Updates the block on right click
+button = "right"
+update = true
 
 [[block]]
 block = "sound"
 format = " $output_name{ $volume|} "
 [block.mappings]
 "alsa_output.pci-0000_00_1f.3.iec958-stereo" = "🔈"
-"alsa_output.pci-0000_00_1b.0.analog-stereo" = "🎧"
+"bluez_sink.5C_44_3E_31_44_6C.a2dp_sink" = "🎧"
+# "alsa_output.pci-0000_00_1b.0.analog-stereo" = "🎧"
 
 [[block]]
 block = "hueshift"
 hue_shifter = "redshift"
 step = 50
 click_temp = 3500
+
+[[block]]
+block = "net"
+format = " $icon {$signal_strength} "
 
 [[block]]
 block = "time"

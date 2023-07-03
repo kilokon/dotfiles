@@ -4,10 +4,17 @@ theme = "tokyonight_storm"
 line-number = "relative"
 mouse = false
 completion-trigger-len = 3
-#auto-info = false
 bufferline = "multiple"
-gutters = ["diff", "spacer", "line-numbers", "spacer", "diagnostics"]
+color-modes = true
+true-color = true
+middle-click-paste = false
+scroll-lines = 3
+shell = ["nu", "-c"]
 
+
+[editor.soft-wrap]
+enable = true
+max-wrap = 25
 
 [editor.cursor-shape]
 insert = "bar"
@@ -18,7 +25,7 @@ select = "underline"
 hidden = false
 
 [editor.lsp]
-display-messages = true
+display-inlay-hints = true
 
 
 [editor.whitespace.render]
@@ -34,10 +41,20 @@ tab = "→"
 newline = "⏎"
 tabpad = "·"  # Tabs will look like "→···" (depending on tab width)
 
+
+[editor.indent-guides]
+render = true
+character = "╎" # Some characters that work well: "▏", "┆", "┊", "⸽"
+skip-levels = 1
+
+
+[editor.gutters]
+layout = ["diff", "diagnostics", "line-numbers", "spacer"]
+
+
 [keys.normal]
 "C-a" = "goto_first_nonwhitespace"
 "C-e" = "goto_line_end_newline"
-# Some nice Helix stuff
 C-h = "select_prev_sibling"
 C-j = "shrink_selection"
 C-k = "expand_selection"
@@ -55,19 +72,19 @@ pageup = "no_op"
 pagedown = "no_op"
 # Clipboards over registers 
 # x = "delete_selection"
-p = "paste_clipboard_after"
-P = "paste_clipboard_before"
+# p = "paste_clipboard_after"
+# P = "paste_clipboard_before"
 y = [
-  "yank_main_selection_to_clipboard",
-  "normal_mode",
-  "flip_selections",
-  "collapse_selection",
+        "yank_main_selection_to_clipboard",
+        "normal_mode",
+        "flip_selections",
+        "collapse_selection",
 ]
 Y = [
-  "extend_to_line_bounds",
-  "yank_main_selection_to_clipboard",
-  "goto_line_start",
-  "collapse_selection",
+        "extend_to_line_bounds",
+        "yank_main_selection_to_clipboard",
+        "goto_line_start",
+        "collapse_selection",
 ]
 X = ["extend_line_up", "extend_to_line_bounds", "select_mode"]
 # Quick iteration on config changes
@@ -82,36 +99,31 @@ C-r = ":config-reload"
 "A-<" = "goto_file_start"
 "A->" = "goto_file_end"
 "C-;" = [
-  "save_selection",
-  "insert_at_line_end",
-  ":append-output echo ';'",
-  "delete_char_forward",
-  "jump_backward",
+        "save_selection",
+        "insert_at_line_end",
+        ":append-output echo ';'",
+        "delete_char_forward",
+        "jump_backward",
 ]
-# up = "no_op"
-# down = "no_op"
-# left = "no_op"
-# right = "no_op"
 pageup = "no_op"
 pagedown = "no_op"
 
 
 [keys.select]
-p = ":clipboard-paste-replace" # No life without this
+p = ":clipboard-paste-replace"                               # No life without this
 P = ":clipboard-paste-after"
-# Clipboards over registers ye ye
 d = ["yank_main_selection_to_clipboard", "delete_selection"]
 # x = ["yank_main_selection_to_clipboard", "delete_selection"]
 y = [
-  "yank_main_selection_to_clipboard",
-  "normal_mode",
-  "flip_selections",
-  "collapse_selection",
+        "yank_main_selection_to_clipboard",
+        "normal_mode",
+        "flip_selections",
+        "collapse_selection",
 ]
 Y = [
-  "extend_to_line_bounds",
-  "yank_main_selection_to_clipboard",
-  "goto_line_start",
-  "collapse_selection",
-  "normal_mode",
+        "extend_to_line_bounds",
+        "yank_main_selection_to_clipboard",
+        "goto_line_start",
+        "collapse_selection",
+        "normal_mode",
 ]

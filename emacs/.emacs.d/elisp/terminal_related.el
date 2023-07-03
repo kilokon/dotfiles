@@ -4,13 +4,14 @@
 
 
 (use-package vterm
+  :load-path "~/.emacs.d/quelpa/build/vterm/"
   :commands (vterm vterm-other-window)
   :bind (("C-c v" . vterm)
          :map vterm-mode-map
          ("C-g" . vterm--self-insert)))
 
 
-(use-package vterm-toggle 
+(use-package vterm-toggle
   :bind (("<f2>" . vterm-toggle)
    	 ("C-<f2>" . vterm-toggle-cd)
 	 :map vterm-mode-map(

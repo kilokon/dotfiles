@@ -5,13 +5,30 @@ scope = "source.rust"
 injection-regex = "rust"
 file-types = ["rs"]
 roots = ["Cargo.toml", "Cargo.lock"]
-auto-format = true
-language-server = { command = "rust-analyzer" }
+language-servers = ["rust-analyzer" ]
 formatter = { command = "rustfmt" }
+auto-format = true
 indent = { tab-width = 2, unit = "  " }
 
-[language.config]
-checkOnSave = { command = "clippy" }
+#Language server config
+[language-server.rust-analyzer]
+command = "rustup"
+args = ["run", "stable", "rust-analyzer"]
+
+#[language-server.rust-analyzer.config]
+
+[language-server.rust-analyzer.config.check]
+command = "clippy"
+
+[language-servers.rust-analyzer.config.inlay-hints]
+inlayHints.bindingModeHints.enable = false
+inlayHints.closingBraceHints.minLines = 10
+inlayHints.closureReturnTypeHints.enable = "with_block"
+inlayHints.discriminantHints.enable = "fieldless"
+inlayHints.lifetimeElisionHints.enable = "skip_trivial"
+inlayHints.typeHints.hideClosureInitialization = false
+
+
 
 [language.debugger]
 name = "lldb-vscode"
@@ -51,8 +68,6 @@ args = { attachCommands = [
   "attach {2}",
 ] }
 
-[[grammar]]
-name = "rust"
 
 [language.auto-pairs]
 '(' = ')'
@@ -61,18 +76,35 @@ name = "rust"
 '"' = '"'
 '`' = '`'
 '<' = '>'
+[[grammar]]
+name = "rust"
+
+
+
+# Ron
+[[language]]
+name = "ron"
+scope = "source.ron"
+injection-regex = "ron"
+file-types = ["ron"]
+roots = []
+comment-token = "//"
+indent = { tab-width = 4, unit = "    " }
+grammar = "rust"
 
 # Toml
 [[language]]
 name = "toml"
 scope = "source.toml"
-roots = ["*.toml"]
+roots = []
 auto-format = true
 injection-regex = "toml"
-file-types = ["toml"]
+file-types = ["toml", "poetry.lock"]
 comment-token = "#"
-language-server = { command = "taplo", args = ["lsp", "stdio"] }
+# language-server = { command = "taplo", args = ["lsp", "stdio"] }
 indent = { tab-width = 2, unit = "  " }
 
 [[grammar]]
 name = "toml"
+source = { git = "https://github.com/ikatyang/tree-sitter-toml", rev = "7cff70bbcbbc62001b465603ca1ea88edd668704" }
+

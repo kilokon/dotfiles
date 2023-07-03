@@ -1,52 +1,100 @@
 -- Reserve space for diagnostic icons
 -- vim.opt.signcolumn = 'yes'
 
+vim.diagnostic.config {
+        virtual_text = false,
+        signs = true,     -- change this
+        update_in_insert = false,
+        underline = true, -- change this
+        severity_sort = false,
+        float = {
+                scope = 'cursor',
+                border = 'single',
+                header = '',
+                prefix = '',
+                focusable = false,
+        },
+        --float = false,     -- change this
+}
+
+
+
+-- K: Displays hover information about the symbol under the cursor in a floating window. See :help vim.lsp.buf.hover().
+--
+-- gd: Jumps to the definition of the symbol under the cursor. See :help vim.lsp.buf.definition().
+--
+-- gD: Jumps to the declaration of the symbol under the cursor. Some servers don't implement this feature. See :help vim.lsp.buf.declaration().
+--
+-- gi: Lists all the implementations for the symbol under the cursor in the quickfix window. See :help vim.lsp.buf.implementation().
+--
+-- go: Jumps to the definition of the type of the symbol under the cursor. See :help vim.lsp.buf.type_definition().
+--
+-- gr: Lists all the references to the symbol under the cursor in the quickfix window. See :help vim.lsp.buf.references().
+--
+-- gs: Displays signature information about the symbol under the cursor in a floating window. See :help vim.lsp.buf.signature_help(). If a mapping already exists for this key this function is not bound.
+--
+-- <F2>: Renames all references to the symbol under the cursor. See :help vim.lsp.buf.rename().
+--
+-- <F3>: Format code in current buffer. See :help vim.lsp.buf.format().
+--
+-- <F4>: Selects a code action available at the current cursor position. See :help vim.lsp.buf.code_action().
+--
+-- gl: Show diagnostics in a floating window. See :help vim.diagnostic.open_float().
+--
+-- [d: Move to the previous diagnostic in the current buffer. See :help vim.diagnostic.goto_prev().
+--
+-- ]d: Move to the next diagnostic. See :help vim.diagnostic.goto_next().
+
+
+
+
 local lsp = require 'lsp-zero'
+vim.lsp.set_log_level("debug")
+lsp.preset {
+        name = 'recommended',
+        set_lsp_keymaps = false,
+        suggest_lsp_servers = false,
+        manage_nvim_cmp = {
+                set_basic_mapping = true,
+                documentation_window = true,
+        }
+}
+
 local navic = require 'nvim-navic'
 
-local null_ls = require 'null-ls'
+vim.o.foldcolumn = '1'
+vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
 
-local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
+-- Using ufo provider need remap `zR` and `zM`.
+vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 
-local null_on_attach = function(client, bufnr)
-        if client.supports_method 'textDocument/formatting' then
-                vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
-                vim.api.nvim_create_autocmd('BufWritePre', {
-                        group = augroup,
-                        buffer = bufnr,
-                        callback = function()
-                                vim.lsp.buf.format { bufnr = bufnr }
-                                -- vim.lsp.buf.formatting_sync()
-                        end,
-                })
-        end
-end
+-- ufo folding provider
+require('ufo').setup()
 
-null_ls.setup {
-        sources = {
-                -- null_ls.builtins.diagnostics.chktex,
-                null_ls.builtins.hover.dictionary,
-                null_ls.builtins.formatting.prettier,
-                null_ls.builtins.formatting.ruff,
-                null_ls.builtins.diagnostics.glslc.with {
-                        extra_args = { '--target-env=opengl' }, -- use opengl instead of vulkan1.0
+-- inlay hints
+local ih = require('inlay-hints')
+ih.setup({
+        -- renderer to use
+        -- possible options are dynamic, eol, virtline and custom
+        renderer = "inlay-hints/render/eol",
+        hints = {
+                parameter = {
+                        show = true,
+                        highlight = "Comment",
                 },
-                -- For formatting toml files
-                null_ls.builtins.formatting.taplo,
-                -- yq is a portable command-line YAML, JSON, XML, CSV and properties processor.
-                null_ls.builtins.formatting.yq.with { filetypes = { 'csv', 'yaml', 'yml' } },
-                null_ls.builtins.formatting.rustfmt,
-                null_ls.builtins.formatting.stylua,
-                null_ls.builtins.formatting.clang_format.with { command = 'clang-format-14' },
-                null_ls.builtins.code_actions.gitsigns,
-
-                -- Shows the value for the current environment variable under the cursor.
-                null_ls.builtins.hover.printenv,
-                -- null_ls.builtins.omnifunc,
+                type = {
+                        show = true,
+                        highlight = "Comment",
+                },
         },
-        debug = true,
-        on_attach = null_on_attach,
-}
+        only_current_line = false,
+        eol = {
+                right_align = false,
+        }
+})
 
 navic.setup {
         icons = {
@@ -84,11 +132,8 @@ navic.setup {
         safe_output = true,
 }
 
-lsp.preset 'recommended'
+-- lsp.preset 'recommended'
 
--- don't initialize this language server
--- we will use rust-tools to setup rust_analyzer
---local cmp_autopairs = require('nvim-autopairs.completion.cmp')
 local luasnip = require 'luasnip'
 local cmp = require 'cmp'
 --cmp.event:on(
@@ -97,6 +142,10 @@ local cmp = require 'cmp'
 --)
 lsp.setup_nvim_cmp {
         preselect = 'none',
+        window = {
+                completion = cmp.config.window.bordered(),
+                documentation = cmp.config.window.bordered(),
+        },
         mapping = {
                 ['<Tab>'] = cmp.mapping(function(fallback)
                         if cmp.visible() then
@@ -133,57 +182,10 @@ lsp.setup_nvim_cmp {
                 ghost_text = true,
         },
 }
-local wk = require 'which-key'
+-- don't initialize this language server
+-- we will use rust-tools to setup rust_analyzer
 
-local lsp_format = function(bufnr)
-        vim.lsp.buf.format {
-                filter = function(client)
-                        -- only use null-ls
-                        return client.name == 'null-ls'
-                end,
-                bufnr = bufnr,
-                async = true,
-        }
-end
-
-local function key_maps(bufnr)
-        --Enable completion triggered by <c-x><c-o>
-        -- vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-
-        -- Mappings.
-        local opts = { buffer = bufnr, noremap = true, silent = true }
-
-        local lspmaps = {
-                ['<leader>l'] = {
-                        name = 'Lsp',
-                        a = { '<cmd>lua vim.lsp.buf.code_action()<CR>', 'Code Action' },
-                        d = { "<cmd>lua require('telescope.builtin').lsp_definitions()<CR>", 'Definition' },
-                        D = { '<cmd>lua vim.lsp.buf.declaration()<CR>', 'Declaration' },
-                        -- fl = {
-                        --         function()
-                        --                 lsp_format(bufnr)
-                        --         end,
-                        --         'Format Buffer',
-                        -- },
-                        -- ff = { '<cmd>lua vim.lsp.buf.format({ async = false })<CR>', 'Format Buffer' },
-                        i = { "<cmd>lua require('telescope.builtin').lsp_implementations()<CR>", 'Implementation' },
-                        k = { '<cmd>lua vim.lsp.buf.hover()<CR>', 'Hover' },
-                        h = { '<cmd>lua vim.lsp.buf.signature_help()<CR>', 'Help' },
-                        n = { '<cmd>lua vim.lsp.buf.rename()<CR>', 'Rename' },
-                        r = { "<cmd>lua require('telescope.builtin').lsp_references()<CR>", 'References' },
-                        l = { "<cmd>lua vim.diagnostic.open_float({scope = 'line'})<CR>", 'Show Diagnostics' },
-                },
-                ['[d'] = { '<cmd>lua vim.diagnostic.goto_prev()<CR>', 'Prev Diagnostics' },
-                [']d'] = { '<cmd>lua vim.diagnostic.goto_next()<CR>', 'Next Diagnostics' },
-        }
-
-        wk.register(lspmaps, opts)
-end
-
-lsp.skip_server_setup { 'rust_analyzer' }
-
-local function common_on_attach(client, bufnr)
-        key_maps(bufnr)
+local function common_on_attach(_, bufnr)
         local lsp_hover_augroup = vim.api.nvim_create_augroup('config_lsp_hover', { clear = false })
         vim.api.nvim_clear_autocmds {
                 buffer = bufnr,
@@ -201,17 +203,76 @@ local function common_on_attach(client, bufnr)
                 group = lsp_hover_augroup,
                 buffer = bufnr,
         })
-        print 'lsp attached'
-        -- require('lsp-format').on_attach(client)
-        if client.server_capabilities.documentSymbolProvider then
-                print 'navic initiated'
-                navic.attach(client, bufnr)
-        end
+end
+
+local function allow_format(servers)
+        return function(client) return vim.tbl_contains(servers, client.name) end
 end
 
 lsp.on_attach(function(client, bufnr)
+        lsp.default_keymaps { buffer = bufnr }
+        lsp.buffer_autoformat()
+        local opts = { buffer = bufnr, remap = false }
+        local additional_opts = { buffer = bufnr, remap = false, silent = true }
+        -- vim.keymap.set('n', 'gd', function() vim.lsp.buf.definition() end, opts)
+        vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
+        vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
+        -- vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
+        vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
+        vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
+        vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
+        vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
+        vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+        vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+        -- vim.keymap.set({ 'n', 'x' }, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
+        vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+        vim.keymap.set('n', '<leader>rx', function() require('telescope.builtin').lsp_references() end, additional_opts)
+
+        vim.keymap.set({ 'n', 'x' }, 'gq', function()
+                vim.lsp.buf.format({
+                        async = false,
+                        timeout_ms = 10000,
+                        filter = allow_format({ 'lua_ls', 'rust_analyzer' })
+                })
+        end, opts)
+
+        if client.server_capabilities.documentSymbolProvider then
+                require('nvim-navic').attach(client, bufnr)
+        end
+
         common_on_attach(client, bufnr)
 end)
+
+lsp.configure('typst_lsp', {
+        cmd = { 'typst_lsp' },
+        filetypes = { 'typst' },
+        on_attach = function(_, _)
+                print 'typst attached'
+                --common_on_attach(client, bufnr)
+                --               require('lsp-format').on_attach(client)
+        end,
+})
+
+lsp.configure('taplo', {
+        cmd = { 'taplo', 'lsp', 'stdio' },
+        filetypes = { 'toml' },
+        on_attach = function(_, _)
+                print 'taplo attached'
+                --common_on_attach(client, bufnr)
+                --               require('lsp-format').on_attach(client)
+        end,
+})
+
+
+lsp.configure('clangd', {
+        cmd = { 'clangd', '--background-index', '--clang-tidy', '--completion-style=bundled', '--header-insertion=iwyu' },
+        filetypes = { 'c', 'cpp', 'objc', 'objcpp' },
+        on_attach = function(_, _)
+                print 'clangd attached'
+                --common_on_attach(client, bufnr)
+                --               require('lsp-format').on_attach(client)
+        end,
+})
 
 lsp.configure('pyright', {
         on_attach = function(_, bufnr)
@@ -241,37 +302,46 @@ lsp.configure('pyright', {
         },
 })
 
+
+lsp.configure('lua_ls', {
+        root_dir = function()
+                --- project root will be the first directory that has
+                --- either .luarc.json or .stylua.toml
+                return lsp.dir.find_first({ '.luarc.json', '.stylua.toml' })
+        end,
+        on_attach = function(client, bufnr)
+                --                print "hello from lua_ls"
+                ih.on_attach(client, bufnr)
+        end,
+        settings = {
+                Lua = {
+                        hint = {
+                                enable = true,
+                        },
+                        diagnostics = {
+                                globals = { 'vim' },
+                        },
+                },
+        },
+})
+
+lsp.set_server_config({
+        capabilities = {
+                textDocument = {
+                        foldingRange = {
+                                dynamicRegistration = false,
+                                lineFoldingOnly = true
+                        }
+                }
+        }
+})
+
 --Configure lua language server for neovim
-lsp.nvim_workspace()
+-- lsp.nvim_workspace()
+lsp.skip_server_setup { 'rust_analyzer', 'hls' }
 
 lsp.setup()
 
-vim.diagnostic.config {
-        virtual_text = false,
-        signs = true, -- change this
-        update_in_insert = false,
-        underline = true, -- change this
-        severity_sort = false,
-        float = {
-                scope = 'cursor',
-                border = 'single',
-                header = '',
-                prefix = '',
-                focusable = false,
-        },
-        --float = false,     -- change this
-}
-vim.cmd 'sign define DiagnosticSignError text= texthl=DiagnosticSignError'
-vim.cmd 'sign define DiagnosticSignWarn text= texthl=DiagnosticSignWarn'
-vim.cmd 'sign define DiagnosticSignInfo text= texthl=DiagnosticSignInfo'
-vim.cmd 'sign define DiagnosticSignHint text= texthl=DiagnosticSignHint'
-
-local lua_lsp = lsp.build_options('lua_language_server', {})
-
-require('neodev').setup {
-        override = { lua_lsp },
-        -- add any options here, or leave empty to use the default settings
-}
 
 -- Initialize rust_analyzer with rust-tools
 local rust_lsp = lsp.build_options('rust_analyzer', {})
@@ -298,6 +368,7 @@ require('rust-tools').setup {
                         vim.keymap.set('n', 'rr', rt.runnables.runnables, { buffer = bufnr })
                         -- Rust Cargo Open
                         vim.keymap.set('n', 'rc', rt.open_cargo_toml.open_cargo_toml, { buffer = bufnr })
+                        ih.on_attach(client, bufnr) -- Inlayhints
                 end,
                 settings = {
                         -- to enable rust-analyzer settings visit:
@@ -314,13 +385,15 @@ require('rust-tools').setup {
                 autoSetHints = true,
                 --hover_with_actions = true,
                 executor = require('rust-tools/executors').termopen,
-                on_initialized = nil,
+                on_initialized = function()
+                        ih.set_all()
+                end,
                 -- automatically call RustReloadWorkspace when writing to a Cargo.toml file.
                 reload_workspace_from_cargo_toml = true,
                 inlay_hints = {
                         -- automatically set inlay hints (type hints)
                         -- default: true
-                        auto = true,
+                        auto = false,
                         -- Only show inlay hints for the current line
                         only_current_line = false,
                         -- whether to show parameter hints with the inlay hints or not
@@ -363,7 +436,127 @@ require('rust-tools').setup {
         },
 }
 
-vim.keymap.set('', '<Leader>xx', require('lsp_lines').toggle, { desc = 'Toggle lsp_lines' })
+local def_opts = { noremap = true, silent = true }
+local haskell_tools = require('haskell-tools')
+local hls_lsp = require('lsp-zero').build_options('hls', {})
+
+local hls_config = {
+        tools = {
+                -- haskell-tools options
+                codeLens = {
+                        -- Whether to automatically display/refresh codeLenses
+                        -- (explicitly set to false to disable)
+                        autoRefresh = true,
+                },
+                hoogle = {
+                        -- 'auto': Choose a mode automatically, based on what is available.
+                        -- 'telescope-local': Force use of a local installation.
+                        -- 'telescope-web': The online version (depends on curl).
+                        -- 'browser': Open hoogle search in the default browser.
+                        mode = 'auto',
+                },
+                hover = {
+                        -- Whether to disable haskell-tools hover
+                        -- and use the builtin lsp's default handler
+                        disable = false,
+                        -- Set to nil to disable
+                        border = {
+                                { '╭', 'FloatBorder' },
+                                { '─', 'FloatBorder' },
+                                { '╮', 'FloatBorder' },
+                                { '│', 'FloatBorder' },
+                                { '╯', 'FloatBorder' },
+                                { '─', 'FloatBorder' },
+                                { '╰', 'FloatBorder' },
+                                { '│', 'FloatBorder' },
+                        },
+                        -- Stylize markdown (the builtin lsp's default behaviour).
+                        -- Setting this option to false sets the file type to markdown and enables
+                        -- Treesitter syntax highligting for Haskell snippets
+                        -- if nvim-treesitter is installed
+                        stylize_markdown = false,
+                        -- Whether to automatically switch to the hover window
+                        auto_focus = false,
+                },
+                definition = {
+                        -- Configure vim.lsp.definition to fall back to hoogle search
+                        -- (does not affect vim.lsp.tagfunc)
+                        hoogle_signature_fallback = false,
+                },
+                repl = {
+                        -- 'builtin': Use the simple builtin repl
+                        -- 'toggleterm': Use akinsho/toggleterm.nvim
+                        handler = 'builtin',
+                        builtin = {
+                                create_repl_window = function(view)
+                                        -- create_repl_split | create_repl_vsplit | create_repl_tabnew | create_repl_cur_win
+                                        return view.create_repl_vsplit()
+                                end
+                        },
+                        -- Can be overriden to either `true` or `false`.
+                        -- The default behaviour depends on the handler.
+                        auto_focus = true,
+                        delete_buffer_on_exit = true,
+                },
+                -- Set up autocmds to generate tags (using fast-tags)
+                -- e.g. so that `vim.lsp.tagfunc` can fall back to Haskell tags
+                tags = {
+                        enable = vim.fn.executable('fast-tags') == 1,
+                        -- Events to trigger package tag generation
+                        package_events = { 'BufWritePost' },
+                },
+                dap = {
+                        cmd = { 'haskell-debug-adapter' },
+                },
+        },
+        hls = {
+                capabilities = hls_lsp.capabilities,
+                on_attach = function(_, bufnr)
+                        local opts = { buffer = bufnr }
+
+                        -- haskell-language-server relies heavily on codeLenses,
+                        -- so auto-refresh (see advanced configuration) is enabled by default
+                        vim.keymap.set('n', '<leader>ca', vim.lsp.codelens.run, opts)
+                        vim.keymap.set('n', '<leader>hs', haskell_tools.hoogle.hoogle_signature, opts)
+                        vim.keymap.set('n', '<leader>ea', haskell_tools.lsp.buf_eval_all, opts)
+                end
+        }
+}
+
+-- Autocmd that will actually be in charging of starting hls
+local hls_augroup = vim.api.nvim_create_augroup('haskell-lsp', { clear = true })
+vim.api.nvim_create_autocmd('FileType', {
+        group = hls_augroup,
+        pattern = { 'haskell' },
+        callback = function(_, bufnr)
+                local opts = { buffer = bufnr, remap = false }
+                haskell_tools.start_or_attach(hls_config)
+
+                ---
+                -- Suggested keymaps that do not depend on haskell-language-server:
+                ---
+
+                -- Toggle a GHCi repl for the current package
+                vim.keymap.set('n', '<leader>rr', haskell_tools.repl.toggle, opts)
+
+                -- Toggle a GHCi repl for the current buffer
+                vim.keymap.set('n', '<leader>rf', function()
+                        haskell_tools.repl.toggle(vim.api.nvim_buf_get_name(0))
+                end, def_opts)
+
+                vim.keymap.set('n', '<leader>rq', haskell_tools.repl.quit, opts)
+        end
+})
+
+
+
+
+
+--
+vim.g.copilot_no_tab_map = true
+vim.g.copilot_assume_mapped = true
+vim.api.nvim_set_keymap('i', '<C-l>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
+-- vim.keymap.set('', '<Leader>xx', require('lsp_lines').toggle, { desc = 'Toggle lsp_lines' })
 
 -- map("n", "C-k", "<Nop>", opts)
 

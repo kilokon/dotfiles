@@ -18,13 +18,14 @@
 
   ;; Different scroll margin
   ;; (setq vertico-scroll-margin 0)
-
+  :bind (:map vertico-map
+              ("TAB" . vertico-next)
+              ("S-TAB" . vertico-previous))
   ;; Show more candidates
   ;; (setq vertico-count 20)
-
+  :custom
   ;; Grow and shrink the Vertico minibuffer
   (setq vertico-resize t)
-
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   (setq vertico-cycle t))
 

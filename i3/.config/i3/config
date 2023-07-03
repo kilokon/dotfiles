@@ -45,6 +45,7 @@ gaps inner 7px
 
 
 for_window [class="wezterm"] border pixel 3
+for_window [title="Alacritty"] border pixel 3
 for_window [class="firefox"] border pixel 3
 # for_window [class = "microsoft-edge-dev"] border pixel 3
 # move tiling windows via drag & drop by left-clicking into the title bar,
@@ -52,10 +53,17 @@ for_window [class="firefox"] border pixel 3
 tiling_drag modifier titlebar
 
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+# bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec alacritty 
 
 # kill focused window
 bindsym $mod+Shift+q kill
+
+# ScratchPads
+bindsym $mod+t exec --no-startup-id "i3-scratchpad -tmt -atc wezterm"
+bindsym $mod+Shift+t exec tdrop -ma -w 50% -h 60% -x -1600 -y 170 -s dropdown wezterm
+# tdrop -ma -w 1 -h 1 -x 0.05 -y 0.05 -s dropdown wezterm
+# -a -w 0.9 -h 0.9 -x 0.05 -y 0.05 -m 0.05 -s 0.05 -d 0.05 -p 0.05 -e wezterm
 
 # start dmenu (a program launcher)
 bindsym $mod+d exec --no-startup-id dmenu_run
@@ -124,8 +132,13 @@ bindsym $mod+a focus parent
 for_window [title="Bevy App"] floating enable
 for_window [title="winit window"] floating enable
 for_window [title="GlslViewer"] floating enable
+for_window [title="vfxpr_gui"] floating enable
+for_window [title="tdrop wezterm"] floating enable
+# for_window [class="Aseprite"] floating enable
+for_window [class="Aseprite"] floating enable, border none
 
-
+assign [class="microsoft-edge-dev"] 3
+popup_during_fullscreen smart
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.

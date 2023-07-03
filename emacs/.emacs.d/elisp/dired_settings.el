@@ -3,6 +3,7 @@
 (add-to-list 'load-path (expand-file-name (concat "dirvish" "/" "extensions") kilokon/quelpa-build-dir))
 
 (use-package dirvish
+  :load-path "~/.emacs.d/quelpa/build/dirvish/"
   :init
   (dirvish-override-dired-mode)
   :custom
@@ -39,4 +40,4 @@
    ("M-t" . dirvish-layout-toggle)
    ("M-s" . dirvish-setup-menu)
    ("M-e" . dirvish-emerge-menu)
-   ("M-j" . dirvish-fd-jump))) 
+   ("M-j" . dirvish-fd-jump)))

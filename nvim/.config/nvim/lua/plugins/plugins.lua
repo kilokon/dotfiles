@@ -17,11 +17,11 @@ return require('packer').startup(function(use)
         use 'kyazdani42/nvim-web-devicons'
         use 'nvim-lua/popup.nvim'
         use 'mattn/webapi-vim'
-
+        use { 'kevinhwang91/nvim-ufo', requires = 'kevinhwang91/promise-async' }
         -- Search and Destroy
         -- use 'windwp/nvim-spectre'
 
-        -- Nvim Telescope
+        -- Nvim Telescope__
         use {
                 'nvim-telescope/telescope.nvim',
                 tag = '0.1.1',
@@ -41,17 +41,20 @@ return require('packer').startup(function(use)
         use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
         use 'jvgrootveld/telescope-zoxide' -- Telescope Zoxide
 
-        -- Mini independent Lua modules . The Swiss Army knife
+        --Navigation and Movement__
+
+        --tab/buffer/list
+        use 'liangxianzhe/nap.nvim'
+
+        -- Mini independent Lua modules . The Swiss Army knife__
         use 'echasnovski/mini.nvim'
 
-        -- Comments
-        use 'JoosepAlviste/nvim-ts-context-commentstring'
 
-        -- Leap & flit (f/F/t/T motions on steroids, building on the Leap interface.)
+        -- Leap & flit (f/F/t/T motions on steroids, building on the Leap interface.)__
         use 'ggandor/leap.nvim'
         use 'ggandor/flit.nvim'
 
-        -- Save Nvim Sessions
+        -- Save Nvim Sessions__
         use 'stevearc/resession.nvim'
 
         --Buffer Navigation
@@ -72,10 +75,10 @@ return require('packer').startup(function(use)
         }
 
         --  indentation guides
-        use 'lukas-reineke/indent-blankline.nvim'
+        -- use 'lukas-reineke/indent-blankline.nvim'
 
         -- Buffer Line
-        use 'noib3/nvim-cokeline'
+        -- use 'noib3/nvim-cokeline'
 
         -- Treesitter
         use {
@@ -87,6 +90,9 @@ return require('packer').startup(function(use)
         use 'nvim-treesitter/nvim-treesitter-textobjects'
         use 'nvim-treesitter/nvim-treesitter-refactor'
         use 'TornaxO7/tree-setter'
+        use 'David-Kunz/markid'
+
+
         -- LSP , CMP, SNIPPETS, MASON
         use {
                 'VonHeikemen/lsp-zero.nvim',
@@ -111,25 +117,21 @@ return require('packer').startup(function(use)
                 },
         }
 
+        -- LSP Saga
+        -- use { 'glepnir/lspsaga.nvim', opt = true, event = 'BufRead' }
+
         -- Use LSP Diagonastics
+        -- use 'chikko80/error-lens.nvim'
+
+        -- Linter and formatter
         use 'jose-elias-alvarez/null-ls.nvim'
 
-        use {
-                'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
-                config = function()
-                        require('lsp_lines').setup()
-                end,
-        }
-
-        -- FZF CMP
-        -- use { 'tzachar/cmp-fuzzy-buffer', requires = { 'tzachar/fuzzy.nvim' } }
-
-        -- Formatting & Linting
-        use 'lukas-reineke/lsp-format.nvim'
-        -- use 'ttibsi/pre-commit.nvim'
-
+        -- REPL MANAGER
+        use { 'hkupty/iron.nvim' }
         --UI for nvim-lsp progress
-        use 'j-hui/fidget.nvim'
+        use { 'j-hui/fidget.nvim',
+                tag = 'legacy'
+        }
 
         -- Diagonastics list and troubleshoot
         use 'folke/trouble.nvim'
@@ -138,20 +140,32 @@ return require('packer').startup(function(use)
         use 'simrat39/inlay-hints.nvim'
 
         -- A code outline window for skimming and quick navigation
-        use 'stevearc/aerial.nvim'
+        -- use 'stevearc/aerial.nvim'
 
-        -- use 'jose-elias-alvarez/null-ls.nvim'
 
         -- Debugging Code
         use 'mfussenegger/nvim-dap'
 
         -- Lua
-        use 'folke/neodev.nvim'
+        -- use 'folke/neodev.nvim'
 
         -- Rust
         use 'simrat39/rust-tools.nvim'
         use 'Canop/nvim-bacon'
         use 'Saecki/crates.nvim'
+
+        -- Haskell
+        use {
+                'mrcjkb/haskell-tools.nvim',
+                requires = {
+                        'nvim-lua/plenary.nvim',
+                        'nvim-telescope/telescope.nvim', -- optional
+                },
+                -- branch = '1.10.1',                       -- recommended
+        }
+
+        -- Typst
+        use { 'kaarmu/typst.vim', ft = { 'typst' } }
 
         -- GlSl Viewer
         use {
@@ -173,13 +187,24 @@ return require('packer').startup(function(use)
                 end,
         }
 
-        -- Commenting
-        -- use {
-        --         'numToStr/Comment.nvim',
-        --         config = function()
-        --                 require('Comment').setup()
-        --         end
-        -- }
+        -- NU Shell
+        use {
+                'LhKipp/nvim-nu',
+                run = ':TSInstall nu'
+        }
+
+        -- Comments
+        use {
+                'numToStr/Comment.nvim',
+
+                -- config = function()
+                --         require('Comment').setup()
+                -- end,
+        }
+
+        use 'JoosepAlviste/nvim-ts-context-commentstring'
+
+
 
         -- parens
         --use "windwp/nvim-autopairs"
@@ -193,26 +218,78 @@ return require('packer').startup(function(use)
         -- Terminals
         use 'akinsho/toggleterm.nvim'
 
+        use('mrjones2014/smart-splits.nvim')
+
         -- vim learning
-        use 'ThePrimeagen/vim-be-good'
+        -- use 'ThePrimeagen/vim-be-good'
 
         -- Speed up loading Lua modules in Neovim to improve startup time.
         use 'lewis6991/impatient.nvim'
 
-        --Nu Shell
-        use 'LhKipp/nvim-nu'
+
 
         -- Which Key
         use {
                 'folke/which-key.nvim',
-                config = function()
-                        vim.o.timeout = true
-                        vim.o.timeoutlen = 300
-                        require('which-key').setup {
-                                -- your configuration comes here
-                                -- or leave it empty to use the default settings
-                                -- refer to the configuration section below
+        }
+        use({
+                "utilyre/barbecue.nvim",
+                tag = "*",
+                requires = {
+                        "SmiteshP/nvim-navic",
+                        "nvim-tree/nvim-web-devicons", -- optional dependency
+                },
+        })
+
+        -- use({
+        --         "utilyre/barbecue.nvim",
+        --         tag = "*",
+        --         requires = {
+        --                 "SmiteshP/nvim-navic",
+        --                 "nvim-tree/nvim-web-devicons", -- optional dependency
+        --         },
+        --         after = "nvim-web-devicons",           -- keep this if you're using NvChad
+        -- })
+        use {
+                'JellyApple102/flote.nvim',
+                --                config = function()
+                --                        require('flote').setup {
+                --                                -- your configuration comes here
+                --                                -- or leave it empty to use the default settings
+                --                                -- refer to the configuration section below
+                --                        }
+                --                end,
+        }
+
+        use {
+                "nvim-neo-tree/neo-tree.nvim",
+                branch = "v2.x",
+                requires = {
+                        "nvim-lua/plenary.nvim",
+                        "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+                        "MunifTanjim/nui.nvim",
+                        {
+                                -- only needed if you want to use the commands with "_with_window_picker" suffix
+                                's1n7ax/nvim-window-picker',
+                                tag = "v1.*",
+                                config = function()
+                                        require 'window-picker'.setup({
+                                                autoselect_one = true,
+                                                include_current = false,
+                                                filter_rules = {
+                                                        -- filter using buffer options
+                                                        bo = {
+                                                                -- if the file type is one of following, the window will be ignored
+                                                                filetype = { 'neo-tree', "neo-tree-popup", "notify" },
+
+                                                                -- if the buffer type is one of following, the window will be ignored
+                                                                buftype = { 'terminal', "quickfix" },
+                                                        },
+                                                },
+                                                other_win_hl_color = '#e35e4f',
+                                        })
+                                end,
                         }
-                end,
+                },
         }
 end)

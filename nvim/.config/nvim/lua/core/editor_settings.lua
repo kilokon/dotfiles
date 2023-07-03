@@ -22,8 +22,12 @@ local options = {
         swapfile = false,
         -- completeopt = { "menuone", "noselect" }, -- Options for insert mode completion
         -- copyindent = true, -- Copy the previous indentation on autoindenting
+        -- Splitting
+        splitbelow = true, -- Horizontal splits will automatically be below
+        splitright = true, -- Vertical splits will automatically be to the rights
+        -- cursor
         cursorline = true, -- Highlight the text line of the cursor
-        pumheight = 17, -- Height of the pop up menu
+        pumheight = 17,    -- Height of the pop up menu
         -- mouse
         mouse = 'a',
         scrolloff = 7, -- Minimal number of screen lines to keep above and below the cursor
@@ -40,32 +44,72 @@ local options = {
 
         -- Undo
         undolevels = 1000,
-        undodir = '$HOME/.cache/nvim/undo_ar', --table.concat(vim.fn.stdpath("data"), "undo", "/"),
+        --       undodir = '$HOME/.cache/nvim/undo_ar', --table.concat(vim.fn.stdpath("data"), "undo", "/"),
         undofile = true,
         -- Cmd
         cmdheight = 0, -- use 2 for Wider command height
-        shell = '/usr/bin/zsh',
+        termguicolors = true,
+        shell = '/usr/bin/bash',
+
+        -- key timeouts
+        timeout = true,
+        timeoutlen = 600,
+
 }
+
+vim.cmd [[
+if has("persistent_undo")
+   let target_path = expand('~/.undodir')
+
+    " create the directory and any parent directories
+    " if the location does not exist.
+    if !isdirectory(target_path)
+        call mkdir(target_path, "p", 0700)
+    endif
+
+    let &undodir=target_path
+    set undofile
+endif
+]]
+
+
 
 for k, v in pairs(options) do
         vim.opt[k] = v
 end
 
 local g = {
-        highlighturl_enabled = true, -- highlight URLs by default
-        autopairs_enabled = true,    -- enable autopairs at start
-        diagnostics_enabled = true,  -- enable diagnostics at start
+        highlighturl_enabled = true,       -- highlight URLs by default
+        autopairs_enabled = true,          -- enable autopairs at start
+        diagnostics_enabled = true,        -- enable diagnostics at start
         status_diagnostics_enabled = true, -- enable diagnostics in statusline
-        icons_enabled = true,        -- disable icons in the UI (disable if no nerd font is available)
-        ui_notifications_enabled = true, -- disable notifications when toggling UI elements
+        icons_enabled = true,              -- disable icons in the UI (disable if no nerd font is available)
+        ui_notifications_enabled = true,   -- disable notifications when toggling UI elements
         loaded_perl_provider = 0,
         loaded_ruby_provider = 0,
-        netrw_banner = 0,
-        netrw_list_hide = '(^|ss)\zs.S+,(^|ss)ntuser.S+',
-        -- netrw_list_hide='.*\.un\~$'
+        --autocomplete
+        cmp_min_chars = 3,
+        loaded_netrw = 1,
+        loaded_netrwPlugin = 1,
+        --netr
+        -- netrw_liststyle = 3,
+        -- netrw_banner = 0,
+        -- netrw_winsize = 25,
+        -- netrw_list_hide = '(^|ss)\zs.S+,(^|ss)ntuser.S+',
+        -- netrw_localcopydircmd = 'cp -r',
+        -- netrw_keepdir = 0,
+        -- netrw_browse_split = 4,
+        -- netrw_altv = 1,
         -- python_host_prog = "/home/aviik/.pyenv/versions/myenv/bin/python",
         -- python3_host_prog = "/home/aviik/.pyenv/versions/myenv/bin/python"
 }
+
+-- vim.cmd [[
+-- augroup ProjectDrawer
+--   autocmd!
+--   autocmd VimEnter * :Vexplore
+-- augroup END
+-- ]]
 
 for kk, vv in pairs(g) do
         vim.g[kk] = vv

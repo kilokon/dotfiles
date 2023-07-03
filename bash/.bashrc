@@ -100,3 +100,5 @@ ex ()
 
 
 eval "$(pyenv virtualenv-init -)"
+
+[ -f "/home/aviik/.ghcup/env" ] && source "/home/aviik/.ghcup/env" # ghcup-env

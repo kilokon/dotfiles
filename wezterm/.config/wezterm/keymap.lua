@@ -3,24 +3,34 @@ local act = wezterm.action
 local M = {}
 M.keys = function()
         return {
-                { key = "C", mods = "CTRL",   action = act.CopyTo("ClipboardAndPrimarySelection") },
-                { key = "V", mods = "CTRL",   action = act.PasteFrom("Clipboard") },
-                { key = "V", mods = "CTRL",   action = act.PasteFrom("PrimarySelection") },
-                { key = "k", mods = "LEADER", action = act({ ActivatePaneDirection = "Up" }) },
-                { key = "j", mods = "LEADER", action = act({ ActivatePaneDirection = "Down" }) },
-                { key = "h", mods = "LEADER", action = act({ ActivatePaneDirection = "Left" }) },
-                { key = "l", mods = "LEADER", action = act({ ActivatePaneDirection = "Right" }) },
-                { key = "l", mods = "LEADER", action = act.ShowLauncher }, -- },
-                { key = "t", mods = "LEADER", action = act.SpawnCommandInNewTab({}) },
+                { key = "C", mods = "CTRL",        action = act.CopyTo("ClipboardAndPrimarySelection") },
+                { key = "V", mods = "CTRL",        action = act.PasteFrom("Clipboard") },
+                { key = "V", mods = "CTRL",        action = act.PasteFrom("PrimarySelection") },
+                { key = "k", mods = "LEADER|CTRL", action = act({ ActivatePaneDirection = "Up" }) },
+                { key = "j", mods = "LEADER|CTRL", action = act({ ActivatePaneDirection = "Down" }) },
+                { key = "h", mods = "LEADER|CTRL", action = act({ ActivatePaneDirection = "Left" }) },
+                { key = "l", mods = "LEADER|CTRL", action = act({ ActivatePaneDirection = "Right" }) },
+                { key = "l", mods = "LEADER",      action = act.ShowLauncher }, -- },
+                { key = "t", mods = "LEADER",      action = act.SpawnCommandInNewTab({}) },
                 {
-                        key = "%",
-                        mods = "CTRL|SHIFT|ALT",
-                        action = act.SplitPane({
-                                direction = "Left",
-                                command = { args = { "top" } },
-                                size = { Percent = 50 },
-                        }),
+                        key = "|",
+                        mods = "ALT|SHIFT|CTRL",
+                        action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
                 },
+                {
+                        key = "-",
+                        mods = "LEADER",
+                        action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
+                },
+                -- {
+                --         key = "%",
+                --         mods = "CTRL|SHIFT|ALT",
+                --         action = act.SplitPane({
+                --                 direction = "Left",
+                --                 -- command = { args = { "top" } },
+                --                 size = { Percent = 50 },
+                --         }),
+                -- },
 
                 -- Create a new workspace with a random name and switch to it
                 { key = "i", mods = "LEADER", action = act.SwitchToWorkspace },
@@ -72,7 +82,7 @@ M.keys = function()
                                 RotatePanes = "Clockwise",
                         }),
                 },
-                { key = ")", mods = "CTRL", action = "SpawnWindow" },
+                { key = ")", mods = "CTRL",     action = "SpawnWindow" },
                 {
                         key = "9",
                         mods = "ALT",
@@ -105,6 +115,16 @@ M.keys = function()
                                 },
                         }),
                 },
+                { key = "{", mods = "LEADER",   action = act.ActivateTabRelative(-1) },
+                { key = "}", mods = "LEADER",   action = act.ActivateTabRelative(1) },
+                { key = "1", mods = "CTRL|ALT", action = act.ActivateTab(0) },
+                { key = "2", mods = "CTRL|ALT", action = act.ActivateTab(1) },
+                { key = "3", mods = "CTRL|ALT", action = act.ActivateTab(2) },
+                { key = "4", mods = "CTRL|ALT", action = act.ActivateTab(3) },
+                { key = "5", mods = "CTRL|ALT", action = act.ActivateTab(4) },
+                { key = "6", mods = "CTRL|ALT", action = act.ActivateTab(5) },
+                { key = "7", mods = "CTRL|ALT", action = act.ActivateTab(6) },
+                { key = "8", mods = "CTRL|ALT", action = act.ActivateTab(7) },
         }
 end
 M.key_tables = function()
@@ -192,4 +212,15 @@ M.key_tables = function()
                 },
         }
 end
+
+-- local tab_keys = {}
+-- for i = 1, 8 do
+--         table.insert(M.tab_keys, {
+--                 -- CTRL+ALT + number to activate that tab
+--                 key = tostring(i),
+--                 mods = "CTRL|ALT",
+--                 action = act.ActivateTab(i - 1),
+--         })
+-- end
+
 return M

@@ -1,5 +1,5 @@
 ;; (use-package tex
-;;   :ensure auctex
+  ;; :ensure auctex
 ;;   :config
 ;;   (setq TeX-PDF-mode t)
 ;;   (setq TeX-parse-self t)
@@ -14,36 +14,74 @@
 ;;                    (TeX-command-menu "LaTeX"))))))
 
 
-(use-package auctex
-  :ensure t
-  :defer t
-  :hook (LaTeX-mode . (lambda ()
+;; (use-package auctex
+;;   :ensure t
+;;   :defer t
+;;   :hook (LaTeX-mode . (lambda ()
+;; 			(push (list 'output-pdf "Zathura")
+;; 			      TeX-view-program-selection))))
+;; (setq TeX-auto-save t)
+;; (setq TeX-parse-self t)
+;; (setq-default TeX-master nil)
+;; (setq TeX-PDF-mode t); PDF mode (rather than DVI-mode)
+
+;; (add-hook 'TeX-mode-hook 'flyspell-mode); Enable Flyspell mode for TeX modes such as AUCTeX. Highlights all misspelled words.
+;; (add-hook 'emacs-lisp-mode-hook 'flyspell-prog-mode); Enable Flyspell program mode for emacs lisp mode, which highlights all misspelled words in comments and strings.
+;; (setq ispell-dictionary "english"); Default dictionary. To change do M-x ispell-change-dictionary RET.
+;; (add-hook 'TeX-mode-hook
+;;           (lambda () (TeX-fold-mode 1))); Automatically activate TeX-fold-mode.
+;; (setq LaTeX-babel-hyphen nil); Disable language-specific hyphen insertion.
+
+
+;; ;; " expands into csquotes macros (for this to work babel must be loaded after csquotes).
+;; (setq LaTeX-csquotes-close-quote "}"
+;;       LaTeX-csquotes-open-quote "\\enquote{")
+
+;; ;; LaTeX-math-mode http://www.gnu.org/s/auctex/manual/auctex/Mathematics.html
+;; (add-hook 'TeX-mode-hook 'LaTeX-math-mode)
+
+
+;; ;;; RefTeX
+;; ;; Turn on RefTeX for AUCTeX http://www.gnu.org/s/auctex/manual/reftex/reftex_5.html
+;; (add-hook 'TeX-mode-hook 'turn-on-reftex)
+(use-package tex
+  :ensure auctex
+  :hook
+  ((LaTeX-mode . flycheck-mode)
+   (LaTeX-mode . flyspell-mode)
+   (LaTeX-mode . fci-mode)
+   (LaTeX-mode . reftex-mode)
+   (LaTeX-mode . (lambda ()
 			(push (list 'output-pdf "Zathura")
-			      TeX-view-program-selection))))
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master nil)
-(setq TeX-PDF-mode t); PDF mode (rather than DVI-mode)
+			      TeX-view-program-selection)))
+   ;; sync tex buffer positions to output pdf
+   (LaTeX-mode . TeX-source-correlate-mode))
+  :config
+  (turn-on-reftex)
+  (setq TeX-after-compilation-finished-functions '(TeX-revert-document-buffer)
+        reftex-plug-into-AUCTeX t
+        reftex-ref-style-default-list '("Cleveref" "Default")))
 
-(add-hook 'TeX-mode-hook 'flyspell-mode); Enable Flyspell mode for TeX modes such as AUCTeX. Highlights all misspelled words.
-(add-hook 'emacs-lisp-mode-hook 'flyspell-prog-mode); Enable Flyspell program mode for emacs lisp mode, which highlights all misspelled words in comments and strings.
-(setq ispell-dictionary "english"); Default dictionary. To change do M-x ispell-change-dictionary RET.
-(add-hook 'TeX-mode-hook
-          (lambda () (TeX-fold-mode 1))); Automatically activate TeX-fold-mode.
-(setq LaTeX-babel-hyphen nil); Disable language-specific hyphen insertion.
+;; add cleveref support
+(with-eval-after-load 'latex
+  (TeX-add-style-hook
+   "cleveref"
+   (lambda ()
+     (when (boundp 'reftex-ref-style-alist)
+       (add-to-list 'reftex-ref-style-alist
+                    '("Cleveref" "cleveref" (("\\cref" ?c)
+                                             ("\\Cref" ?C)
+                                             ("\\cpageref" ?d)
+                                             ("\\Cpageref" ?D)))))
+     (reftex-ref-style-activate "Cleveref")
+     (TeX-add-symbols
+      '("cref" TeX-arg-ref)
+      '("Cref" TeX-arg-ref)
+      '("cpageref" TeX-arg-ref)
+      '("Cpageref" TeX-arg-ref)))))
 
 
-;; " expands into csquotes macros (for this to work babel must be loaded after csquotes).
-(setq LaTeX-csquotes-close-quote "}"
-      LaTeX-csquotes-open-quote "\\enquote{")
 
-;; LaTeX-math-mode http://www.gnu.org/s/auctex/manual/auctex/Mathematics.html
-(add-hook 'TeX-mode-hook 'LaTeX-math-mode)
-
-
-;;; RefTeX
-;; Turn on RefTeX for AUCTeX http://www.gnu.org/s/auctex/manual/reftex/reftex_5.html
-(add-hook 'TeX-mode-hook 'turn-on-reftex)
 
 (eval-after-load 'reftex-vars; Is this construct really needed?
   '(progn
@@ -141,3 +179,28 @@
         ("renewlist" "{")
         ("setlistdepth" "{")
         ("restartlist" "{")))
+
+
+
+
+(defun nd/init-company-auctex ()
+  "Set the company backends for auctex modes."
+  (setq-local company-backends '((company-auctex-labels
+                                  company-auctex-bibs
+                                  company-auctex-macros
+                                  company-auctex-symbols
+                                  company-auctex-environments
+                                  ;; company-latex-commands
+                                  company-math-symbols-latex
+                                  company-math-symbols-unicode))))
+
+;; (use-package company-math
+;;   :after (tex company)
+;;   :config
+;;   (setq company-math-allow-unicode-symbols-in-faces '(font-latex-math-face)
+;;         company-math-disallow-latex-symbols-in-faces nil))
+
+;; (use-package company-auctex
+;;   :after (tex company company-math)
+;;   :hook
+;;   ((LaTeX-mode . nd/init-company-auctex)))

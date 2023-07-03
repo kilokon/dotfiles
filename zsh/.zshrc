@@ -1,5 +1,5 @@
 fpath+=~/.zfunc
-
+fpath=(path/to/zsh-completions/src $fpath)
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
@@ -34,9 +34,9 @@ setopt hist_ignore_all_dups  # If a history entry would be duplicate, delete old
 
 # Comletion =====================================================
 # ------------------------------
-if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then 
-       . /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh 
-fi        
+if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+       . /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
 
 autoload -U compinit && compinit -u
 zstyle ':completion:*' menu select
@@ -84,6 +84,11 @@ alias cd..="cd .."
 alias cd...="cd ../.."
 alias cd....="cd ../../.."
 alias dev="cd $HOME/Dev/"
+alias gg="emacsclient -c -e '(magit-status)'" # magit
+alias emacs="emacsclient -t"
+alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
+#alias emacs="emacs -nw"
+alias emacs29="emacs -nw --init-directory ~/dotfiles/emacs/emacs29"
 # alias hx="helix"
 alias nvdot="nvim ~/.dotfiles/"
 #alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
@@ -93,7 +98,8 @@ alias k="kill -9"
 alias sync_notes="onedrive --synchronize --single-directory 'mynotes'"
 alias sync_dev="onedrive --synchronize --single-directory 'dev'"
 #alias kmo="kmonad $DOTFILES/kmonad/.config/kmonad/ansi_qwerty_circle_87keys.kbd"
-
+alias bevc="gh gist view 9c7afb882391fcc1264b8a7d4f8dcb6e | xsel -ib"
+alias nvim="nvim -p"
 #------------------------------
 # ShellFuncs
 #------------------------------
@@ -135,5 +141,39 @@ eval "$(pyenv virtualenv-init -)"
 
 source ~/repos/sourcing/zabb/zabb.plugin.zsh
 
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+# place this after nvm initialization!
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
+      nvm use
+    fi
+  elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
 
 
+vterm_printf() {
+    if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ]); then
+        # Tell tmux to pass the escape sequences through
+        printf "\ePtmux;\e\e]%s\007\e\\" "$1"
+    elif [ "${TERM%%-*}" = "screen" ]; then
+        # GNU screen (screen, screen-256color, screen-256color-bce)
+        printf "\eP\e]%s\007\e\\" "$1"
+    else
+        printf "\e]%s\e\\" "$1"
+    fi
+}
+[ -f "/home/aviik/.ghcup/env" ] && source "/home/aviik/.ghcup/env" # ghcup-env

@@ -19,8 +19,16 @@
 ;; evil-commentary
 (require 'evil-commentary)
 (evil-commentary-mode)
+(unless (display-graphic-p)
+  (require 'evil-terminal-cursor-changer)
+  (evil-terminal-cursor-changer-activate)) ; or (etcc-on))
+  (setq evil-motion-state-cursor 'box)  ; █
+  (setq evil-visual-state-cursor 'box)  ; █
+  (setq evil-normal-state-cursor 'box)  ; █
+  (setq evil-insert-state-cursor 'bar)  ; ⎸
+  (setq evil-emacs-state-cursor  'hbar) ; _
 
-
+(setq blink-cursor-mode nil)
 ;; General
 (require 'general)
 
@@ -89,7 +97,7 @@
   "p" 'org-insert-link
   ;; ...
   )
-(defconst kilo-key "<Space>") 
+(defconst kilo-key "<Space>")
 (general-create-definer kilo-leader-key
   :prefix kilo-key)
 

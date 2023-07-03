@@ -1,11 +1,3 @@
-"query:.          ---YouTube Linux---:tags # \"YouTube\""
-https://www.youtube.com/feeds/videos.xml?channel_id=UCUyeluBRhGPCW4rPe_UvBZQ "Linux" "YouTube"                              #ThePrimeagen
-https://www.youtube.com/feeds/videos.xml?channel_id=UCd3dNckv1Za2coSaHGHl5aA "Linux" "YouTube"                              #TJ
-https://www.youtube.com/feeds/videos.xml?channel_id=UCoSvlWS5XcwaSzIcbuJ-Ysg "Notion" "Youtube" #Notion
-
-https://www.youtube.com/feeds/videos.xml?channel_id=UCJLZe_NoiG0hT7QCX_9vmqw "General" "Youtube" #IDIDATHING
-
-
 "query:.          ---YouTube Linux---:tags # \"RUST\""
 https://www.youtube.com/feeds/videos.xml?channel_id=UC_iD0xppBwwsrM9DegC5cQQ "RUST" #Jon Gjengset
 https://www.youtube.com/feeds/videos.xml?channel_id=UCmBgC0JN41HjyjAXfkdkp-Q "RUST" #Doug Milford
@@ -21,9 +13,15 @@ https://www.youtube.com/feeds/videos.xml?channel_id=UC8Pksdbj37CdE00kmE7Z1dw "Ph
 
 "query:.          ---Reddit---:tags # \"Reddit\""
 https://www.reddit.com/r/bash.rss "Reddit" "linux bash"
+https://www.reddit.com/r/emacs.rss "Reddit" "Emacs"
+https://www.reddit.com/r/commandline.rss "Reddit" "Commandline"
+https://www.reddit.com/r/HelixEditor.rss "Reddit" "Helix"
+https://www.reddit.com/r/neovim.rss "Reddit" "Neovim"
 
 
 "query:.          ---Blogs---:tags # \"Blog\""
 https://this-week-in-neovim.org/rss "Blog" "Neovim"
 https://www.archlinux.org/feeds/news/ "Blog" "linux"
 
+"query:.          ---Stack Exchange---:tags # \"STACK\""
+https://vi.stackexchange.com/feeds "STACK" #Neovim
