@@ -19,6 +19,7 @@ vim.diagnostic.config {
 
 
 
+
 -- K: Displays hover information about the symbol under the cursor in a floating window. See :help vim.lsp.buf.hover().
 --
 -- gd: Jumps to the definition of the symbol under the cursor. See :help vim.lsp.buf.definition().
@@ -556,6 +557,8 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.g.copilot_no_tab_map = true
 vim.g.copilot_assume_mapped = true
 vim.api.nvim_set_keymap('i', '<C-l>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
+vim.api.nvim_set_keymap('i', '<M-]>', 'copilot#Next()', { silent = true, expr = true })
+vim.api.nvim_set_keymap('i', '<M-x>', 'copilot#Disable()', { silent = true, expr = true })
 -- vim.keymap.set('', '<Leader>xx', require('lsp_lines').toggle, { desc = 'Toggle lsp_lines' })
 
 -- map("n", "C-k", "<Nop>", opts)

@@ -91,6 +91,7 @@ return require('packer').startup(function(use)
         use 'nvim-treesitter/nvim-treesitter-refactor'
         use 'TornaxO7/tree-setter'
         use 'David-Kunz/markid'
+        use "IndianBoy42/tree-sitter-just" -- justfile Parser
 
 
         -- LSP , CMP, SNIPPETS, MASON
@@ -145,6 +146,12 @@ return require('packer').startup(function(use)
 
         -- Debugging Code
         use 'mfussenegger/nvim-dap'
+        use 'rcarriga/nvim-dap-ui'
+        use 'theHamsta/nvim-dap-virtual-text'
+        use 'nvim-telescope/telescope-dap.nvim'
+        use 'mfussenegger/nvim-dap-python'
+        -- use 'Pocco81/DAPInstall.nvim'
+
 
         -- Lua
         -- use 'folke/neodev.nvim'

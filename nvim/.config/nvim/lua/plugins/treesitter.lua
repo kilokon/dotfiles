@@ -161,6 +161,7 @@ require('nvim-treesitter.configs').setup {
 
 local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 
+-- Nu Script Parser
 parser_config.nu = {
         install_info = {
                 url = "https://github.com/nushell/tree-sitter-nu",
@@ -169,3 +170,17 @@ parser_config.nu = {
         },
         filetype = "nu",
 }
+
+-- Just File Parser
+parser_config.just = {
+        install_info = {
+                url = "https://github.com/IndianBoy42/tree-sitter-just", -- local path or git repo
+                files = { "src/parser.c", "src/scanner.cc" },
+                branch = "main",
+                -- use_makefile = true -- this may be necessary on MacOS (try if you see compiler errors)
+        },
+        maintainers = { "@IndianBoy42" },
+}
+
+
+-- require "nvim-treesitter.install".compilers = { "gcc-11" }
