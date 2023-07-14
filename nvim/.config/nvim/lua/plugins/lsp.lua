@@ -1,3 +1,4 @@
+--
 -- Reserve space for diagnostic icons
 -- vim.opt.signcolumn = 'yes'
 
@@ -50,7 +51,7 @@ vim.diagnostic.config {
 
 
 local lsp = require 'lsp-zero'
-vim.lsp.set_log_level("debug")
+-- vim.lsp.set_log_level("debug")
 lsp.preset {
         name = 'recommended',
         set_lsp_keymaps = false,
@@ -548,9 +549,13 @@ vim.api.nvim_create_autocmd('FileType', {
                 vim.keymap.set('n', '<leader>rq', haskell_tools.repl.quit, opts)
         end
 })
-
-
-
+-- vim.keymap.set({ "i" }, "<C-K>", function() require('luasnip').expand() end, { silent = true })
+require("luasnip.loaders.from_vscode").load()
+require("luasnip.loaders.from_vscode").load({
+        paths = {
+                "../../snippets",
+        }
+})
 
 
 --

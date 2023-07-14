@@ -1,7 +1,10 @@
-fpath+=~/.zfunc
-fpath=(path/to/zsh-completions/src $fpath)
+# fpath+=~/.zfunc
+# export FPATH=~/.zfunc:$FPATH
+
+
+# fpath=(zsh-completions/src $fpath)
 # If not running interactively, don't do anything
-[[ $- != *i* ]] && return
+# [[ $- != *i* ]] && return
 
 # Enable colors and change prompt:
 autoload -U colors && colors
@@ -69,7 +72,7 @@ export BROWSER="microsoft-edge-dev"
 # Alias ===========================================================
 # -----------------------------
 
-alias zrc="$EDITOR ~.zshrc"
+alias zrc="$EDITOR ~/.zshrc"
 alias grep='grep --color=auto'
 alias vi="nvim"
 alias cls="clear"
@@ -80,9 +83,10 @@ alias lfancy="exa --icons"
 alias ef="exec fish"
 alias eb="exec bash"
 alias ez="exec zsh"
-alias cd..="cd .."
-alias cd...="cd ../.."
-alias cd....="cd ../../.."
+alias en="exec nu"
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
 alias dev="cd $HOME/Dev/"
 alias gg="emacsclient -c -e '(magit-status)'" # magit
 alias emacs="emacsclient -t"
@@ -100,6 +104,7 @@ alias sync_dev="onedrive --synchronize --single-directory 'dev'"
 #alias kmo="kmonad $DOTFILES/kmonad/.config/kmonad/ansi_qwerty_circle_87keys.kbd"
 alias bevc="gh gist view 9c7afb882391fcc1264b8a7d4f8dcb6e | xsel -ib"
 alias nvim="nvim -p"
+alias code="code --profile aviik"
 #------------------------------
 # ShellFuncs
 #------------------------------
@@ -134,6 +139,10 @@ man() {
 
 [ -n "$WEZTERM_PANE" ] && export NVIM_LISTEN_ADDRESS="/tmp/nvim$WEZTERM_PANE"
 
+#Pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+
 # Zoxide
 eval "$(zoxide init zsh)"
 eval "$(starship init zsh)"
@@ -141,8 +150,11 @@ eval "$(pyenv virtualenv-init -)"
 
 source ~/repos/sourcing/zabb/zabb.plugin.zsh
 
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 # place this after nvm initialization!
 autoload -U add-zsh-hook
 load-nvmrc() {
@@ -177,3 +189,8 @@ vterm_printf() {
     fi
 }
 [ -f "/home/aviik/.ghcup/env" ] && source "/home/aviik/.ghcup/env" # ghcup-env
+
+
+fpath=( ~/.zfunc "${fpath[@]}" )
+autoload -Uz mkcd
+autoload -Uz create-c-project

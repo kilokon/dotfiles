@@ -8,15 +8,16 @@ end
 
 local opts = { noremap = true, silent = true }
 
---local wk = require 'which-key'
+
+
+vim.cmd([[command! -nargs=0 Wq wq]])
+vim.cmd([[command! -nargs=0 W w]])
 
 --Remap space as leader key
 map('n', '<Space>', '<Nop>', opts)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
---Commentry in insert mode
--- vim.api.nvim_set_keymap("i", "<M-/>", ":Commentary<Cr>", { silent = true :Commentary})
 
 -- For Wezterm Navigation
 map('n', 'C-h', '<Nop>', opts)
@@ -55,12 +56,20 @@ map('n', '<S-Right>', '<C-w>l', opts)
 -- map("n", "<leader>c", ":nohl<CR>")
 
 -- Toggle code folds.
-map('n', ',', '<Cmd>silent! execute "normal! za"<CR>')
+-- map('n', ',', '<Cmd>silent! execute "normal! za"<CR>')
 
 -- Visual --
 -- Stay in indent mode
 map('v', '<', '<gv', opts)
 map('v', '>', '>gv', opts)
+
+-- do not yank with x
+vim.keymap.set("n", "x", '"_x')
+
+-- better up/down
+map("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+map("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+
 
 -- Save file with ctrl-s in inser mode
 -- map("i", "<C-s>", "<c-o>:w<cr>")
@@ -70,29 +79,7 @@ map('v', '>', '>gv', opts)
 
 map('n', 'gt', '<cmd>:tabnext<cr>', opts)
 map('n', 'gT', '<cmd>:tabprevious<cr>', opts)
+map("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New Tab" })
 
--- map("n", "gT", "<cmd>:tabnext<cr>", opts)
-
--- map('n', 'gc', '<Nop>', opts)
---map('n', 'gcc', '<Nop>', opts)
-
--- vim.cmd [[
---         nnoremap <leader>dd :Lexplore %:p:h<CR>
---         nnoremap <Leader>da :Lexplore<CR>
---         function! NetrwMapping()
---                 nmap <buffer> H u
---                 nmap <buffer> h -^
---                 nmap <buffer> l <CR>
---
---                 nmap <buffer> . gh
---                 nmap <buffer> P <C-w>z
---
---                 nmap <buffer> L <CR>:Lexplore<CR>
---                 nmap <buffer> <Leader>dd :Lexplore<CR>
---         endfunction
---
---         augroup netrw_mapping
---                 autocmd!
---                 autocmd filetype netrw call NetrwMapping()
---         augroup END
--- ]]
+--Commentry in insert mode
+vim.keymap.set('i', '<M-/>', require('Comment.api').toggle.linewise.current)

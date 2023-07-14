@@ -12,6 +12,8 @@ exec:
     [pdf]
   nvim:
     [lua, rs, c, bash_rc, fish, cc, cpp]
+  mpv:
+    [ogg]
 
 # (Optional)
 # Whether to use syntax highlighting in the preview mode.

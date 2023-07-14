@@ -148,8 +148,7 @@ $env.config.keybindings = [
 ]
 
 
-# Load atuin shell integration
-# source ~/.local/share/atuin/init.nu
+
 
 # def create_left_prompt [] {
 #     ^starship prompt --cmd-duration $env.CMD_DURATION_MS $'--status=($env.LAST_EXIT_CODE)'
@@ -157,11 +156,11 @@ $env.config.keybindings = [
 
 # $env.PROMPT_COMMAND = { create_left_prompt }
 
-# avoid same PROMPT_INDICATOR
-$env.PROMPT_INDICATOR = { "" }
-$env.PROMPT_INDICATOR_VI_INSERT = { ": " }
-$env.PROMPT_INDICATOR_VI_NORMAL = { "〉" }
-$env.PROMPT_MULTILINE_INDICATOR = { "::: " }
+# # avoid same PROMPT_INDICATOR
+# $env.PROMPT_INDICATOR = { "" }
+# $env.PROMPT_INDICATOR_VI_INSERT = { ": " }
+# $env.PROMPT_INDICATOR_VI_NORMAL = { "〉" }
+# $env.PROMPT_MULTILINE_INDICATOR = { "::: " }
 
 
 
@@ -187,6 +186,8 @@ source poetry-completions.nu
 source npm-completions.nu
 source typst-completions.nu
 source zoxide-menu.nu
+source run-c-cpp.nu
+source activate.nu
 
 # Utilities
 source ~/.config/nushell/scripts/unit-conversions.nu
@@ -204,4 +205,5 @@ source ~/.cache/starship/init.nu
 # Load the zoxide shell integration
 source ~/.cache/.zoxide.nu
 
-
+# Load atuin shell integration
+# source ~/.local/share/atuin/init.nu

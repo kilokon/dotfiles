@@ -11,7 +11,7 @@ require('nvim-treesitter.configs').setup {
 
         -- Automatically install missing parsers when entering buffer
         -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-        auto_install = true,
+        -- auto_install = true,
 
         -- List of parsers to ignore installing (for "all")
         -- ignore_install = { "javascript" },
@@ -49,6 +49,15 @@ require('nvim-treesitter.configs').setup {
                         clear_on_cursor_move = true,
                 },
         },
+          incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "gnn", -- set to `false` to disable one of the mappings
+      node_incremental = "grn",
+      scope_incremental = "grc",
+      node_decremental = "grm",
+    },
+  },
         textobjects = {
                 select = {
                         enable = true,

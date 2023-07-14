@@ -1,0 +1,33 @@
+alias b := build
+alias c := clean
+alias r := run
+alias t := test
+
+# Compiler
+cc := gcc
+
+# Compiler flags
+CFLAGS := -Wall -Wextra -Werror -pedantic -std=c99
+
+# Source files
+SRC := src/*.c
+
+# Target executable
+TARGET := bin/program
+
+# Build the project
+build:
+        @echo "Building the project..."
+        @$(cc) $(CFLAGS) $(SRC) -o $(TARGET)
+
+
+# Run the project
+run:
+        @echo "Running the project..."
+        @./$(TARGET)
+
+
+# Clean the project
+clean:
+        @echo "Cleaning the project..."
+        @rm -f $(TARGET)

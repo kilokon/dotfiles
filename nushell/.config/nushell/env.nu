@@ -1,20 +1,25 @@
 # Nushell Environment Config File
 
-# Use nushell functions to define your right and left prompt
-# let-env PROMPT_COMMAND = { create_left_prompt }
-# let-env PROMPT_COMMAND_RIGHT = { create_right_prompt }
+let-env STARSHIP_SHELL = "nu"
 
-# let-env NVIM = {"/usr/local/bin/nvim"}
+def create_left_prompt [] {
+    starship prompt --cmd-duration $env.CMD_DURATION_MS $'--status=($env.LAST_EXIT_CODE)'
+}
+
+# Use nushell functions to define your right and left prompt
+let-env PROMPT_COMMAND = { || create_left_prompt }
+let-env PROMPT_COMMAND_RIGHT = ""
+
 # The prompt indicators are environmental variables that represent
 # the state of the prompt
-# let-env PROMPT_INDICATOR = { "> " }
-# let-env PROMPT_INDICATOR_VI_INSERT = { ": " }
-# let-env PROMPT_INDICATOR_VI_NORMAL = { "> " }
-# let-env PROMPT_MULTILINE_INDICATOR = { "::: " }
-# Specifies how environment variables are:
-# - converted from a string to a value on Nushell startup (from_string)
-# - converted from a value back to a string when running external commands (to_string)
-# Note: The conversions happen *after* config.nu is loaded
+let-env PROMPT_INDICATOR = ""
+let-env PROMPT_INDICATOR_VI_INSERT = ": "
+let-env PROMPT_INDICATOR_VI_NORMAL = "〉"
+let-env PROMPT_MULTILINE_INDICATOR = "::: "
+
+
+
+
 let-env ENV_CONVERSIONS = {
   "PATH": {
     from_string: { |s| $s | split row (char esep) | path expand -n }
@@ -49,12 +54,15 @@ export-env { load-env {
         EMACS_HOME: ($env.HOME | path join ".emacs.d")
         CARGO_HOME: ($env.HOME | path join ".cargo")
         CABAL_HOME: ($env.HOME | path join ".cabal")
+        PYENV_ROOT: ($env.HOME | path join ".pyenv")
+        DOTFILES: ($env.HOME | path join "dotfiles")
+        RUST_BACKTRACE: 1
 }}
 
 
 # Allication defaults
 $env.BROWSER = "microsoft-edge-dev"
-$env.TERMINAL = "wezterm"
+$env.TERMINAL = "alacritty"
 $env.EDITOR = 'nvim'
 $env.VISUAL = $env.EDITOR
 $env.PAGER = "less"
@@ -65,6 +73,7 @@ $env.PATH = (
     $env.PATH | split row (char esep)
     | prepend ($env.HOME | path join ".local" "bin")
     | prepend ($env.CARGO_HOME | path join "bin")
+    | prepend ($env.PYENV_ROOT | path join "bin")
     | uniq
 )
 
