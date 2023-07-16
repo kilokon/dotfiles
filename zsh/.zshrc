@@ -194,3 +194,20 @@ vterm_printf() {
 fpath=( ~/.zfunc "${fpath[@]}" )
 autoload -Uz mkcd
 autoload -Uz create-c-project
+
+fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    BUFFER="fg"
+    zle accept-line -w
+  else
+    zle push-input -w
+    zle clear-screen -w
+  fi
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
+
+
+# fzf
+#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+which green >& /dev/null && source "$( green --completion-file )"
