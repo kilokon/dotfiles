@@ -1,0 +1,9 @@
+alias s := sync
+alias f := format
+
+sync:
+	nvim --headless "+Lazy! sync" +qa
+
+format:
+	#!/usr/bin/env fish
+	stylua lua/**.lua
