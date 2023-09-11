@@ -13,8 +13,12 @@ return {
     },
   },
   {
+    -- TODO: Integrate with Hydra
     "willothy/wezterm.nvim",
     config = true,
+    opts = function()
+      vim.keymap.set("n", "<leader>wt", require("wezterm").switch_tab.relative)
+    end,
   },
   {
     "willothy/flatten.nvim",

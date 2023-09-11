@@ -6,19 +6,68 @@ return {
     config = false,
     init = function()
       -- Disable automatic setup, we are doing it manually
-      vim.g.lsp_zero_extend_cmp = 0
-      vim.g.lsp_zero_extend_lspconfig = 0
-      vim.b.lsp_zero_enable_autoformat = 0
+      -- vim.g.lsp_zero_extend_cmp = 0
+      -- vim.g.lsp_zero_extend_lspconfig = 0
+      -- vim.b.lsp_zero_enable_autoformat = 0
     end,
   },
-
   {
     "L3MON4D3/LuaSnip",
-    event = "VeryLazy",
+    version = "2.*",
+    dependencies = { "rafamadriz/friendly-snippets" },
+    -- build = "make install_jsregexp",
+    event = { "InsertEnter" },
     config = function()
-      require("luasnip.loaders.from_lua").load({ paths = "./snippets" })
+      local ls = require("luasnip")
+      local types = require("luasnip.util.types")
+
+      ls.config.set_config({
+        history = true,
+        delete_check_events = "TextChanged",
+        ext_opts = {
+          [types.choiceNode] = {
+            active = {
+              virt_text = { { "choiceNode", "Comment" } },
+            },
+          },
+        },
+        -- treesitter-hl has 100, use something higher (default is 200).
+        ext_base_prio = 300,
+        -- minimal increase in priority.
+        ext_prio_increase = 1,
+        enable_autosnippets = true,
+        -- mapping for cutting selected text so it's usable as SELECT_DEDENT,
+        -- SELECT_RAW or TM_SELECTED_TEXT (mapped via xmap).
+        store_selection_keys = "<Tab>",
+      })
+
+      require("luasnip.loaders.from_lua").lazy_load()
+
+      -- <c-l> is selecting within a list of options.
+      vim.keymap.set({ "s", "i" }, "<c-l>", function()
+        if ls.choice_active() then
+          ls.change_choice(1)
+        end
+      end, { desc = "Scroll through choice nodes" })
+
+      vim.keymap.set("i", "<Tab>", function()
+        return ls.expand_or_jumpable() and "<Plug>luasnip-expand-or-jump" or "<Tab>"
+      end, { desc = "Expand or jump snippet", expr = true, silent = true })
+
+      vim.keymap.set("i", "<S-Tab>", function()
+        if ls.jumpable(-1) then
+          ls.jump(-1)
+        end
+      end, { desc = "Jump backwards snippet" })
     end,
   },
+  -- {
+  --   "L3MON4D3/LuaSnip",
+  --   event = "VeryLazy",
+  --   config = function()
+  --     require("luasnip.loaders.from_lua").load({ paths = "./snippets" })
+  --   end,
+  -- },
 
   -- Autocompletion
   {
@@ -26,9 +75,9 @@ return {
     event = "InsertEnter",
     dependencies = {
       { "hrsh7th/cmp-nvim-lsp" },
-      { "L3MON4D3/LuaSnip" },
       { "hrsh7th/cmp-path" }, -- vim/neovim }snippet stuffs
       { "hrsh7th/cmp-cmdline" }, -- vim/n}eovim snippet stuffs
+      { "saadparwaiz1/cmp_luasnip" },
       { "hrsh7th/cmp-nvim-lsp-signature-help" },
       { "windwp/nvim-autopairs" }, -- Auto }pairs
       { "PaterJason/cmp-conjure" },
@@ -37,34 +86,27 @@ return {
       -- Here is where you configure the autocompletion settings.
       local lsp_zero = require("lsp-zero")
       lsp_zero.extend_cmp()
-      lsp_zero.format_on_save({
-        format_opts = {
-          async = false,
-          timeout_ms = 10000,
-        },
-        servers = {
-          ["ruff_lsp"] = { "python" },
-          ["stylua"] = { "lua" },
-          ["tsserver"] = { "javascript", "typescript" },
-          ["rust_analyzer"] = { "rust" },
-        },
-      })
 
       -- And you can configure cmp even more, if you want to.
       local cmp = require("cmp")
+      -- local cmp_format = require("lsp-zero").cmp_format()
+      local cmp_action = require("lsp-zero").cmp_action()
       local luasnip = require("luasnip")
-      local cmp_action = lsp_zero.cmp_action()
-
-      local has_words_before = function()
-        unpack = unpack or table.unpack
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0
-          and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s")
-            == nil
-      end
+      require("luasnip.loaders.from_vscode").lazy_load()
 
       cmp.setup({
-        formatting = lsp_zero.cmp_format(),
+        -- formatting = lsp_zero.cmp_format(),
+        fields = { "abbr", "kind", "menu" },
+        -- formatting = cmp_format,
+        formatting = {
+          fields = { "abbr", "kind", "menu" },
+          format = require("lspkind").cmp_format({
+            mode = "symbol", -- show only symbol annotations
+            maxwidth = 50, -- prevent the popup from showing more than provided characters
+            ellipsis_char = "...", -- when popup menu exceed maxwidth,
+          }),
+        },
+        preselect = "none",
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
@@ -77,9 +119,11 @@ return {
           { name = "path" },
           { name = "conjure" },
         },
-        -- completion = {
-        -- 	autocomplete = true
-        -- },
+        completion = {
+          -- autocomplete = true
+          completeopt = "menu,menuone,noinsert",
+        },
+
         mapping = cmp.mapping.preset.insert({
           ["<C-Space>"] = cmp.mapping.complete(),
           ["<C-u>"] = cmp.mapping.scroll_docs(-4),
@@ -94,29 +138,9 @@ return {
             cmp.close()
             fallback()
           end, { "i" }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then
-              luasnip.expand_or_jump()
-            elseif has_words_before() then
-              cmp.complete()
-              -- elseif luasnip.jumpable(1) then
-              -- 	luasnip.jump(1)
-            else
-              fallback()
-            end
-          end),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end),
-          ["<cr>"] = cmp.mapping.confirm({
+          ["<Tab>"] = cmp_action.tab_complete(),
+          ["<S-Tab>"] = cmp_action.select_prev_or_fallback(),
+          ["<CR>"] = cmp.mapping.confirm({
             behavior = cmp.ConfirmBehavior.Replace,
             select = false,
           }),
@@ -129,18 +153,6 @@ return {
             "c",
           }),
         }),
-        -- sorting = {
-        -- 	comparators = {
-        -- 		cmp.config.compare.offset,
-        -- 		cmp.config.compare.exact,
-        -- 		cmp.config.compare.recently_used,
-        -- 		-- require("clangd_extensions.cmp_scores"),
-        -- 		cmp.config.compare.kind,
-        -- 		cmp.config.compare.sort_text,
-        -- 		cmp.config.compare.length,
-        -- 		cmp.config.compare.order,
-        -- 	},
-        -- },
       })
       cmp.setup.cmdline("/", {
         sources = {
@@ -165,6 +177,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     cmd = { "LspInfo", "LspInstall", "LspStart" },
+    -- event = { "BufReadPre" },
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
 
@@ -182,94 +195,47 @@ return {
       },
       { "williamboman/mason-lspconfig.nvim", enabled = true },
       { "simrat39/inlay-hints.nvim" },
-      { "simrat39/rust-tools.nvim" },
-      {
-        "Civitasv/cmake-tools.nvim",
-        dependencies = {
-          "stevearc/overseer.nvim",
-        },
-        config = function()
-          require("cmake-tools").setup({
-            cmake_build_directory = "build",
-          })
-        end,
-      },
-      -- DAPS
-      { "rcarriga/nvim-dap-ui" }, -- UI fo}r Dap
-      { "mfussenegger/nvim-dap" }, -- Debug}ger, setup below
-      { "mfussenegger/nvim-lint" }, -- Neovi}m linter
-      { "mhartington/formatter.nvim" }, -- Neovi}m formatter
-      { "hrsh7th/cmp-nvim-lsp" }, -- Neovim }LSP feeder for cmp
-      { "jbyuki/one-small-step-for-vimkind" }, -- Neovim }Dap
+      { "j-hui/fidget.nvim" },
+      { "mfussenegger/nvim-lint" },
+      { "hrsh7th/cmp-nvim-lsp" },
+      { "lukas-reineke/lsp-format.nvim" },
+      { "onsails/lspkind.nvim" },
     },
 
     config = function()
       -- This is where all the LSP shenanigans will live
-      require("formatter").setup({
-        filetype = {
-          ["*"] = {
-            require("formatter.filetypes.any"),
-          },
-          lua = {
-            -- You can also define your own configuration
-            function()
-              local util = require("formatter.util")
-              -- Full specification of configurations is down below and in Vim help
-              -- files
-              return {
-                exe = "stylua",
-                args = {
-                  "--indent-type",
-                  "Spaces",
-                  "--search-parent-directories",
-                  "--stdin-filepath",
-                  util.escape_path(util.get_current_buffer_file_path()),
-                  "--",
-                  "-",
-                },
-                stdin = true,
-              }
-            end,
-          },
-        },
-      })
 
       local lsp_zero = require("lsp-zero")
       local ih = require("inlay-hints")
-      local dap = require("dap")
-      local dapui = require("dapui")
-      local osv = require("osv")
-      lsp_zero.extend_lspconfig()
+      ih.setup()
 
-      lsp_zero.on_attach(function(client, bufnr)
+      lsp_zero.on_attach(function(_, bufnr)
         -- see :help lsp-zero-keybindings
         -- to learn the available actions
-        lsp_zero.default_keymaps({
-          buffer = bufnr,
-          omit = { "K" },
-        })
-        if client.server_capabilities.documentSymbolProvider then
-          require("nvim-navic").attach(client, bufnr)
-        end
+        lsp_zero.default_keymaps({ buffer = bufnr })
       end)
+      lsp_zero.set_sign_icons({
+        error = "✘",
+        warn = "▲",
+        hint = "⚑",
+        info = "»",
+      })
 
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "ruff_lsp", "clangd" },
+        ensure_installed = { "lua_ls", "ruff_lsp", "clangd", "neocmake" },
         handlers = {
-          -- lsp_zero.default_setup,
+          lsp_zero.default_setup,
+
+          --LUA LSP
           lua_ls = function()
-            -- (Optional) Configure lua language server for neovim
             local lua_opts = lsp_zero.nvim_lua_ls()
             require("lspconfig").lua_ls.setup({
               lua_opts,
               root_dir = function()
-                --- project root will be the first directory that has
                 --- either .luarc.json or .stylua.toml
                 return lsp_zero.dir.find_first({ ".luarc.json", ".stylua.toml" })
               end,
               on_attach = function(client, bufnr)
-                -- on_attach(client, bufnr)
-                print("hello from lua_ls")
                 ih.on_attach(client, bufnr)
               end,
               settings = {
@@ -284,6 +250,8 @@ return {
               },
             })
           end,
+
+          -- Python Ruff Linter and Formatter
           ruff_lsp = function()
             require("lspconfig").ruff_lsp.setup({
               -- on_attach = on_attach,
@@ -295,13 +263,54 @@ return {
               },
             })
           end,
+
+          -- C/C++ LSP
           clangd = function()
             require("lspconfig").clangd.setup({
-              -- on_attach = on_attach
+              cmd = {
+                "clangd",
+                "--background-index",
+                "--clang-tidy",
+                "--completion-style=bundled",
+                "--header-insertion=iwyu",
+              },
+              filetypes = { "c", "cpp", "objc", "objcpp", "h", "hpp" },
+              on_attach = function()
+                require("clangd_extensions.inlay_hints").setup_autocmd()
+                require("clangd_extensions.inlay_hints").set_inlay_hints()
+              end,
+            })
+          end,
+
+          -- CMake File LSP
+          neocmake = function()
+            require("lspconfig").neocmake.setup({
+              cmd = { "neocmakelsp", "--stdio" },
+              filetypes = { "cmake" },
+              root_dir = function()
+                return lsp_zero.dir.find_first({ ".git", 'cmake' })
+              end,
+              single_file_support = true, -- suggested
             })
           end,
         },
       })
+    end,
+    -- lsp.setup()
+  },
+
+  -- DAPS
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      { "rcarriga/nvim-dap-ui" },
+      { "theHamsta/nvim-dap-virtual-text" },
+      { "jbyuki/one-small-step-for-vimkind" },
+    },
+    config = function()
+      local dap = require("dap")
+      local dapui = require("dapui")
+      local osv = require("osv")
       vim.fn.sign_define("DapBreakpoint", { text = "🔴", texthl = "", linehl = "", numhl = "" })
       vim.fn.sign_define(
         "DapBreakpointCondition",
@@ -343,6 +352,7 @@ return {
       end
     end,
   },
+
   { "Olical/nfnl", ft = "fennel" },
   { "Olical/aniseed" },
   {
@@ -432,16 +442,126 @@ return {
       require("copilot").setup({})
     end,
   },
-}
 
--- vim.api.nvim_create_autocmd("VimEnter", {
--- 	desc = "Auto select virtualenv Nvim open",
--- 	pattern = "*",
--- 	callback = function()
--- 		local venv = vim.fn.findfile("pyproject.toml", vim.fn.getcwd() .. ";")
--- 		if venv ~= "" then
--- 			require("venv-selector").retrieve_from_cache()
--- 		end
--- 	end,
--- 	once = true,
--- })
+  {
+    "Civitasv/cmake-tools.nvim",
+    ft = { "cmake" },
+    dependencies = {
+      "stevearc/overseer.nvim",
+    },
+    config = function()
+      require("cmake-tools").setup({
+        cmake_build_directory = "build",
+      })
+    end,
+  },
+  {
+    "mrcjkb/haskell-tools.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim",
+      "akinsho/toggleterm.nvim",
+    },
+    ft = { "haskell", "cabal" },
+    config = function()
+      require("haskell-tools").setup({
+        hls = {
+          on_attach = function()
+            require("pokerus.lsp").on_attach()
+          end,
+          settings = {
+            haskell = {
+              formattingProvider = "fourmolu",
+              plugin = {
+                stan = { globalOn = false },
+              },
+            },
+          },
+        },
+        repl = { handler = "toggleterm" },
+      })
+    end,
+  },
+  -- {
+  --   "mhartington/formatter.nvim",
+  --   cmd = { "Format", "FormatWrite" },
+  --   config = function()
+  --     require("formatter").setup({
+  --       filetype = {
+  --         c = { require("formatter.filetypes.c").clangformat },
+  --         cpp = { require("formatter.filetypes.c").clangformat },
+  --         css = { require("formatter.filetypes.css").prettier },
+  --         html = { require("formatter.filetypes.html").prettier },
+  --         javascript = { require("formatter.filetypes.javascript").prettier },
+  --         json = { require("formatter.filetypes.json").prettier },
+  --         lua = { require("formatter.filetypes.lua").stylua },
+  --         markdown = { require("formatter.filetypes.markdown").prettier },
+  --         rust = { require("formatter.filetypes.rust").rustfmt },
+  --         sh = { require("formatter.filetypes.sh").shfmt },
+  --         toml = { require("formatter.filetypes.toml").taplo },
+  --       },
+  --     })
+  --   end,
+  -- },
+
+  -- Linting and Formatting
+  {
+    "nvimdev/guard.nvim",
+    -- enabled = false,
+    config = function()
+      local ft = require("guard.filetype")
+
+      ft("c"):fmt("clang-format"):lint("clang-tidy")
+
+      ft("lua"):fmt("stylua")
+
+      -- Call setup() LAST!
+      require("guard").setup({
+        -- the only options for the setup function
+        fmt_on_save = true,
+        -- Use lsp if no formatter was defined for this filetype
+        lsp_as_default_formatter = false,
+      })
+    end,
+  },
+  {
+    "p00f/clangd_extensions.nvim",
+    event = "VeryLazy",
+    ft = { "c", "cpp", "h", "hpp" },
+    config = function()
+      require("clangd_extensions").setup({
+        -- Setup
+      })
+    end,
+  },
+  { "simrat39/rust-tools.nvim" },
+  { "NoahTheDuke/vim-just" },
+  { "rafcamlet/nvim-luapad" },
+  { -- This plugin
+    "Zeioth/compiler.nvim",
+    cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
+    dependencies = { "stevearc/overseer.nvim" },
+    opts = {},
+    keys = {
+      { "<F6>", "<cmd>CompilerOpen<CR>" },
+    },
+  },
+  { -- The task runner we use
+    "stevearc/overseer.nvim",
+    commit = "19aac0426710c8fc0510e54b7a6466a03a1a7377",
+    cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
+    opts = {
+      task_list = {
+        direction = "bottom",
+        min_height = 25,
+        max_height = 25,
+        default_detail = 1,
+        bindings = {
+          ["q"] = function()
+            vim.cmd("OverseerClose")
+          end,
+        },
+      },
+    },
+  },
+}

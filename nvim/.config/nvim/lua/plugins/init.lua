@@ -1,4 +1,13 @@
 return {
+  {
+    "dstein64/vim-startuptime",
+    -- lazy-load on a command
+    cmd = "StartupTime",
+    -- init is called during startup. Configuration for vim plugins typically should be set in an init function
+    init = function()
+      vim.g.startuptime_tries = 10
+    end,
+  },
   { "nvim-lua/plenary.nvim" },
   { "nvim-tree/nvim-web-devicons", lazy = true },
   {
@@ -17,53 +26,9 @@ return {
     -- sqlite is only needed if you want to use frecency sorting
     -- dependencies = { 'kkharji/sqlite.lua' }
   },
-  -- {
-  --   "nacro90/numb.nvim",
-  --   event = "CmdLineEnter",
-  --   opts = {
-  --     show_numbers = true, -- Enable 'number' for the window while peeking
-  --     show_cursorline = true, -- Enable 'cursorline' for the window while peeking
-  --   },
-  -- },
-  -- {
-  --   "folke/noice.nvim",
-  --   event = "VeryLazy",
-  --   opts = {
-  --     -- add any options here
-  --   },
-  --   dependencies = {
-  --     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-  --     "MunifTanjim/nui.nvim",
-  --     -- OPTIONAL:
-  --     --   `nvim-notify` is only needed, if you want to use the notification view.
-  --     --   If not available, we use `mini` as the fallback
-  --     "rcarriga/nvim-notify",
-  --   },
-  --   config = function()
-  --     require("noice").setup({
-  --       lsp = {
-  --         -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-  --         override = {
-  --           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-  --           ["vim.lsp.util.stylize_markdown"] = true,
-  --           ["cmp.entry.get_documentation"] = true,
-  --         },
-  --       },
-  --       -- you can enable a preset for easier configuration
-  --       presets = {
-  --         bottom_search = true, -- use a classic bottom cmdline for search
-  --         command_palette = true, -- position the cmdline and popupmenu together
-  --         long_message_to_split = true, -- long messages will be sent to a split
-  --         inc_rename = false, -- enables an input dialog for inc-rename.nvim
-  --         lsp_doc_border = false, -- add a border to hover docs and signature help
-  --       },
-  --     })
-  --   end,
-  -- },
-  -- the colorscheme should be available when starting Neovim
   {
     "folke/tokyonight.nvim",
-    lazy = false,    -- make sure we load this during startup if it is your main colorscheme
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       -- load the colorscheme here
@@ -85,6 +50,34 @@ return {
       --Config goes here
     },
   },
+  {
+    "abecodes/tabout.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    priority = 1000,
+    event = "InsertEnter",
+    config = function()
+      require("tabout").setup({
+        tabkey = "<Tab>", -- key to trigger tabout, set to an empty string to disable
+        backwards_tabkey = "<S-Tab>", -- key to trigger backwards tabout, set to an empty string to disable
+        act_as_tab = true, -- shift content if tab out is not possible
+        act_as_shift_tab = false, -- reverse shift content if tab out is not possible (if your keyboard/terminal supports <S-Tab>)
+        default_tab = "<C-t>", -- shift default action (only at the beginning of a line, otherwise <TAB> is used)
+        default_shift_tab = "<C-d>", -- reverse shift default action,
+        enable_backwards = true, -- well ...
+        completion = true, -- if the tabkey is used in a completion pum
+        tabouts = {
+          { open = "'", close = "'" },
+          { open = '"', close = '"' },
+          { open = "`", close = "`" },
+          { open = "(", close = ")" },
+          { open = "[", close = "]" },
+          { open = "{", close = "}" },
+        },
+        ignore_beginning = true, --[[ if the cursor is at the beginning of a filled element it will rather tab out than shift the content ]]
+        exclude = {}, -- tabout will ignore these filetypes
+      })
+    end,
+  },
   -- add this to your lua/plugins.lua, lua/plugins/init.lua,  or the file you keep your other plugins:
   {
     "numToStr/Comment.nvim",
@@ -93,58 +86,39 @@ return {
     end,
     lazy = false,
   },
+  -- Search
   {
     "kevinhwang91/nvim-hlslens",
     config = function()
-      require("hlslens").setup({
-        -- calm_down = true,
-        -- nearest_only = true,
-        -- nearest_float_when = "always",
-        -- override_lens = function(render, posList, nearest, idx, relIdx)
-        --   local sfw = vim.v.searchforward == 1
-        --   local indicator, text, chunks
-        --   local absRelIdx = math.abs(relIdx)
-        --   if absRelIdx > 1 then
-        --     indicator = ("%d%s"):format(absRelIdx, sfw ~= (relIdx > 1) and "▲" or "▼")
-        --   elseif absRelIdx == 1 then
-        --     indicator = sfw ~= (relIdx == 1) and "▲" or "▼"
-        --   else
-        --     indicator = ""
-        --   end
-        --
-        --   if posList[idx] ~= nil then
-        --     local lnum, col = table.unpack(posList[idx])
-        --     if nearest then
-        --       local cnt = #posList
-        --       if indicator ~= "" then
-        --         text = ("[%s %d/%d]"):format(indicator, idx, cnt)
-        --       else
-        --         text = ("[%d/%d]"):format(idx, cnt)
-        --       end
-        --       chunks = { { " ", "Ignore" }, { text, "HlSearchLensNear" } }
-        --     else
-        --       text = ("[%s %d]"):format(indicator, idx)
-        --       chunks = { { " ", "Ignore" }, { text, "HlSearchLens" } }
-        --     end
-        --     render.setVirt(0, lnum - 1, col - 1, chunks, nearest)
-        --   end
-        -- end,
-      })
+      require("hlslens").setup({})
     end,
   },
+
+  -- Search and Replace across multiple files
+  {
+    "nvim-pack/nvim-spectre",
+    event = "VeryLazy",
+    keys = {
+      { "<leader>S", '<cmd>lua require("spectre").toggle()<CR>' },
+      { "<leader>sw", '<cmd>lua require("spectre").open_visual({select_word=true})<CR>' },
+    },
+  },
+
   {
     "kevinhwang91/nvim-ufo",
     dependencies = { "kevinhwang91/promise-async" },
     event = "VeryLazy",
     init = function()
       vim.o.foldcolumn = "1" -- '0' is not bad
-      vim.o.foldlevel = 99   -- Using ufo provider need a large value, feel free to decrease the value
+      vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
       vim.o.foldlevelstart = 99
       vim.o.foldenable = true
     end,
     config = function()
       vim.keymap.set("n", "zR", require("ufo").openAllFolds)
       vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
+      vim.keymap.set("n", "zr", require("ufo").openFoldsExceptKinds)
+      vim.keymap.set("n", "zm", require("ufo").closeFoldsWith) -- closeAllFolds == closeFoldsWith(0)
       vim.keymap.set("n", "zK", require("ufo").peekFoldedLinesUnderCursor, { desc = "peek-folds" })
       vim.api.nvim_set_hl(0, "MoreMsg", { bg = "none", fg = "#7E9CD8" })
 
@@ -175,33 +149,22 @@ return {
           curWidth = curWidth + chunkWidth
         end
         local rAlignAppndx =
-            math.max(math.min(vim.opt.textwidth["_value"], width - 1) - curWidth - sufWidth, 0)
+          math.max(math.min(vim.opt.textwidth["_value"], width - 1) - curWidth - sufWidth, 0)
         suffix = (" "):rep(rAlignAppndx) .. suffix
         table.insert(newVirtText, { suffix, "MoreMsg" })
         return newVirtText
       end
 
       require("ufo").setup({
-        -- provider_selector = function(bufnr, filetype, buftype)
-        --   return { "treesitter", "indent" }
-        -- end,
+        provider_selector = function(bufnr, filetype, buftype)
+          return { "treesitter", "indent" }
+        end,
         fold_virt_text_handler = handler,
       })
     end,
   },
   {
-    "folke/todo-comments.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    opts = {
-      highlight = {
-        before = "",
-        keyword = "fg",
-        after = "",
-      },
-      -- your configuration comes here
-      -- or leave it empty to use the default settings
-      -- refer to the configuration section below
-    },
+    "yamatsum/nvim-cursorline",
   },
   {
     "tamago324/lir.nvim",
@@ -269,18 +232,89 @@ return {
   },
   {
     "ggandor/flit.nvim",
+    event = "VeryLazy",
     dependencies = {
-      { "ggandor/leap.nvim" },
-    }
+      {
+        "ggandor/leap.nvim",
+        dependencies = { "tpope/vim-repeat" },
+      },
+    },
+    config = function()
+      require("flit").setup({
+        keys = { f = "f", F = "F", t = "t", T = "T" },
+        -- A string like "nv", "nvo", "o", etc.
+        labeled_modes = "v",
+        multiline = true,
+        -- Like `leap`s similar argument (call-specific overrides).
+        -- E.g.: opts = { equivalence_classes = {} }
+        opts = {},
+      })
+    end,
   },
   {
-	'mbbill/undotree',
+    -- NOTE: fix this
+    "mbbill/undotree",
     keys = {
-      {"<leader>u", "vim.cmd.UndotreeToggle"}
+      { "<leader>u", ":UndotreeToggle<CR>", desc = "Toggle Undo Tree" },
     },
-	-- config = function()
-	-- 	vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
-	-- end
-}
-  -- visual representation for idention
+  },
+  {
+    "ethanholz/nvim-lastplace",
+    opts = {
+      lastplace_ignore_buftype = { "quickfix", "nofile", "help" },
+      lastplace_ignore_filetype = {
+        "gitcommit",
+        "gitrebase",
+        "svn",
+        "hgcommit",
+      },
+      lastplace_open_folds = true,
+    },
+  },
+  {
+    -- TODO: Integrate nap with Hydra
+    "liangxianzhe/nap.nvim",
+    lazy = false,
+    config = function()
+      local Hydra = require("hydra")
+      Hydra({
+        name = "Side scroll",
+        mode = "n",
+        body = "<leader>z",
+        heads = {
+          { "h", "5zh" },
+          { "l", "5zl", { desc = "←/→" } },
+          { "H", "zH" },
+          { "L", "zL", { desc = "half screen ←/→" } },
+        },
+      })
+    end,
+  },
+  {
+    "echasnovski/mini.ai",
+    keys = { { "a", mode = { "x", "o" } }, { "i", mode = { "x", "o" } } },
+    branch = "stable",
+    config = function()
+      require("mini.ai").setup({
+        search_method = "cover_or_nearest",
+        custom_textobjects = { b = { { "%b()", "%b[]", "%b{}" }, "^.().*().$" } },
+        -- { { '%b()', '%b[]', '%b{}' }, '^.().*().$' }
+      })
+    end,
+  },
+  {
+    "Julian/vim-textobj-variable-segment",
+    keys = { { "av", mode = { "x", "o" } }, { "iv", mode = { "x", "o" } } },
+    dependencies = { "kana/vim-textobj-user" },
+  },
+  -- idention
+  {
+    "michaeljsmith/vim-indent-object",
+    keys = {
+      { "ai", mode = { "x", "o" } },
+      { "ii", mode = { "x", "o" } },
+      { "aI", mode = { "x", "o" } },
+      { "iI", mode = { "x", "o" } },
+    },
+  },
 }

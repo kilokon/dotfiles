@@ -12,11 +12,31 @@ local opts_x = { expr = true, silent = true }
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Move by visible lines, fixes annoying behavior on wrapped lines
+-- vim.api.nvim_set_keymap({ "n", "x" }, "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true })
+-- map({ "n", "x" }, "k", [[v:count == 0 ? 'gk' : 'k']], { expr = true })
+
+-- ^ is nuts
+map("n", "H", "^")
+map("n", "L", "g_")
+
 -- new tab
 map("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New Tab" })
 
 -- Cancel search highlighting with ESC
 map("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", opts)
+
+-- traversing buffers
+map("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "[b", "<cmd>bprevious<cr>", { desc = "Previous Buffer" })
+
+-- Move to start/end on line in command mode
+map("c", "<C-a>", "<home>", { desc = "Move to end of line" })
+map("c", "<C-e>", "<end>", { desc = "Move to begining of line" })
+
+-- Fix common mistypes in command mode
+map("c", "Q", "q", { desc = "Always write q" })
+map("c", "W", "w", { desc = "Always write w" })
 
 -- Visual --
 -- Stay in indent mode
