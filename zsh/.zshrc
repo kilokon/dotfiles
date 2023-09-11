@@ -1,26 +1,5 @@
-# fpath+=~/.zfunc
-# export FPATH=~/.zfunc:$FPATH
-
-
-# fpath=(zsh-completions/src $fpath)
-# If not running interactively, don't do anything
-# [[ $- != *i* ]] && return
-
-# Enable colors and change prompt:
-autoload -U colors && colors
-
-
-
-# install zsh-autosuggestions and zsh-syntax-highlighting from aur/arch
-
-
-# Colors ==================================================================
-#------------------------------
-
-source ~/repos/sourcing/F-Sy-H/F-Sy-H.plugin.zsh
-
-
-
+setopt COMBINING_CHARS
+# echo "Loading zshrc"
 
 # History stuff =============================================
 #------------------------------
@@ -41,18 +20,38 @@ if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; 
        . /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
+zstyle ':completion:*:(all-|)files' ignored-patterns '(|*/)CVS'
+zstyle ':completion:*:cd:*' ignored-patterns '(*/)#CVS'
+
+
+# Fuzzy matching of completions for when you mistype them:
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
+zstyle -e ':completion:*:approximate:*' \
+        max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3))numeric)'
+# Ignore completion functions for commands you don’t have
+zstyle ':completion:*:functions' ignored-patterns '_*'
+
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:kill:*'   force-list always
+
+
 autoload -U compinit && compinit -u
-zstyle ':completion:*' menu select
-# Auto complete with case insenstivity
-#zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion::complete:*' use-cache on
-zstyle ':completion::complete:*' cache-path ~/.cache/zsh_completion
-# Make completion match at any part of the string (not just the beginning).
-# (Note this isn't fuzzy though; it looks for an exact match).
-zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
-# Shift tab to navigate backwards
-bindkey '^[[Z' reverse-menu-complete
+# zstyle ':completion:*' menu select
+# # Auto complete with case insenstivity
+# #zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+# zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
+# zstyle ':completion::complete:*' use-cache on
+# zstyle ':completion::complete:*' cache-path ~/.cache/zsh_completion
+# # Make completion match at any part of the string (not just the beginning).
+# # (Note this isn't fuzzy though; it looks for an exact match).
+# zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
+# # Shift tab to navigate backwards
+# bindkey '^[[Z' reverse-menu-complete
 
 
 zmodload zsh/complist
@@ -61,6 +60,14 @@ compinit
 
 _comp_options+=(globdots)		# Include hidden files.
 
+
+# Colors ==================================================================
+#------------------------------
+
+source ~/repos/sourcing/F-Sy-H/F-Sy-H.plugin.zsh
+autoload -U colors && colors
+
+
 # Globals ========================================================
 # -----------------------------
 
@@ -68,6 +75,13 @@ export EDITOR="nvim"
 export VISUAL="nvim"
 export STARSHIP_CONFIG=~/.config/zsh_starship.toml
 export BROWSER="microsoft-edge-dev"
+
+# Vim Mode =======================================================
+# -----------------------------
+#source "$HOME/repos/zsh-vim-mode/zsh-vim-mode.plugin.zsh"
+
+# https://github.com/jeffreytse/zsh-vi-mode
+source "$HOME/repos/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
 
 # Alias ===========================================================
 # -----------------------------
@@ -103,7 +117,7 @@ alias sync_notes="onedrive --synchronize --single-directory 'mynotes'"
 alias sync_dev="onedrive --synchronize --single-directory 'dev'"
 #alias kmo="kmonad $DOTFILES/kmonad/.config/kmonad/ansi_qwerty_circle_87keys.kbd"
 alias bevc="gh gist view 9c7afb882391fcc1264b8a7d4f8dcb6e | xsel -ib"
-alias nvim="nvim -p"
+# alias nvim="nvim -p"
 alias code="code --profile aviik"
 #------------------------------
 # ShellFuncs
@@ -139,23 +153,36 @@ man() {
 
 [ -n "$WEZTERM_PANE" ] && export NVIM_LISTEN_ADDRESS="/tmp/nvim$WEZTERM_PANE"
 
+
+#Direnv 
+eval "$(direnv hook zsh)"
+
 #Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 
 # Zoxide
 eval "$(zoxide init zsh)"
+source ~/repos/sourcing/zabb/zabb.plugin.zsh
+
+# Starship
 eval "$(starship init zsh)"
+
+# Pyenv
+eval "$(pyenv init -)"
+eval "$(pyenv init - --no-rehash zsh)"
 eval "$(pyenv virtualenv-init -)"
 
-source ~/repos/sourcing/zabb/zabb.plugin.zsh
+# Atuin
+export ATUIN_NOBIND="true"
+eval "$(atuin init zsh)"
+
+
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-# export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-# place this after nvm initialization!
+
 autoload -U add-zsh-hook
 load-nvmrc() {
   local nvmrc_path="$(nvm_find_nvmrc)"
@@ -192,8 +219,10 @@ vterm_printf() {
 
 
 fpath=( ~/.zfunc "${fpath[@]}" )
-autoload -Uz mkcd
+# echo $fpath
+# autoload -Uz mkcd
 autoload -Uz create-c-project
+autoload -Uz $(ls ~/.zfunc)
 
 fancy-ctrl-z () {
   if [[ $#BUFFER -eq 0 ]]; then
@@ -207,7 +236,19 @@ fancy-ctrl-z () {
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
 
-
 # fzf
 #[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-which green >& /dev/null && source "$( green --completion-file )"
+# which green >& /dev/null && source "$( green --completion-file )"
+
+
+
+#keybindings
+bindkey -v
+#
+# ^ = Ctrl
+# ^[ = Alt
+# \e or \E = Escape
+
+bindkey '^a' beginning-of-line
+bindkey '^e' end-of-line
+bindkey '^[r' _atuin_search_widget

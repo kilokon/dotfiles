@@ -1,14 +1,14 @@
 #!/bin/zsh
 
-file_name=$1
-max_number="00"
-current_dir=$(basename "$PWD")
+local file_name=$1
+local max_number="00"
+local current_dir=$(basename "$PWD")
 
 
 #Check id praxis dir is empty
 _check_praxis_dir_is_empty() {
     setopt nullglob
-    dirpaths=( "$PWD"/*/ )
+    local dirpaths=( "$PWD"/*/ )
     for dir in "${dirpaths[@]}"; do
         local temp=$(basename "$dir")
         if [[ $temp =~ [0-9][0-9]_* ]]; then
@@ -51,7 +51,7 @@ _find_last_dir() {
     return $count
 }
 
-increment_number_with_pad() {
+_increment_number_with_pad() {
     local num=$1
     local num_incr=$((num+1))
     if (( num_incr > 0)) && (( num_incr < 10 )); then
@@ -62,39 +62,40 @@ increment_number_with_pad() {
 }
 
 create-c-project() {
+    echo $PWD
     # check if the present directory name is "praxis"
     # Get the base name of the current directory
     if _check_if_praxis_dir; then
-        echo "You are in the praxis directory"
+        # echo "You are in the praxis directory"
         # Check if the praxis directory is empty
         _check_praxis_dir_is_empty
         local empty=$? # capture the return value of the function
         if [[ $empty -eq 0 ]]; then
-            echo "The praxis directory is not empty"
+            # echo "The praxis directory is not empty"
             _find_last_dir
             local count=$?
             # echo $count
-            local file_num=$(increment_number_with_pad $count)
+            local file_num=$(_increment_number_with_pad $count)
             # echo $file_num
             local current_filename="${file_num}_${file_name}"
             # echo $current_filename
             local current_path="${PWD}/${current_filename}"
             # echo $current_path
-            create_dirs $current_path
+            _create_dirs $current_path
         else
-            echo "The praxis directory is empty"
+            # echo "The praxis directory is empty"
             local current_filename="00_${file_name}"
             local current_path="${PWD}/${current_filename}"
             # echo $current_path
-            create_dirs $current_path
+            _create_dirs $current_path
         fi
     else
-        echo "You are not in the praxis directory"
-        create_dirs $file_name
+        # echo "You are not in the praxis directory"
+        _create_dirs $file_name
     fi
 }
 
-create_dirs() {
+_create_dirs() {
 # Create a C project with a main.c file
         mkdir -p "$1" && cd "$1" || return 1
         mkdir -p src include bin 
@@ -115,4 +116,4 @@ create_dirs() {
         git init
     }
 
-create-c-project
+#create-c-project $file_name
