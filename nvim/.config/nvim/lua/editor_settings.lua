@@ -58,6 +58,7 @@ for k, v in pairs(options) do
 end
 
 vim.g.rust_recommended_style = false
+vim.g.python3_host_prog = "/usr/bin/python3"
 
 if vim.fn.has("nvim-0.9") == 1 and not vim.opt.diff:get() then
   vim.opt.signcolumn = "yes:1"

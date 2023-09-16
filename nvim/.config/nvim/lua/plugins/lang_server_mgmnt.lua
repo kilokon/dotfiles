@@ -44,21 +44,21 @@ return {
       require("luasnip.loaders.from_lua").lazy_load()
 
       -- <c-l> is selecting within a list of options.
-      vim.keymap.set({ "s", "i" }, "<c-l>", function()
-        if ls.choice_active() then
-          ls.change_choice(1)
-        end
-      end, { desc = "Scroll through choice nodes" })
+      -- vim.keymap.set({ "s", "i" }, "<c-l>", function()
+      --   if ls.choice_active() then
+      --     ls.change_choice(1)
+      --   end
+      -- end, { desc = "Scroll through choice nodes" })
 
-      vim.keymap.set("i", "<Tab>", function()
-        return ls.expand_or_jumpable() and "<Plug>luasnip-expand-or-jump" or "<Tab>"
-      end, { desc = "Expand or jump snippet", expr = true, silent = true })
-
-      vim.keymap.set("i", "<S-Tab>", function()
-        if ls.jumpable(-1) then
-          ls.jump(-1)
-        end
-      end, { desc = "Jump backwards snippet" })
+      --   vim.keymap.set("i", "<Tab>", function()
+      --     return ls.expand_or_jumpable() and "<Plug>luasnip-expand-or-jump" or "<Tab>"
+      --   end, { desc = "Expand or jump snippet", expr = true, silent = true })
+      --
+      --   vim.keymap.set("i", "<S-Tab>", function()
+      --     if ls.jumpable(-1) then
+      --       ls.jump(-1)
+      --     end
+      --   end, { desc = "Jump backwards snippet" })
     end,
   },
   -- {
@@ -138,8 +138,10 @@ return {
             cmp.close()
             fallback()
           end, { "i" }),
-          ["<Tab>"] = cmp_action.tab_complete(),
-          ["<S-Tab>"] = cmp_action.select_prev_or_fallback(),
+          ["<Tab>"] = cmp_action.luasnip_supertab(),
+          ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),
+          -- ["<Tab>"] = cmp_action.tab_complete(),
+          -- ["<S-Tab>"] = cmp_action.select_prev_or_fallback(),
           ["<CR>"] = cmp.mapping.confirm({
             behavior = cmp.ConfirmBehavior.Replace,
             select = false,
@@ -222,7 +224,7 @@ return {
       })
 
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "ruff_lsp", "clangd", "neocmake" },
+        ensure_installed = { "lua_ls", "ruff_lsp", "clangd", "neocmake", "pylsp" },
         handlers = {
           lsp_zero.default_setup,
 
@@ -263,6 +265,34 @@ return {
               },
             })
           end,
+          pylsp = function()
+            require("lspconfig").pylsp.setup({
+              settings = {
+                pylsp = {
+                  plugins = {
+                    ruff = {
+                      enabled = true,
+                      extendSelect = { "I" },
+                    },
+                  },
+                },
+              },
+            })
+          end,
+          -- pyright = function()
+          --   require("lspconfig").pyright.setup({
+          --     cmd = { "pyright-langserver", "--stdio" },
+          --     settings = {
+          --       python = {
+          --         analysis = {
+          --           autoSearchPaths = true,
+          --           diagnosticMode = "openFilesOnly",
+          --           useLibraryCodeForTypes = true,
+          --         },
+          --       },
+          --     },
+          --   })
+          -- end,
 
           -- C/C++ LSP
           clangd = function()
@@ -288,7 +318,7 @@ return {
               cmd = { "neocmakelsp", "--stdio" },
               filetypes = { "cmake" },
               root_dir = function()
-                return lsp_zero.dir.find_first({ ".git", 'cmake' })
+                return lsp_zero.dir.find_first({ ".git", "cmake" })
               end,
               single_file_support = true, -- suggested
             })
@@ -512,7 +542,7 @@ return {
       local ft = require("guard.filetype")
 
       ft("c"):fmt("clang-format"):lint("clang-tidy")
-
+      ft("python"):fmt("black")
       ft("lua"):fmt("stylua")
 
       -- Call setup() LAST!

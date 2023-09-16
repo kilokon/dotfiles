@@ -1,35 +1,79 @@
+-- WezTerm configuration
+---------------------------------------------------------------
+
+print("hello")
 local wezterm = require("wezterm")
 local wezKeys = require("keymap")
 
+local config = {}
 -- local nf = wezterm.nerdfonts
 -- local pane_cwd_cache = {}
+if wezterm.config_builder then
+	config = wezterm.config_builder()
+end
 
-
-
-
-return {
-        default_prog = { "/usr/bin/zsh" },
-        -- set_environment_variables = set_environment_variables,
-        default_cursor_style = "SteadyBar", -- SteadyBlock, BlinkingBlock, SteadyUnderline, BlinkingUnderline, SteadyBar, and BlinkingBar
-        -- font = wezterm.font("JetBrains Mono"),
-        -- font = wezterm.font("Source Code Pro"),
-        font = wezterm.font("RobotoMono Nerd Font"),
-        -- font = wezterm.font("Comic Neue Angular"),
-        font_size = 11,
-        color_scheme = "tokyonight-storm",
-        hide_tab_bar_if_only_one_tab = true,
-        window_background_opacity = 0.85,
-        text_background_opacity = 0.7,
-        disable_default_key_bindings = true,
-        -- pane_focus_follows_mouse = true,
-        window_padding = {
-                top = 1,
-                bottom = 2,
-                left = 1,
-                right = 1,
-        },
-        -- All Keys are defined in keymap.lua
-        leader = { key = "VoidSymbol", mods = "", timeout_milliseconds = 1000 },
-        keys = wezKeys.keys(),
-        key_tables = wezKeys.key_tables(),
+config.default_prog = { "/usr/bin/zsh", "-l" }
+config.default_cursor_style = "SteadyBar"
+config.font = wezterm.font("RobotoMono Nerd Font")
+config.font_size = 11
+config.color_scheme = "tokyonight-storm"
+config.hide_tab_bar_if_only_one_tab = true
+config.window_background_opacity = 0.85
+config.text_background_opacity = 0.7
+config.disable_default_key_bindings = true
+config.window_padding = {
+	top = 7,
+	bottom = 2,
+	left = 1,
+	right = 1,
 }
+config.use_fancy_tab_bar = false
+config.tab_bar_at_bottom = true
+config.tab_max_width = 30
+config.window_decorations = "RESIZE"
+config.leader = { key = "VoidSymbol", mods = "", timeout_milliseconds = 1000 }
+config.keys = wezKeys.keys()
+config.key_tables = wezKeys.key_tables()
+config.window_frame = {
+	font = wezterm.font({ family = "Fira Code", weight = "Bold" }),
+	font_size = 11.0,
+	border_left_width = "0.0cell",
+	border_right_width = "0.0cell",
+	border_bottom_height = "0.10cell",
+	border_bottom_color = "#1a1b26",
+	border_top_height = "0.0cell",
+}
+config.underline_thickness = 1
+config.underline_position = -2.0
+
+-- wezterm.on(
+--   'format-tab-title',
+--   function(tab, tabs, panes, conf, hover, max_width)
+--     local has_unseen_output = false
+--     if not tab.is_active then
+--       for _, pane in ipairs(tab.panes) do
+--         if pane.has_unseen_output then
+--           has_unseen_output = true
+--           break
+--         end
+--       end
+--     end
+--
+--     local title = string.format(' %s ~ %s  ', get_process(tab), get_current_working_dir(tab))
+--
+--     if has_unseen_output then
+--       return {
+--         { Foreground = { Color = 'Orange' } },
+--         { Text = title },
+--       }
+--     end
+--
+--     return {
+--       { Text = title },
+--     }
+--   end
+-- )
+
+wezterm.log_info("hellos")
+
+return config
