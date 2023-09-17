@@ -13,10 +13,12 @@ return {
           -- load_textobjects = true
         end,
       },
+      { "mimmanuel/nvim-treesitter-powershell" },
     },
     build = ":TSUpdate",
     config = function()
       local configs = require("nvim-treesitter.configs")
+      local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 
       require("nvim-treesitter.parsers").get_parser_configs().just = {
         install_info = {
@@ -27,18 +29,34 @@ return {
         },
         maintainers = { "@IndianBoy42" },
       }
+
+      -- IMPORTANT: Install tree-sitter-cli
+      parser_config.PowerShell = require("ts-powershell").parser_config
+
       configs.setup({
         ensure_installed = {
+          "bash",
           "c",
           "cpp",
+          "csv",
           "cmake",
+          "dockerfile",
           "fennel",
+          "fish",
+          "gitignore",
+          "haskell",
           "html",
           "just",
           "lua",
+          "make",
+          "meson",
+          "nix",
+          "PowerShell",
           "python",
+          "qmljs",
           "query",
           "rust",
+          "toml",
           "vim",
           "vimdoc",
           "javascript",
