@@ -4,6 +4,7 @@
 print("hello")
 local wezterm = require("wezterm")
 local wezKeys = require("keymap")
+local helpers = require("helpers")
 
 local config = {}
 -- local nf = wezterm.nerdfonts
@@ -11,6 +12,8 @@ local config = {}
 if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
+
+helpers.apply_to_config(config)
 
 config.default_prog = { "/usr/bin/zsh", "-l" }
 config.default_cursor_style = "SteadyBar"
@@ -31,6 +34,7 @@ config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = true
 config.tab_max_width = 30
 config.window_decorations = "RESIZE"
+-- config.leader = { key = "VoidSymbol", mods = "", timeout_milliseconds = 1000 }
 config.leader = { key = "VoidSymbol", mods = "", timeout_milliseconds = 1000 }
 config.keys = wezKeys.keys()
 config.key_tables = wezKeys.key_tables()

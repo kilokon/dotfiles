@@ -10,14 +10,18 @@ return {
     opts = {
       shell = "/usr/bin/zsh",
       open_mapping = [[<c-\>]],
+      size = 25,
     },
   },
   {
     -- TODO: Integrate with Hydra
     "willothy/wezterm.nvim",
     config = true,
+    keys = {
+      { "<leader>w", "<cmd>WeztermSpawn<CR>" },
+    },
     opts = function()
-      vim.keymap.set("n", "<leader>wt", require("wezterm").switch_tab.relative)
+      -- vim.keymap.set("n", "<leader>w", require("wezterm").switch_tab.relative)
     end,
   },
   {

@@ -3,6 +3,7 @@
 # ############ #
 
 # By Frenzy
+set window-title-basename true
 
 set font                        "rubik 12"
 set default-bg                  "#2E3440"

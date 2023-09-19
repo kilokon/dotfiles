@@ -50,35 +50,28 @@ return {
       --Config goes here
     },
   },
-  -- {
-  --   "abecodes/tabout.nvim",
-  --   dependencies = { "nvim-treesitter/nvim-treesitter" },
-  --   priority = 1000,
-  --   event = "InsertEnter",
-  --   config = function()
-  --     require("tabout").setup({
-  --       tabkey = "<Tab>", -- key to trigger tabout, set to an empty string to disable
-  --       backwards_tabkey = "<S-Tab>", -- key to trigger backwards tabout, set to an empty string to disable
-  --       act_as_tab = true, -- shift content if tab out is not possible
-  --       act_as_shift_tab = false, -- reverse shift content if tab out is not possible (if your keyboard/terminal supports <S-Tab>)
-  --       default_tab = "<C-t>", -- shift default action (only at the beginning of a line, otherwise <TAB> is used)
-  --       default_shift_tab = "<C-d>", -- reverse shift default action,
-  --       enable_backwards = true, -- well ...
-  --       completion = true, -- if the tabkey is used in a completion pum
-  --       tabouts = {
-  --         { open = "'", close = "'" },
-  --         { open = '"', close = '"' },
-  --         { open = "`", close = "`" },
-  --         { open = "(", close = ")" },
-  --         { open = "[", close = "]" },
-  --         { open = "{", close = "}" },
-  --       },
-  --       ignore_beginning = true, --[[ if the cursor is at the beginning of a filled element it will rather tab out than shift the content ]]
-  --       exclude = {}, -- tabout will ignore these filetypes
-  --     })
-  --   end,
-  -- },
-  -- add this to your lua/plugins.lua, lua/plugins/init.lua,  or the file you keep your other plugins:
+
+  {
+    "kylechui/nvim-surround",
+    version = "*", -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy",
+    config = function()
+      require("nvim-surround").setup({
+        -- Configuration here, or leave empty to use defaults
+      })
+    end,
+
+    --
+    --       Old text                    Command         New text
+    -- --------------------------------------------------------------------------------
+    --     surr*ound_words             ysiw)           (surround_words)
+    --     *make strings               ys$"            "make strings"
+    --     [delete ar*ound me!]        ds]             delete around me!
+    --     remove <b>HTML t*ags</b>    dst             remove HTML tags
+    --     'change quot*es'            cs'"            "change quotes"
+    --     <b>or tag* types</b>        csth1<CR>       <h1>or tag types</h1>
+    --     delete(functi*on calls)     dsf             function calls
+  },
   {
     "numToStr/Comment.nvim",
     opts = function()
@@ -106,7 +99,23 @@ return {
 
   {
     "kevinhwang91/nvim-ufo",
-    dependencies = { "kevinhwang91/promise-async" },
+    dependencies = {
+      { "kevinhwang91/promise-async" },
+      {
+        "luukvbaal/statuscol.nvim",
+        config = function()
+          local builtin = require("statuscol.builtin")
+          require("statuscol").setup({
+            relculright = true,
+            segments = {
+              { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
+              { text = { "%s" }, click = "v:lua.ScSa" },
+              { text = { builtin.lnumfunc, " " }, click = "v:lua.ScLa" },
+            },
+          })
+        end,
+      },
+    },
     event = "VeryLazy",
     init = function()
       vim.o.foldcolumn = "1" -- '0' is not bad
@@ -119,7 +128,7 @@ return {
       vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
       vim.keymap.set("n", "zr", require("ufo").openFoldsExceptKinds)
       vim.keymap.set("n", "zm", require("ufo").closeFoldsWith) -- closeAllFolds == closeFoldsWith(0)
-      vim.keymap.set("n", "zK", require("ufo").peekFoldedLinesUnderCursor, { desc = "peek-folds" })
+      vim.keymap.set("n", "zp", require("ufo").peekFoldedLinesUnderCursor, { desc = "peek-folds" })
       vim.api.nvim_set_hl(0, "MoreMsg", { bg = "none", fg = "#7E9CD8" })
 
       local handler = function(virtText, lnum, endLnum, width, truncate)
@@ -202,7 +211,7 @@ return {
       })
     end,
     keys = {
-      { "<leader>lr", ":lua require'lir.float'.toggle()<CR>", desc = "lir explorer" },
+      { "<leader>L", ":lua require'lir.float'.toggle()<CR>", desc = "lir explorer" },
     },
     config = function()
       -- local lir = require('lir')
@@ -290,18 +299,18 @@ return {
       })
     end,
   },
-  {
-    "echasnovski/mini.ai",
-    keys = { { "a", mode = { "x", "o" } }, { "i", mode = { "x", "o" } } },
-    branch = "stable",
-    config = function()
-      require("mini.ai").setup({
-        search_method = "cover_or_nearest",
-        custom_textobjects = { b = { { "%b()", "%b[]", "%b{}" }, "^.().*().$" } },
-        -- { { '%b()', '%b[]', '%b{}' }, '^.().*().$' }
-      })
-    end,
-  },
+  -- {
+  --   "echasnovski/mini.ai",
+  --   keys = { { "a", mode = { "x", "o" } }, { "i", mode = { "x", "o" } } },
+  --   branch = "stable",
+  --   config = function()
+  --     require("mini.ai").setup({
+  --       search_method = "cover_or_nearest",
+  --       custom_textobjects = { b = { { "%b()", "%b[]", "%b{}" }, "^.().*().$" } },
+  --       -- { { '%b()', '%b[]', '%b{}' }, '^.().*().$' }
+  --     })
+  --   end,
+  -- },
   {
     "Julian/vim-textobj-variable-segment",
     keys = { { "av", mode = { "x", "o" } }, { "iv", mode = { "x", "o" } } },

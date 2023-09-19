@@ -202,6 +202,8 @@ return {
       { "hrsh7th/cmp-nvim-lsp" },
       { "lukas-reineke/lsp-format.nvim" },
       { "onsails/lspkind.nvim" },
+      { "b0o/schemastore.nvim" },
+      { "dnlhc/glance.nvim" },
     },
 
     config = function()
@@ -224,7 +226,18 @@ return {
       })
 
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "ruff_lsp", "clangd", "neocmake", "pylsp" },
+        ensure_installed = {
+          "lua_ls",
+          "ruff_lsp",
+          "clangd",
+          "fennel_language_server",
+          "neocmake",
+          "powershell_es",
+          "pylsp",
+          "taplo",
+          "typst_lsp",
+          "yamlls",
+        },
         handlers = {
           lsp_zero.default_setup,
 
@@ -253,6 +266,16 @@ return {
             })
           end,
 
+          jsonls = function()
+            require("lspconfig").jsonls.setup({
+              settings = {
+                json = {
+                  schemas = require("schemastore").json.schemas(),
+                  validate = { enable = true },
+                },
+              },
+            })
+          end,
           -- Python Ruff Linter and Formatter
           ruff_lsp = function()
             require("lspconfig").ruff_lsp.setup({
@@ -279,21 +302,6 @@ return {
               },
             })
           end,
-          -- pyright = function()
-          --   require("lspconfig").pyright.setup({
-          --     cmd = { "pyright-langserver", "--stdio" },
-          --     settings = {
-          --       python = {
-          --         analysis = {
-          --           autoSearchPaths = true,
-          --           diagnosticMode = "openFilesOnly",
-          --           useLibraryCodeForTypes = true,
-          --         },
-          --       },
-          --     },
-          --   })
-          -- end,
-
           -- C/C++ LSP
           clangd = function()
             require("lspconfig").clangd.setup({
@@ -512,38 +520,22 @@ return {
       })
     end,
   },
-  -- {
-  --   "mhartington/formatter.nvim",
-  --   cmd = { "Format", "FormatWrite" },
-  --   config = function()
-  --     require("formatter").setup({
-  --       filetype = {
-  --         c = { require("formatter.filetypes.c").clangformat },
-  --         cpp = { require("formatter.filetypes.c").clangformat },
-  --         css = { require("formatter.filetypes.css").prettier },
-  --         html = { require("formatter.filetypes.html").prettier },
-  --         javascript = { require("formatter.filetypes.javascript").prettier },
-  --         json = { require("formatter.filetypes.json").prettier },
-  --         lua = { require("formatter.filetypes.lua").stylua },
-  --         markdown = { require("formatter.filetypes.markdown").prettier },
-  --         rust = { require("formatter.filetypes.rust").rustfmt },
-  --         sh = { require("formatter.filetypes.sh").shfmt },
-  --         toml = { require("formatter.filetypes.toml").taplo },
-  --       },
-  --     })
-  --   end,
-  -- },
-
   -- Linting and Formatting
   {
     "nvimdev/guard.nvim",
+    dependencies = {
+      "nvimdev/guard-collection",
+    },
     -- enabled = false,
     config = function()
       local ft = require("guard.filetype")
 
-      ft("c"):fmt("clang-format"):lint("clang-tidy")
+      ft("c"):fmt("clang-format")
       ft("python"):fmt("black")
       ft("lua"):fmt("stylua")
+      ft("html, css, scss, less, md, yaml, json, xml, typescript, javascript, typescriptreact"):fmt(
+        "prettier"
+      )
 
       -- Call setup() LAST!
       require("guard").setup({
@@ -564,34 +556,37 @@ return {
       })
     end,
   },
+
   { "simrat39/rust-tools.nvim" },
   { "NoahTheDuke/vim-just" },
   { "rafcamlet/nvim-luapad" },
   { -- This plugin
     "Zeioth/compiler.nvim",
     cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
-    dependencies = { "stevearc/overseer.nvim" },
-    opts = {},
-    keys = {
-      { "<F6>", "<cmd>CompilerOpen<CR>" },
-    },
-  },
-  { -- The task runner we use
-    "stevearc/overseer.nvim",
-    commit = "19aac0426710c8fc0510e54b7a6466a03a1a7377",
-    cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
-    opts = {
-      task_list = {
-        direction = "bottom",
-        min_height = 25,
-        max_height = 25,
-        default_detail = 1,
-        bindings = {
-          ["q"] = function()
-            vim.cmd("OverseerClose")
-          end,
+    dependencies = {
+      { -- The task runner we use
+        "stevearc/overseer.nvim",
+        commit = "19aac0426710c8fc0510e54b7a6466a03a1a7377",
+        cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
+        opts = {
+          task_list = {
+            direction = "bottom",
+            min_height = 25,
+            max_height = 25,
+            default_detail = 1,
+            bindings = {
+              ["q"] = function()
+                vim.cmd("OverseerClose")
+              end,
+            },
+          },
         },
       },
     },
+    opts = {},
+    keys = {
+      { "<leader>cc", "<cmd>CompilerOpen<CR>" },
+    },
   },
+  { "krady21/compiler-explorer.nvim" },
 }

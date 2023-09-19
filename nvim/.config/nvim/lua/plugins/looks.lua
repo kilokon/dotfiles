@@ -94,6 +94,10 @@ return {
       })
     end,
   },
+  {
+    "stevearc/dressing.nvim",
+    opts = {},
+  },
   -- { "akinsho/bufferline.nvim", version = "*", dependencies = "nvim-tree/nvim-web-devicons" },
   {
     -- TODO: Mike, fork this and make it stable maybe?
@@ -117,10 +121,11 @@ return {
           resizer = specs.slide_resizer,
           winhl = "Specs",
         },
-        ignore_filetypes = excluded_filetypes_array,
+        -- ignore_filetypes = excluded_filetypes_array,
         ignore_buftypes = { nofile = true, prompt = true },
       })
     end,
   },
   { "lewis6991/satellite.nvim" },
+  -- { "Bekaboo/dropbar.nvim" },
 }
