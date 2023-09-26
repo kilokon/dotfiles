@@ -80,7 +80,7 @@ return {
       { "saadparwaiz1/cmp_luasnip" },
       { "hrsh7th/cmp-nvim-lsp-signature-help" },
       { "windwp/nvim-autopairs" }, -- Auto }pairs
-      { "PaterJason/cmp-conjure" },
+      -- { "PaterJason/cmp-conjure" },
     },
     config = function()
       -- Here is where you configure the autocompletion settings.
@@ -117,7 +117,8 @@ return {
           { name = "nvim_lsp" },
           { name = "nvim_lua" },
           { name = "path" },
-          { name = "conjure" },
+          -- { name = "crates" },
+          -- { name = "conjure" },
         },
         completion = {
           -- autocomplete = true
@@ -196,28 +197,121 @@ return {
         config = true,
       },
       { "williamboman/mason-lspconfig.nvim", enabled = true },
-      { "simrat39/inlay-hints.nvim" },
-      { "j-hui/fidget.nvim" },
+      -- { "simrat39/inlay-hints.nvim" },
+      { "lvimuser/lsp-inlayhints.nvim" },
       { "mfussenegger/nvim-lint" },
       { "hrsh7th/cmp-nvim-lsp" },
       { "lukas-reineke/lsp-format.nvim" },
       { "onsails/lspkind.nvim" },
       { "b0o/schemastore.nvim" },
-      { "dnlhc/glance.nvim" },
+      { "simrat39/rust-tools.nvim" },
+      {
+        "dnlhc/glance.nvim",
+        keys = {
+          { "gD", "<CMD>Glance definitions<CR>" },
+          { "gR", "<CMD>Glance references<CR>" },
+          { "gY", "<CMD>Glance type_definitions<CR>" },
+          { "gM", "<CMD>Glance implementations<CR>" },
+        },
+      },
+      {
+        "SmiteshP/nvim-navic",
+        config = function()
+          require("nvim-navic").setup({
+            icons = {
+              File = " ",
+              Module = " ",
+              Namespace = " ",
+              Package = " ",
+              Class = " ",
+              Method = " ",
+              Property = " ",
+              Field = " ",
+              Constructor = " ",
+              Enum = "練",
+              Interface = "練",
+              Function = " ",
+              Variable = " ",
+              Constant = " ",
+              String = " ",
+              Number = " ",
+              Boolean = "◩ ",
+              Array = " ",
+              Object = " ",
+              Key = " ",
+              Null = "ﳠ ",
+              EnumMember = " ",
+              Struct = " ",
+              Event = " ",
+              Operator = " ",
+              TypeParameter = " ",
+            },
+            highlight = true,
+          })
+        end,
+      },
     },
 
     config = function()
       -- This is where all the LSP shenanigans will live
 
       local lsp_zero = require("lsp-zero")
-      local ih = require("inlay-hints")
+      -- local ih = require("inlay-hints")
+      local ih = require("lsp-inlayhints")
       ih.setup()
 
-      lsp_zero.on_attach(function(_, bufnr)
+      lsp_zero.on_attach(function(client, bufnr)
         -- see :help lsp-zero-keybindings
         -- to learn the available actions
-        lsp_zero.default_keymaps({ buffer = bufnr })
+        lsp_zero.default_keymaps({
+          buffer = bufnr,
+          exclude = { "gD", "gR", "gY", "gM" }, -- Glance will handle these
+        })
+
+        if client.server_capabilities.documentSymbolProvider then
+          require("nvim-navic").attach(client, bufnr)
+        end
       end)
+
+      vim.g.haskell_tools = {
+        hls = {
+          capabilities = lsp_zero.get_capabilities(),
+        },
+      }
+
+      -- Autocmd that will actually be in charging of starting hls
+      local hls_augroup = vim.api.nvim_create_augroup("haskell-lsp", { clear = true })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = hls_augroup,
+        pattern = { "haskell" },
+        callback = function()
+          ---
+          -- Suggested keymaps from the quick setup section:
+          -- https://github.com/mrcjkb/haskell-tools.nvim#quick-setup
+          ---
+
+          local ht = require("haskell-tools")
+          local bufnr = vim.api.nvim_get_current_buf()
+          local def_opts = { noremap = true, silent = true, buffer = bufnr }
+          local opts = { noremap = true, silent = true }
+
+          -- haskell-language-server relies heavily on codeLenses,
+          -- so auto-refresh (see advanced configuration) is enabled by default
+          vim.keymap.set("n", "<space>ca", vim.lsp.codelens.run, opts)
+          -- Hoogle search for the type signature of the definition under the cursor
+          vim.keymap.set("n", "<space>hs", ht.hoogle.hoogle_signature, opts)
+          -- Evaluate all code snippets
+          vim.keymap.set("n", "<space>ea", ht.lsp.buf_eval_all, opts)
+          -- Toggle a GHCi repl for the current package
+          vim.keymap.set("n", "<leader>rr", ht.repl.toggle, opts)
+          -- Toggle a GHCi repl for the current buffer
+          vim.keymap.set("n", "<leader>rf", function()
+            ht.repl.toggle(vim.api.nvim_buf_get_name(0))
+          end, def_opts)
+          vim.keymap.set("n", "<leader>rq", ht.repl.quit, opts)
+        end,
+      })
+
       lsp_zero.set_sign_icons({
         error = "✘",
         warn = "▲",
@@ -227,13 +321,15 @@ return {
 
       require("mason-lspconfig").setup({
         ensure_installed = {
-          "lua_ls",
-          "ruff_lsp",
           "clangd",
           "fennel_language_server",
+          -- "hls",
+          "lua_ls",
           "neocmake",
           "powershell_es",
           "pylsp",
+          "ruff_lsp",
+          "rust_analyzer",
           "taplo",
           "typst_lsp",
           "yamlls",
@@ -251,6 +347,7 @@ return {
                 return lsp_zero.dir.find_first({ ".luarc.json", ".stylua.toml" })
               end,
               on_attach = function(client, bufnr)
+                -- on_attach,
                 ih.on_attach(client, bufnr)
               end,
               settings = {
@@ -265,7 +362,37 @@ return {
               },
             })
           end,
+          -- RUST TOOLS
+          rust_analyzer = function()
+            local rust_tools = require("rust-tools")
 
+            rust_tools.setup({
+              server = {
+                on_attach = function(client, bufnr)
+                  -- on_attach(client, bufnr)
+                  ih.on_attach(client, bufnr)
+                  vim.keymap.set(
+                    "n",
+                    "<leader>ca",
+                    rust_tools.hover_actions.hover_actions,
+                    { buffer = bufnr }
+                  )
+                end,
+              },
+              tools = {
+                executor = require("rust-tools.executors").toggleterm,
+                on_initialized = function()
+                  -- ih.on_attach(client, bufnr)
+                  -- ih.set_all()
+                end,
+                inlay_hints = {
+                  auto = false,
+                },
+              },
+            })
+          end,
+
+          -- JSONLS
           jsonls = function()
             require("lspconfig").jsonls.setup({
               settings = {
@@ -279,7 +406,6 @@ return {
           -- Python Ruff Linter and Formatter
           ruff_lsp = function()
             require("lspconfig").ruff_lsp.setup({
-              -- on_attach = on_attach,
               init_options = {
                 settings = {
                   -- Any extra CLI arguments for `ruff` go here.
@@ -313,7 +439,7 @@ return {
                 "--header-insertion=iwyu",
               },
               filetypes = { "c", "cpp", "objc", "objcpp", "h", "hpp" },
-              on_attach = function()
+              on_attach = function(_, _)
                 require("clangd_extensions.inlay_hints").setup_autocmd()
                 require("clangd_extensions.inlay_hints").set_inlay_hints()
               end,
@@ -333,68 +459,96 @@ return {
           end,
         },
       })
+      -- lsp_zero.skip_server_setup({ "rust_analyzer", "hls" })
+      lsp_zero.setup()
     end,
-    -- lsp.setup()
   },
 
   -- DAPS
   {
+    "jay-babu/mason-nvim-dap.nvim",
+    dependencies = { "mfussenegger/nvim-dap" },
+    opts = {
+      ensure_installed = { "python", "cppdbg", "chrome", "codelldb" },
+      handlers = {
+        python = function(config)
+          config.adapters = {
+            type = "executable",
+            command = "/usr/bin/python3",
+            args = {
+              "-m",
+              "debugpy.adapter",
+            },
+          }
+          require("mason-nvim-dap").default_setup(config) -- don't forget this!
+        end,
+      },
+    },
+  },
+  {
     "mfussenegger/nvim-dap",
     dependencies = {
-      { "rcarriga/nvim-dap-ui" },
-      { "theHamsta/nvim-dap-virtual-text" },
+      { "theHamsta/nvim-dap-virtual-text", config = true },
       { "jbyuki/one-small-step-for-vimkind" },
     },
-    config = function()
-      local dap = require("dap")
-      local dapui = require("dapui")
-      local osv = require("osv")
-      vim.fn.sign_define("DapBreakpoint", { text = "🔴", texthl = "", linehl = "", numhl = "" })
-      vim.fn.sign_define(
+    config = function(_, _)
+      vim.fn.sign_define("DapStopped", { text = "", texthl = "DiagnosticWarn" })
+      vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DiagnosticInfo" })
+      vim.fn.sign_define("DapBreakpointRejected", { text = "", texthl = "DiagnosticError" })
+      vim.fn.sign_define("DapBreakpointCondition", { text = "", texthl = "DiagnosticInfo" })
+      vim.fn.sign_define("DapLogPoint", { text = ".>", texthl = "DiagnosticInfo" })
+
+      -- Catppuccin
+      local sign = vim.fn.sign_define
+
+      sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
+      sign(
         "DapBreakpointCondition",
-        { text = "🔵", texthl = "", linehl = "", numhl = "" }
+        { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" }
       )
-      require("dap.ext.vscode").load_launchjs()
-      dapui.setup()
+      sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
+    end,
+  },
+  {
+    "rcarriga/nvim-dap-ui",
+    opts = { floating = { border = "rounded" } },
+    config = function(_, opts)
+      local dap, dapui = require("dap"), require("dapui")
       dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
       end
       dap.listeners.before.event_terminated["dapui_config"] = function()
         dapui.close()
       end
-      dap.listeners.after.event_exited["dapui_config"] = function()
+      dap.listeners.before.event_exited["dapui_config"] = function()
         dapui.close()
       end
-      local osv_port = 8086
-      if not dap.launch_server then
-        dap.launch_server = {}
-      end
-      dap.configurations.lua = {
-        {
-          type = "nlua",
-          request = "attach",
-          name = "Attach to running Neovim instance",
-        },
-      }
-      dap.configurations[""] = dap.configurations.lua
-      dap.adapters.nlua = function(callback, config)
-        callback({
-          type = "server",
-          host = config.host or "127.0.0.1",
-          port = config.port or osv_port,
-        })
-      end
-      dap.launch_server["nil"] = function()
-        print("Starting OSV DAP Server")
-        osv.launch({ port = osv_port })
-      end
+      dapui.setup(opts)
     end,
+  },
+  {
+    "andythigpen/nvim-coverage",
+    cmd = {
+      "Coverage",
+      "CoverageLoad",
+      "CoverageLoadLcov",
+      "CoverageShow",
+      "CoverageHide",
+      "CoverageToggle",
+      "CoverageClear",
+      "CoverageSummary",
+    },
+    config = function()
+      require("coverage").setup()
+    end,
+    requires = { "nvim-lua/plenary.nvim" },
   },
 
   { "Olical/nfnl", ft = "fennel" },
-  { "Olical/aniseed" },
+  -- { "Olical/aniseed" },
   {
     "Olical/conjure",
+    lazy = true,
     ft = { "clojure", "fennel" }, -- etc
     -- [Optional] cmp-conjure for cmp
     dependencies = {
@@ -436,6 +590,7 @@ return {
       -- name = "venv",
       -- auto_refresh = false
     },
+    enabled = true,
     event = "VeryLazy", -- Optional: needed only if you want to type `:VenvSelect` without a keymapping
     keys = {
       {
@@ -447,30 +602,14 @@ return {
         "<cmd>:VenvSelectCached<cr>",
       },
     },
-  },
-  {
-    "linux-cultist/venv-selector.nvim",
-    dependencies = {
-      "neovim/nvim-lspconfig",
-      "nvim-telescope/telescope.nvim",
-      "mfussenegger/nvim-dap-python",
+    config = {
+      function()
+        require("venv-selector").setup({
+
+          notify_user_on_activate = true,
+        })
+      end,
     },
-    -- dev = true,
-    enabled = true,
-    config = true,
-    event = "VeryLazy",
-    -- event = "VeryLazy", -- This is only needed if you want to run :VenvSelect without keymappings
-    -- config = {
-    -- 	function()
-    -- 		require("venv-selector").setup({
-    --
-    -- 			notify_user_on_activate = true,
-    -- 		})
-    -- 	end
-    keys = { {
-      "<localleader>v",
-      "<cmd>VenvSelect<cr>",
-    } },
   },
   {
     "zbirenbaum/copilot.lua",
@@ -497,29 +636,11 @@ return {
     "mrcjkb/haskell-tools.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim",
-      "akinsho/toggleterm.nvim",
     },
-    ft = { "haskell", "cabal" },
-    config = function()
-      require("haskell-tools").setup({
-        hls = {
-          on_attach = function()
-            require("pokerus.lsp").on_attach()
-          end,
-          settings = {
-            haskell = {
-              formattingProvider = "fourmolu",
-              plugin = {
-                stan = { globalOn = false },
-              },
-            },
-          },
-        },
-        repl = { handler = "toggleterm" },
-      })
-    end,
+    branch = "2.x.x", -- Recommended
+    ft = { "haskell", "lhaskell", "cabal", "cabalproject" },
   },
+
   -- Linting and Formatting
   {
     "nvimdev/guard.nvim",
@@ -557,7 +678,6 @@ return {
     end,
   },
 
-  { "simrat39/rust-tools.nvim" },
   { "NoahTheDuke/vim-just" },
   { "rafcamlet/nvim-luapad" },
   { -- This plugin
@@ -589,4 +709,33 @@ return {
     },
   },
   { "krady21/compiler-explorer.nvim" },
+  {
+    "j-hui/fidget.nvim",
+    tag = "legacy",
+    event = "LspAttach",
+    config = function()
+      require("fidget").setup()
+    end,
+  },
+
+  {
+    "saecki/crates.nvim",
+    event = { "BufRead Cargo.toml" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("crates").setup()
+
+      local cmp = require("cmp")
+      local config = cmp.get_config()
+      table.insert(config.sources, {
+        name = "buffer",
+        option = {
+          sources = {
+            { name = "conjure" },
+          },
+        },
+      })
+      cmp.setup(config)
+    end,
+  },
 }

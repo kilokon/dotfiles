@@ -252,3 +252,7 @@ bindkey -v
 bindkey '^a' beginning-of-line
 bindkey '^e' end-of-line
 bindkey '^[r' _atuin_search_widget
+
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}

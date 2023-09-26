@@ -60,13 +60,13 @@ end
 vim.g.rust_recommended_style = false
 vim.g.python3_host_prog = "/usr/bin/python3"
 
-if vim.fn.has("nvim-0.9") == 1 and not vim.opt.diff:get() then
-  vim.opt.signcolumn = "yes:1"
-elseif vim.fn.has("nvim-0.9") == 0 then
-  vim.opt.signcolumn = "number"
-end
-
-if vim.fn.has("nvim-0.9.0") == 1 then
-  vim.opt.splitkeep = "screen"
-  vim.opt.shortmess = "filnxtToOFWIcC"
-end
+-- if vim.fn.has("nvim-0.9") == 1 and not vim.opt.diff:get() then
+--   vim.opt.signcolumn = "yes:1"
+-- elseif vim.fn.has("nvim-0.9") == 0 then
+--   vim.opt.signcolumn = "number"
+-- end
+--
+-- if vim.fn.has("nvim-0.9.0") == 1 then
+--   vim.opt.splitkeep = "screen"
+--   vim.opt.shortmess = "filnxtToOFWIcC"
+-- end

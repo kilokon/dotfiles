@@ -1,22 +1,22 @@
 return {
+
   {
     "nvim-lualine/lualine.nvim",
     dependencies = {
-      "nvim-tree/nvim-web-devicons",
-      "onsails/lspkind-nvim",
-      "SmiteshP/nvim-navic",
+      { "nvim-tree/nvim-web-devicons" },
+      -- { "onsails/lspkind-nvim" },
     },
-    event = "VeryLazy",
-    -- lazy = false,
-    -- event = "UIEnter",
+    -- event = "VeryLazy",
+    lazy = false,
+    event = "UIEnter",
     -- priority = 999,
     config = function()
-      local navic = require("nvim-navic")
+      -- local navic = require("nvim-navic")
       -- local icons = require("lazyvim.config").icons
       require("lualine").setup({
         options = {
           fmt = string.lower,
-          icons_enabled = false,
+          icons_enabled = true,
           theme = "auto",
           component_separators = { left = "", right = "" },
           section_separators = { left = "", right = "" },
@@ -43,7 +43,29 @@ return {
             },
           },
           lualine_b = { "branch" },
-          lualine_c = { { navic.get_location, cond = navic.is_available }, "filename" },
+          lualine_c = {
+            -- {
+            --   "filetype",
+            --   icon_only = true,
+            --   padding = { left = 1, right = 0 },
+            -- },
+            -- "filename",
+            {
+              "navic",
+              icon = ">",
+              padding = 0,
+            },
+            -- {
+            --   function()
+            --     return navic.get_location()
+            --   end,
+            --   cond = function()
+            --     return navic.is_available()
+            --   end,
+            -- },
+            -- "filename",
+          },
+          -- lualine_c = { { navic.get_location, cond = navic.is_available }, "filename" },
           lualine_x = {
             -- 'diagnostics',
             {
@@ -69,15 +91,18 @@ return {
                 info = "DiagnosticInfo", -- Changes diagnostics' info color.
                 hint = "DiagnosticHint", -- Changes diagnostics' hint color.
               },
-              symbols = { error = "E", warn = "W", info = "I", hint = "H" },
+              -- symbols = { error = "E", warn = "W", info = "I", hint = "H" },
+              symbols = { error = "✖ ", warn = "❢ ", info = "𝓲 ", hint = " " },
+              padding = { left = 0, right = 1 },
               colored = true, -- Displays diagnostics status in color if set to true.
               update_in_insert = false, -- Update diagnostics in insert mode.
               always_visible = false, -- Show diagnostics even if there are none.
             },
           },
           lualine_y = { "location" },
+          lualine_z = {"filetype"},
           -- lualine_y = {},
-          lualine_z = { "filetype" },
+          -- lualine_z = { { "buffers", mode = 3 } },
         },
         inactive_sections = {
           lualine_a = {},
@@ -87,8 +112,21 @@ return {
           lualine_y = {},
           lualine_z = {},
         },
-        tabline = {},
-        winbar = {},
+        tabline = {
+          lualine_a = { "buffers" },
+          lualine_z = { "tabs" },
+        },
+        winbar = {
+          lualine_c = {
+            -- {
+            --   "navic",
+            --   color_correction = nil,
+            --   navic_opts = nil,
+            -- },
+          },
+          -- lualine_z = {'filename'},
+        },
+        -- winbar = {},
         inactive_winbar = {},
         extensions = {},
       })
@@ -126,6 +164,13 @@ return {
       })
     end,
   },
-  { "lewis6991/satellite.nvim" },
-  -- { "Bekaboo/dropbar.nvim" },
+  { "lewis6991/satellite.nvim" }, -- satellite.nvim is a Neovim plugin that displays decorated scrollbars.
+  { "echasnovski/mini.trailspace", version = false },
+  {
+    "echasnovski/mini.indentscope",
+    version = false,
+    config = function()
+      require("mini.indentscope").setup()
+    end,
+  },
 }

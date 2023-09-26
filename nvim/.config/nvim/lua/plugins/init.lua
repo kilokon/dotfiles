@@ -19,12 +19,12 @@ return {
   },
   {
     "mrjones2014/legendary.nvim",
-    -- since legendary.nvim handles all your keymaps/commands,
-    -- its recommended to load legendary.nvim before other plugins
+    --   -- since legendary.nvim handles all your keymaps/commands,
+    --   -- its recommended to load legendary.nvim before other plugins
     priority = 10000,
     lazy = false,
-    -- sqlite is only needed if you want to use frecency sorting
-    -- dependencies = { 'kkharji/sqlite.lua' }
+    --   -- sqlite is only needed if you want to use frecency sorting
+    dependencies = { "kkharji/sqlite.lua" },
   },
   {
     "folke/tokyonight.nvim",
@@ -37,9 +37,13 @@ return {
   },
   {
     "max397574/better-escape.nvim",
-    config = function()
-      require("better_escape").setup()
-    end,
+    event = "InsertCharPre",
+    opts = {
+      mapping = { "jk", "jj" },
+      timeout = vim.o.timeoutlen, -- the time in which the keys must be hit in ms. Use option timeoutlen by default
+      clear_empty_lines = false, -- clear line after escaping if there is only whitespace
+      keys = "<Esc>",
+    },
   },
   {
 
@@ -123,6 +127,40 @@ return {
       vim.o.foldlevelstart = 99
       vim.o.foldenable = true
     end,
+
+    opts = {
+      preview = {
+        mappings = {
+          scrollB = "<C-b>",
+          scrollF = "<C-f>",
+          scrollU = "<C-u>",
+          scrollD = "<C-d>",
+        },
+      },
+      provider_selector = function(_, filetype, buftype)
+        local function handleFallbackException(bufnr, err, providerName)
+          if type(err) == "string" and err:match("UfoFallbackException") then
+            return require("ufo").getFolds(bufnr, providerName)
+          else
+            return require("promise").reject(err)
+          end
+        end
+
+        -- only use indent until a file is opened
+        return (filetype == "" or buftype == "nofile") and "indent"
+          or function(bufnr)
+            return require("ufo")
+              .getFolds(bufnr, "lsp")
+              :catch(function(err)
+                return handleFallbackException(bufnr, err, "treesitter")
+              end)
+              :catch(function(err)
+                return handleFallbackException(bufnr, err, "indent")
+              end)
+          end
+      end,
+    },
+
     config = function()
       vim.keymap.set("n", "zR", require("ufo").openAllFolds)
       vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
@@ -175,70 +213,111 @@ return {
   {
     "yamatsum/nvim-cursorline",
   },
+  -- {
+  --   "tamago324/lir.nvim",
+  --   dependencies = {
+  --     -- { "kyazdani42/nvim-web-devicons" },
+  --     { "nvim-lua/plenary.nvim" },
+  --     {
+  --       "tamago324/lir-git-status.nvim",
+  --       config = function()
+  --         require("lir.git_status").setup({
+  --           show_ignored = false,
+  --         })
+  --       end,
+  --     },
+  --   },
+  --   init = function()
+  --     -- disable netrw
+  --     vim.g.loaded_netrw = 1
+  --     vim.g.loaded_netrwPlugin = 1
+  --
+  --     vim.api.nvim_create_autocmd({ "FileType" }, {
+  --       pattern = { "lir" },
+  --       callback = function()
+  --         -- use visual mode
+  --         vim.api.nvim_buf_set_keymap(
+  --           0,
+  --           "x",
+  --           "J",
+  --           ':<C-u>lua require"lir.mark.actions".toggle_mark("v")<CR>',
+  --           { noremap = true, silent = true }
+  --         )
+  --
+  --         -- echo cwd
+  --         -- vim.api.nvim_echo({ { vim.fn.expand("%:p"), "Normal" } }, false, {})
+  --       end,
+  --     })
+  --   end,
+  --   keys = {
+  --     { "<leader>L", ":lua require'lir.float'.toggle()<CR>", desc = "lir explorer" },
+  --   },
+  --   config = function()
+  --     -- local lir = require("lir")
+  --     local actions = require("lir.actions")
+  --     local marks = require("lir.mark.actions")
+  --     local clipboard = require("lir.clipboard.actions")
+  --     require("lir").setup({
+  --       mappings = {
+  --         ["<CR>"] = actions.tabedit,
+  --         ["vv"] = actions.vsplit,
+  --         ["q"] = actions.quit,
+  --         ["o"] = actions.mkdir,
+  --         ["<left>"] = actions.up,
+  --         ["<right>"] = actions.cd,
+  --         ["m"] = marks.toggle_mark,
+  --         ["cc"] = clipboard.copy,
+  --         ["cx"] = clipboard.cut,
+  --         ["cv"] = clipboard.paste,
+  --       },
+  --       hide_cursor = true,
+  --       float = {
+  --         winblend = 0,
+  --         win_opts = function()
+  --           return {
+  --             border = "single",
+  --             zindex = 46,
+  --           }
+  --         end,
+  --       },
+  --     })
+  --   end,
+  -- },
   {
-    "tamago324/lir.nvim",
-    dependencies = {
-      { "nvim-lua/plenary.nvim" },
-      {
-        "tamago324/lir-git-status.nvim",
-        config = function()
-          require("lir.git_status").setup({
-            show_ignored = false,
-          })
-        end,
-      },
-    },
-    init = function()
-      -- disable netrw
-      vim.g.loaded_netrw = 1
-      vim.g.loaded_netrwPlugin = 1
-
-      vim.api.nvim_create_autocmd({ "FileType" }, {
-        pattern = { "lir" },
-        callback = function()
-          -- use visual mode
-          vim.api.nvim_buf_set_keymap(
-            0,
-            "x",
-            "J",
-            ':<C-u>lua require"lir.mark.actions".toggle_mark("v")<CR>',
-            { noremap = true, silent = true }
-          )
-
-          -- echo cwd
-          vim.api.nvim_echo({ { vim.fn.expand("%:p"), "Normal" } }, false, {})
-        end,
-      })
+    "luukvbaal/nnn.nvim",
+    lazy = false,
+    cond = function()
+      local buf = vim.api.nvim_buf_get_name(0)
+      return buf == "" or vim.fn.isdirectory(buf)
     end,
     keys = {
-      { "<leader>L", ":lua require'lir.float'.toggle()<CR>", desc = "lir explorer" },
+      { "<leader>nn", "<cmd>NnnPicker<CR>" },
+      { "<leader>ne", "<cmd>NnnExplorer<CR>" },
     },
     config = function()
-      -- local lir = require('lir')
-      local actions = require("lir.actions")
-      local marks = require("lir.mark.actions")
-      local clipboard = require("lir.clipboard.actions")
-      require("lir").setup({
+      local nnn = require("nnn")
+      nnn.setup({
+        explorer = { side = "topleft", tabs = true },
+        picker = { style = { border = "rounded" } },
+        replace_netrw = "explorer",
+        windownav = { left = "<C-h>", right = "<C-l>" },
+        auto_open = { setup = "explorer", tabpage = "explorer", empty = true },
+        auto_close = true,
+        offset = true,
+        quitcd = "tcd",
         mappings = {
-          ["q"] = actions.quit,
-          ["o"] = actions.mkdir,
-          ["m"] = marks.toggle_mark,
-          ["cc"] = clipboard.copy,
-          ["cx"] = clipboard.cut,
-          ["cv"] = clipboard.paste,
-        },
-        float = {
-          winblend = 0,
-          win_opts = function()
-            return {
-              border = "single",
-              zindex = 46,
-            }
-          end,
+          { "<C-t>", nnn.builtin.open_in_tab }, -- open file(s) in tab
+          { "<C-s>", nnn.builtin.open_in_split }, -- open file(s) in split
+          { "<C-v>", nnn.builtin.open_in_vsplit }, -- open file(s) in vertical split
+          { "<C-y>", nnn.builtin.copy_to_clipboard }, -- copy file(s) to clipboard
+          { "<C-w>", nnn.builtin.cd_to_path }, -- cd to file directory
+          { "<C-p>", nnn.builtin.open_in_preview }, -- open file in preview split keeping nnn focused
+          { "<C-e>", nnn.builtin.populate_cmdline }, -- populate cmdline (:) with file(s)
         },
       })
     end,
   },
+
   {
     "ggandor/flit.nvim",
     event = "VeryLazy",

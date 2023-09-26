@@ -13,7 +13,6 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
-helpers.apply_to_config(config)
 
 config.default_prog = { "/usr/bin/zsh", "-l" }
 config.default_cursor_style = "SteadyBar"
@@ -78,6 +77,7 @@ config.underline_position = -2.0
 --   end
 -- )
 
+-- helpers.apply_to_config(config)
 wezterm.log_info("hellos")
 
 return config
