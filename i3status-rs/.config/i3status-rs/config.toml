@@ -4,7 +4,6 @@ theme = "srcery"
 [icons]
 icons = "awesome6"
 
-
 [[block]]
 block = "disk_space"
 info_type = "available"
@@ -78,9 +77,9 @@ hue_shifter = "redshift"
 step = 50
 click_temp = 3500
 
-[[block]]
-block = "net"
-format = " $icon {$signal_strength} "
+# [[block]]
+# block = "net"
+# format = " $icon {$signal_strength} "
 
 [[block]]
 block = "time"

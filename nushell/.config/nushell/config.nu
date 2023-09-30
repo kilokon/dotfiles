@@ -1,4 +1,10 @@
 # Nushell Config File
+# export def build-prompt [] {
+#     let prompt = (starship prompt --cmd-duration $env.CMD_DURATION_MS $'--status=($env.LAST_EXIT_CODE)')
+#     echo $prompt
+# }
+#
+# PROMPT_COMMAND: { build-prompt }
 
 $env.config = ($env.config? | default {} | merge {
     ls: {
@@ -149,22 +155,6 @@ $env.config.keybindings = [
 
 
 
-
-# def create_left_prompt [] {
-#     ^starship prompt --cmd-duration $env.CMD_DURATION_MS $'--status=($env.LAST_EXIT_CODE)'
-# }
-
-# $env.PROMPT_COMMAND = { create_left_prompt }
-
-# # avoid same PROMPT_INDICATOR
-# $env.PROMPT_INDICATOR = { "" }
-# $env.PROMPT_INDICATOR_VI_INSERT = { ": " }
-# $env.PROMPT_INDICATOR_VI_NORMAL = { "〉" }
-# $env.PROMPT_MULTILINE_INDICATOR = { "::: " }
-
-
-
-
 alias :q = exit
 
 
@@ -187,7 +177,7 @@ source npm-completions.nu
 source typst-completions.nu
 source zoxide-menu.nu
 source run-c-cpp.nu
-source activate.nu
+# source activate.nu
 
 # Utilities
 source ~/.config/nushell/scripts/unit-conversions.nu
@@ -200,10 +190,10 @@ source ~/.config/nushell/scripts/create_project.nu
 
 
 # Load the starship prompt
-source ~/.cache/starship/init.nu
+# source ~/.cache/starship/init.nu
 
 # Load the zoxide shell integration
 source ~/.cache/.zoxide.nu
 
 # Load atuin shell integration
-# source ~/.local/share/atuin/init.nu
+source ~/.cache/atuin/init.nu

@@ -101,4 +101,5 @@ ex ()
 
 eval "$(pyenv virtualenv-init -)"
 
-[ -f "/home/aviik/.ghcup/env" ] && source "/home/aviik/.ghcup/env" # ghcup-env
+[ -f "/home/aviik/.ghcup/env" ] && source "/home/aviik/.ghcup/env" # ghcup-env[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
+eval "$(atuin init bash)"

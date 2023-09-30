@@ -1,9 +1,9 @@
 local function map(mode, lhs, rhs, opts)
-  local options = { noremap = true, silent = true }
-  if opts then
-    options = vim.tbl_extend("force", options, opts)
-  end
-  vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+	local options = { noremap = true, silent = true }
+	if opts then
+		options = vim.tbl_extend("force", options, opts)
+	end
+	vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
 local opts = { noremap = true, silent = true }
@@ -12,9 +12,15 @@ local opts_x = { expr = true, silent = true }
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
--- Move by visible lines, fixes annoying behavior on wrapped lines
--- vim.api.nvim_set_keymap({ "n", "x" }, "j", [[v:count == 0 ? 'gj' : 'j']], { expr = true })
--- map({ "n", "x" }, "k", [[v:count == 0 ? 'gk' : 'k']], { expr = true })
+map("n", "<left>", "<Nop>", opts)
+map("n", "<right>", "<Nop>", opts)
+map("n", "<up>", "<Nop>", opts)
+map("n", "<down>", "<Nop>", opts)
+
+map("i", "<left>", "<Nop>", opts)
+map("i", "<right>", "<Nop>", opts)
+map("i", "<up>", "<Nop>", opts)
+map("i", "<down>", "<Nop>", opts)
 
 -- ^ is nuts
 map("n", "H", "^")
@@ -31,8 +37,8 @@ map("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "Previous Buffer" })
 
 -- Move to start/end on line in command mode
-map("c", "<C-a>", "<home>", { desc = "Move to end of line" })
-map("c", "<C-e>", "<end>", { desc = "Move to begining of line" })
+map("i", "<C-a>", "<home>", { desc = "Move to end of line" })
+map("i", "<C-e>", "<end>", { desc = "Move to begining of line" })
 
 -- Fix common mistypes in command mode
 map("c", "Q", "q", { desc = "Always write q" })
@@ -51,22 +57,17 @@ map("n", "j", "v:count==0 ? 'gj' : 'j'", opts_x)
 map("n", "k", "v:count==0 ? 'gk' : 'k'", opts_x)
 
 -- buffers
-map(
-  "n",
-  "<leader>bb",
-  "<cmd>lua require('telescope.builtin').buffers()<CR>",
-  { desc = "Switcg Buffers" }
-)
+map("n", "<leader>bb", "<cmd>lua require('telescope.builtin').buffers()<CR>", { desc = "Switcg Buffers" })
 
 map(
-  "n",
-  "<C-s>",
-  ':w<CR>:lua vim.notify(string.format("Saved %s", vim.fn.expand("%:t")), "info")<CR>',
-  { silent = true }
+	"n",
+	"<C-s>",
+	':w<CR>:lua vim.notify(string.format("Saved %s", vim.fn.expand("%:t")), "info")<CR>',
+	{ silent = true }
 )
 map(
-  "i",
-  "<C-s>",
-  '<esc>:w<CR>:lua vim.notify(string.format("Saved %s", vim.fn.expand("%:t")), "info")<CR>',
-  { silent = true }
+	"i",
+	"<C-s>",
+	'<esc>:w<CR>:lua vim.notify(string.format("Saved %s", vim.fn.expand("%:t")), "info")<CR>',
+	{ silent = true }
 )

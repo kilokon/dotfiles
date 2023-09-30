@@ -9,8 +9,11 @@
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
+# setting mod1 to windows button
 set $mod Mod4
+# setting sup as the alt button
 set $sup Mod1
+
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
 font pango:monospace 8
@@ -37,27 +40,71 @@ exec --no-startup-id nm-applet
 # redshift &
 exec_always --no-startup-id i3-layouts
 
+
+
+
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
+for_window [class=".*"] border pixel 2
+# gaps inner 7px
+gaps inner 3
+# #
+smart_gaps on
+smart_gaps inverse_outer
+#
+smart_borders on
+smart_borders no_gaps
+# for_window [class="wezterm"] floating enable, border pixel 3
+# for_window [class="wezterm"]  border pixel 3
+# for_window [title="Alacritty"] border pixel 3
+# for_window [class="firefox"] border pixel 3
 
-gaps outer 7px
-gaps inner 7px
+
+# handling minor ui widgets
+for_window [window_role="About"] floating enable
+for_window [window_role="Organizer"] floating enable
+for_window [window_role="Preferences"] floating enable
+for_window [window_role="bubble"] floating enable
+for_window [window_role="page-info"] floating enable
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [window_role="toolbox"] floating enable
+for_window [window_role="webconsole"] floating enable
+for_window [window_type="dialog"] floating enable
+for_window [window_type="menu"] floating enable
+# Blender Render
 
 
-for_window [class="wezterm"] floating enable, border pixel 3
-for_window [title="Alacritty"] border pixel 3
-for_window [class="firefox"] border pixel 3
 
-#make VS code floating and borderless
+
+
+for_window [title="Hello*"] floating enable, border pixel 3
+for_window [title="Vulkan*"] floating enable
+for_window [title="Bevy*"] floating enable, border pixel 3
+for_window [class="feh"] floating enable, border pixel 3
+for_window [class="love"] floating enable, border pixel 3
 for_window [class="code-oss"] floating enable, border pixel 1
+for_window [title="Blender Preferences"] floating enable, border pixel 3
+for_window [title="Bevy App"] floating enable
+for_window [title="winit window"] floating enable
+for_window [title="GlslViewer"] floating enable
+for_window [title="vfxpr_gui"] floating enable
+for_window [title="tdrop wezterm"] floating enable
+for_window [class="Aseprite"] floating enable, border none
+for_window [title="Blender Render"] floating enable
+for_window [title="*Viewport*"] floating enable
+for_window [title="Viewport"] floating enable
+for_window [title="NodeGraph"] floating enable
+# for_window [instance="tabme"] move window to mark target
+#make VS code floating and borderless
 
-# for_window [class = "microsoft-edge-dev"] border pixel 3
+
+
 # move tiling windows via drag & drop by left-clicking into the title bar,
 # or left-clicking anywhere into the window while holding the floating modifier.
 tiling_drag modifier titlebar
 
 # start a terminal
-# bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Return exec wezterm 
 
 # kill focused window
@@ -80,7 +127,7 @@ bindsym $mod+p exec --no-startup-id rofi -show drun
 # bindsym XF86AudioRaiseVolume exec amixer -q set Master 2dB+ unmute
 # bindsym XF86AudioLowerVolume exec amixer -q set Master 2dB- unmute
 # bindsym XF86AudioMute exec amixer -q set Master toggle
-
+bindsym --release Print exec scrot -s '%Y-%m-%d-%H.%M.%S.png' -e 'mv $f ~/OneDrive/scr-prnt/hq'
 
 # change focus
 bindsym $mod+j focus left
@@ -107,8 +154,8 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 # bindsym $mod+Shift+semicolon move container to output HDMI-1
 # bindsym $mod+Shift+period move container to DP-0
-bindsym $mod+x move container to output HDMI-0 DP-0
-bindsym $mod+z focus output HDMI-0 DP-0
+bindsym $mod+x move container to output DP-2 DP-0
+bindsym $mod+z focus output DP-2 DP-0
 
 # split in horizontal orientation
 bindsym $mod+h split h
@@ -136,14 +183,7 @@ bindsym $mod+space focus mode_toggle
 bindsym $mod+a focus parent
 #
 # # focus the child container
-# bindsym $mod+] focus child
-for_window [title="Bevy App"] floating enable
-for_window [title="winit window"] floating enable
-for_window [title="GlslViewer"] floating enable
-for_window [title="vfxpr_gui"] floating enable
-for_window [title="tdrop wezterm"] floating enable
-# for_window [class="Aseprite"] floating enable
-for_window [class="Aseprite"] floating enable, border none
+# bindsym $mod+ focus child
 
 
 popup_during_fullscreen smart
@@ -161,9 +201,9 @@ set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
 
-assign [class="microsoft-edge-dev"] 3
-assign [class="code-oss"] 2
-assign [title="nvim"] 2
+# assign [class="microsoft-edge-dev"] 3
+# assign [class="code-oss"] 2
+# assign [title="nvim"] 2
 
 
 # switch to workspace
@@ -192,16 +232,12 @@ bindsym $mod+Shift+0 move container to workspace number $ws10
 
 # set $i3l vstack to workspace $ws1
 # set $i3l hstack 0.6 up to workspace $ws2
-# set $i3l spiral 0.6 to workspace $ws3
-# set $i3l 3columns 0.66 0.5 2 left to workspace $ws4
 # set $i3l 2columns right to workspace $ws5
 # set $i3l companion 0.3 0.4 up to workspace $ws6
 # set $i3l autosplit to workspace $ws7
 
-set $i3l autosplit to workspace $ws1
-set $i3l hstack 0.7 up to workspace $ws3
-set $i3l spiral 0.6 up to workspace $ws2
-set $i3l autosplit to workspace $ws4
+set $i3l spiral 0.6 to workspace number $ws1
+set $i3l 3columns 0.66 0.5 2 left to workspace $ws2
 
 # move $ws3 to output DP-1
 
@@ -220,13 +256,18 @@ bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 
+# Monitor Specific Start-Up
+workspace 1 output primary
+workspace 2 output nonprimary
+
+
+
 
 
 bindsym $mod+Shift+w exec "feh --bg-fill --randomize ~/.config/wallpapers/* ~/.config/wallpapers/*" 
 
 exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/microsoft-edge-dev; workspace 2; exec wezterm'
 
-for_window [instance="tabme"] move window to mark target
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -265,7 +306,7 @@ bindsym $mod+r mode "resize"
 bar {
     font pango:Source Code Pro, FontAwesome 12
     position top
-    output nonprimary
+    output primary
     status_command i3status-rs $HOME/.config/i3status-rs/config.toml
     colors {
         separator #666666
@@ -277,3 +318,5 @@ bar {
         urgent_workspace #2f343a #900000 #ffffff
     }
 }
+
+
