@@ -5,5 +5,5 @@ sync:
 	nvim --headless "+Lazy! sync" +qa
 
 format:
-	#!/usr/bin/env fish
+	#!/usr/bin/env bash
 	stylua lua/**.lua
