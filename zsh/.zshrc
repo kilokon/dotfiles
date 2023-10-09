@@ -71,8 +71,10 @@ autoload -U colors && colors
 # Globals ========================================================
 # -----------------------------
 
-export EDITOR="nvim"
-export VISUAL="nvim"
+# export EDITOR="nvim"
+# export VISUAL="nvim"
+EDITOR=emacsclient
+GIT_EDITOR=$EDITOR
 export STARSHIP_CONFIG=~/.config/zsh_starship.toml
 export BROWSER="microsoft-edge-dev"
 
@@ -107,8 +109,8 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias dev="cd $HOME/Dev/"
 alias gg="emacsclient -c -e '(magit-status)'" # magit
-# alias emacs="emacsclient -t"
-# alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
+alias emacn="emacsclient -nw"
+alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
 #alias emacs="emacs -nw"
 # alias emacs29="emacs -nw --init-directory ~/dotfiles/emacs/emacs29"
 # alias hx="helix"
@@ -260,3 +262,23 @@ bindkey '^[r' _atuin_search_widget
 mkcd() {
   mkdir -p "$1" && cd "$1"
 }
+
+# Emacs modifications
+if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+    alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
+    echo "in emacs"
+fi
+
+# emacs M-x shell
+if [[ "dumb" == $TERM ]] ; then
+  alias l='cat'
+  alias less='cat'
+  alias m='cat'
+  alias more='cat'
+  export PAGER=cat
+  export TERM=xterm-256color
+else
+  alias l='less'
+  alias m='more'
+  fi
+[[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ '

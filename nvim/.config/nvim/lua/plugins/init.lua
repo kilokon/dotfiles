@@ -17,16 +17,16 @@ return {
 		-- require("plugins.keymaps")
 		-- end,
 	},
-	{
-		"mrjones2014/legendary.nvim",
-		--   -- since legendary.nvim handles all your keymaps/commands,
-		--   -- its recommended to load legendary.nvim before other plugins
-		priority = 10000,
-		lazy = false,
-		enabled = false,
-		--   -- sqlite is only needed if you want to use frecency sorting
-		dependencies = { "kkharji/sqlite.lua" },
-	},
+  --	{
+	-- 	"mrjones2014/legendary.nvim",
+	-- 	--   -- since legendary.nvim handles all your keymaps/commands,
+	-- 	--   -- its recommended to load legendary.nvim before other plugins
+	-- 	priority = 10000,
+	-- 	lazy = false,
+	-- 	enabled = false,
+	-- 	--   -- sqlite is only needed if you want to use frecency sorting
+	-- 	dependencies = { "kkharji/sqlite.lua" },
+	-- },
 	{
 		"folke/tokyonight.nvim",
 		lazy = false, -- make sure we load this during startup if it is your main colorscheme
@@ -63,6 +63,9 @@ return {
 		opts = {
 			--Config goes here
 		},
+	},
+	{
+		"abecodes/tabout.nvim",
 	},
 	--
 	--

@@ -126,6 +126,7 @@ return {
 					-- { name = "conjure" },
 				},
 				completion = {
+          keyword_length = 2,
 					-- autocomplete = true
 					completeopt = "menu,menuone,noinsert",
 				},
@@ -326,6 +327,7 @@ return {
 
 			require("mason-lspconfig").setup({
 				ensure_installed = {
+					-- "ccls",
 					"clangd",
 					"fennel_language_server",
 					-- "hls",
@@ -454,6 +456,21 @@ return {
 						})
 					end,
 
+					-- ccls = function()
+					-- 	require("lspconfig").ccls.setup({
+					-- 		cmd = { "ccls" },
+					-- 		init_options = {
+					-- 			compilationDatabaseDirectory = "build",
+					-- 			index = {
+					-- 				threads = 0,
+					-- 			},
+					-- 			clang = {
+					-- 				excludeArgs = { "-frounding-math" },
+					-- 			},
+					-- 		},
+					-- 	})
+					-- end,
+
 					-- CMake File LSP
 					neocmake = function()
 						require("lspconfig").neocmake.setup({
@@ -498,12 +515,7 @@ return {
 					},
 				},
 			},
-			-- {
-			-- 	"jay-babu/mason-nvim-dap.nvim",
-			-- 	dependencies = { "nvim-dap" },
-			-- 	cmd = { "DapInstall", "DapUninstall" },
-			-- 	opts = { handlers = {} },
-			-- },
+
 			{
 				"rcarriga/nvim-dap-ui",
 				opts = { floating = { border = "rounded" } },
@@ -520,8 +532,6 @@ return {
 					end
 					dapui.setup(opts)
 				end,
-				-- opts = { floating = { border = "rounded" } },
-				-- config = require("plugins.configs.nvim-dap-ui"),
 			},
 			{
 				"rcarriga/cmp-dap",
@@ -539,10 +549,20 @@ return {
 						},
 					})
 				end,
-				-- dependencies = { "nvim-cmp" },
-				-- config = require("plugins.configs.cmp-dap"),
 			},
 		},
+		config = function()
+			local sign = vim.fn.sign_define
+
+			sign("dapbreakpoint", { text = "●", texthl = "dapbreakpoint", linehl = "", numhl = "" })
+			sign("dapbreakpointcondition", { text = "●", texthl = "dapbreakpointcondition", linehl = "", numhl = "" })
+			sign("daplogpoint", { text = "◆", texthl = "daplogpoint", linehl = "", numhl = "" })
+			sign("dapstopped", { text = "", texthl = "diagnosticwarn" })
+			sign("dapbreakpoint", { text = "", texthl = "diagnosticinfo" })
+			sign("dapbreakpointrejected", { text = "", texthl = "diagnosticerror" })
+			-- sign("dapbreakpointcondition", { text = "", texthl = "diagnosticinfo" })
+			-- sign("daplogpoint", { text = ".>", texthl = "diagnosticinfo" })
+		end,
 	},
 	--
 	-- {
@@ -572,18 +592,18 @@ return {
 	-- 		{ "jbyuki/one-small-step-for-vimkind" },
 	-- 	},
 	-- 	config = function(_, _)
-	-- 		vim.fn.sign_define("DapStopped", { text = "", texthl = "DiagnosticWarn" })
-	-- 		vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DiagnosticInfo" })
-	-- 		vim.fn.sign_define("DapBreakpointRejected", { text = "", texthl = "DiagnosticError" })
-	-- 		vim.fn.sign_define("DapBreakpointCondition", { text = "", texthl = "DiagnosticInfo" })
-	-- 		vim.fn.sign_define("DapLogPoint", { text = ".>", texthl = "DiagnosticInfo" })
+	-- 		vim.fn.sign_define("dapstopped", { text = "", texthl = "diagnosticwarn" })
+	-- 		vim.fn.sign_define("dapbreakpoint", { text = "", texthl = "diagnosticinfo" })
+	-- 		vim.fn.sign_define("dapbreakpointrejected", { text = "", texthl = "diagnosticerror" })
+	-- 		vim.fn.sign_define("dapbreakpointcondition", { text = "", texthl = "diagnosticinfo" })
+	-- 		vim.fn.sign_define("daplogpoint", { text = ".>", texthl = "diagnosticinfo" })
 	--
-	-- 		-- Catppuccin
+	-- 		-- catppuccin
 	-- 		local sign = vim.fn.sign_define
 	--
-	-- 		sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
-	-- 		sign("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
-	-- 		sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
+	-- 		sign("dapbreakpoint", { text = "●", texthl = "dapbreakpoint", linehl = "", numhl = "" })
+	-- 		sign("dapbreakpointcondition", { text = "●", texthl = "dapbreakpointcondition", linehl = "", numhl = "" })
+	-- 		sign("daplogpoint", { text = "◆", texthl = "daplogpoint", linehl = "", numhl = "" })
 	-- 	end,
 	-- },
 	-- {
