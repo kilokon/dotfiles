@@ -10,7 +10,7 @@
 (defalias 'list-buffers 'ibuffer-other-window)
 
 ;; (setq make-backup-files nil)
-(defvar elpaca-installer-version 0.5)
+(defvar elpaca-installer-version 0.6)
 (defvar elpaca-directory
   (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory
@@ -102,17 +102,22 @@
 
 ;; Block until current queue processed.
 (elpaca-wait)
-(message "loaded elpaca basics")
+;; (message "loaded elpaca basics")
 
 ;; (setq-default display-line-numbers 'visual
 ;;               display-line-numbers-widen t
 ;;               ;; this is the default
 ;;               display-line-numbers-current-absolute t)
 
-
 ;;;;;;;;;;;;;;
-;; KEYBOARD ;;
+;; SETUP.EL ;;
 ;;;;;;;;;;;;;;
+(use-package
+ setup
+ :elpaca (:type git :host sourcehut :repo "pkal/setup"))
+;; ;;;;;;;;;;;;;;
+;; ;; KEYBOARD ;;
+;; ;;;;;;;;;;;;;;
 (use-package which-key :config (which-key-mode))
 
 
@@ -168,6 +173,8 @@
  (major-mode-hydra :host github :repo "jerrypnz/major-mode-hydra.el")
  :bind ("M-SPC" . major-mode-hydra))
 
+(use-package pretty-hydra :demand t)
+
 (use-package
  diminish
  :demand t
@@ -196,32 +203,67 @@
  :preface
  (defun my-display-numbers-hook ()
    (display-line-numbers-mode t))
+ (defun crm-indicator (args)
+   (cons
+    (format "[CRM%s] %s"
+            (replace-regexp-in-string
+             "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" "" crm-separator)
+            (car args))
+    (cdr args)))
  :hook
- (prog-mode . electric-pair-mode)
- (prog-mode . my-display-numbers-hook)
- ;; :general
- ;; ('normal "gcc" 'comment-line)
- ;; ('visual "gc" 'comment-or-uncomment-region)
- ;; ('insert "C-V" 'yank) 
- ;; :hook
- ;; ( prog-mode . display-line-numbers-mode)
+ ((prog-mode . electric-pair-mode)
+  (prog-mode . my-display-numbers-hook)
+  (minibuffer-setup . cursor-intangible-mode))
+ :custom
+ ;;; remember recent files
+ (recentf-exclude
+  '( ;; Compressed files & Archives
+    "\\.tar$"
+    "\\.tbz2$"
+    "\\.tbz$"
+    "\\.tgz$"
+    "\\.bz2$"
+    "\\.bz$"
+    "\\.gz$"
+    "\\.gzip$"
+    "\\.xz$"
+    "\\.zpaq$"
+    "\\.lz$"
+    "\\.lrz$"
+    "\\.lzo$"
+    "\\.lzma$"
+    "\\.shar$"
+    "\\.kgb$"
+    "\\.zip$"
+    "\\.Z$"
+    "\\.7z$"
+    "\\.rar$"
+    ;; TRAMP
+    "^/sudo:"
+    "^/ssh:"
+    ;; Emacs-Everywhere
+    "/tmp/emacs-everywhere"))
+ ;;; remember cursor location
  :config
- ;; (tab-bar-mode 1)
- ;; (setq-default display-line-numbers 'visual
- ;;             display-line-numbers-widen t
- ;;             ;; this is the default
- ;;             display-line-numbers-current-absolute t)
+ (recentf-mode 1)
+ (save-place-mode 1)
+ ;;Vertico
+ (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
  ;; corfu
  (setq completion-cycle-threshold 3)
  (setq read-extended-command-predicate
        #'command-completion-default-include-p)
  (delete-selection-mode 1)
+ ;; (setq recentf-max-menu-items 30)
+ (setq recentf-max-saved-items 200)
+ (setq save-place-forget-unreadable-files nil)
  (setq
   ring-bell-function #'ignore
   confirm-kill-processes nil ;; disable confirmation to kill processes on Emacs exit
   ;; display-line-numbers-type 'relative
   inhibit-startup-screen t
   completion-cycle-threshold 3
+  enable-recursive-minibuffers t
   warning-minimum-level
   :error)
  (setq-default
@@ -229,10 +271,9 @@
   ;; Show stray whitespace.
   show-trailing-whitespace t
   indicate-empty-lines t
-  indicate-buffer-boundaries 'left
-  ;; minibuffer
-  enable-recursive-minibuffers t
-  kill-buffer-query-functions nil)
+  indicate-buffer-boundaries 'left)
+ ;; minibuffer
+ ;; kill-buffer-query-functions nil)
  ;; Search back/forth for the symbol at point
  ;; See http://www.emacswiki.org/emacs/SearchAtPoint
  (defun isearch-yank-symbol ()
@@ -267,12 +308,121 @@
 ;;  '(line-number-current-line ((t :weight bold :foreground "goldenrod"))))
 
 ;; do not allow the cursor in the minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+;; (setq minibuffer-prompt-properties
+;;       '(read-only t cursor-intangible t face minibuffer-prompt))
+;; (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
 ;; don't need to confirm to revert buffer
-(setq revert-without-query t)
+;; (setq revert-without-query t)
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;; INBUILT FUNCTIONS ;;
+;;;;;;;;;;;;;;;;;;;;;;;
+(use-package
+ no-littering
+ :elpaca
+ (no-littering
+  :type git
+  :host github
+  :repo "emacscollective/no-littering")
+ :config
+ (add-to-list
+  'recentf-exclude
+  (recentf-expand-file-name no-littering-var-directory))
+ (add-to-list
+  'recentf-exclude
+  (recentf-expand-file-name no-littering-etc-directory)))
+
+;;;;;;;;;;;;;;;;
+;; DIRED ;;
+;;;;;;;;;;;
+
+(use-package dired :elpaca nil)
+
+(use-package
+ dired-x
+ :elpaca nil
+ :requires (dired)
+ :preface
+ (defun dired-external-launch (application extensions)
+   "External `APPLICATION' used for launching specific file-extensions."
+   (let ((pattern (concat "\\." (regexp-opt extensions t) "$"))
+         (entry (list pattern application)))
+     (add-to-list 'dired-guess-shell-alist-user entry)))
+ :custom
+ (dired-external-launch
+  (if (eq system-type 'gnu/linux)
+      "mpv"
+    "xdg-open")
+  '("avi"
+    "flv"
+    "mkv"
+    "mov"
+    "mp3"
+    "mp4"
+    "mpeg"
+    "mpg"
+    "ogg"
+    "ogm"
+    "wav"
+    "wmv"))
+
+ (dired-external-launch
+  (if (eq system-type 'gnu/linux)
+      "libreoffice"
+    "xdg-open")
+  '("doc" "docx" "odt" "xls" "xlsx")))
+
+;; Different syntax highlighting for directories
+(use-package
+ diredfl
+ :hook ((dired-mode dirvish-directory-view-mode) . diredfl-mode)
+ :custom-face (diredfl-dir-name ((t :bold t))))
+
+;; Alternative frontend for dired
+(use-package
+ dirvish
+ :commands (dirivish-side)
+ :hook (dired-mode . dirvish-side-follow-mode)
+ :bind
+ (("C-c f" . dirvish-side)
+  :map
+  dirvish-mode-map
+  ("a" . dirvish-quick-access)
+  ("f" . dirvish-file-info-menu)
+  ("y" . dirvish-yank-menu)
+  ("N" . dirvish-narrow)
+  ("^" . dirvish-history-last)
+  ("h" . dirvish-history-jump)
+  ("s" . dirvish-quicksort)
+  ("v" . dirvish-vc-menu)
+  ("TAB" . dirvish-subtree-toggle)
+  ("M-f" . dirvish-history-go-forward)
+  ("M-b" . dirvish-history-go-backward)
+  ("M-l" . dirvish-ls-switches-menu)
+  ("M-m" . dirvish-mark-menu)
+  ("M-t" . dirvish-layout-toggle)
+  ("M-s" . dirvish-setup-menu)
+  ("M-e" . dirvish-emerge-menu)
+  ("M-j" . dirvish-fd-jump))
+ :config (dirvish-override-dired-mode +1)
+ :custom
+ (dirvish-side-width 30)
+ (dirvish-use-header-line t)
+ (dirvish-fd-default-dir "~/")
+ (dirvish-quick-access-entries
+  '(("h" "~/" "Home")
+    ("d" "~/Downloads/" "Downloads")
+    ("m" "~/Library/unexplored" "Library")
+    ("t" "~/.local/share/Trash/files/" "Trash")))
+ (dirvish-mode-line-format
+  '(:left (sort symlink) :right (omit yank index)))
+ (dirvish-attributes
+  '(nerd-icons
+    file-time file-size collapse subtree-state vc-state git-msg))
+ (dired-listing-switches
+  "-l --almost-all --human-readable --group-directories-first --no-group"))
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; GLYPHS AND ICONS ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -335,7 +485,7 @@
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 
 
-(message "loaded emacs icons")
+;; (message "loaded emacs icons")
 
 
 (use-package
@@ -364,32 +514,14 @@
  (load-theme 'doom-tokyo-night t))
 
 
-;; Must be used *after* the theme is loaded
-;; (custom-set-faces
-;;  `(font-lock-comment-face ((t (:background unspecified)))))
-
-
-;; (message "loaded doom-themes")
-
-
 ;;;;;;;;;;;;;;;;;
 ;; PARENTHESIS ;;
 ;;;;;;;;;;;;;;;;;
 
 
-(use-feature paren
-  :defer 1
-  :config (show-paren-mode))
-
-
-(use-package
- undo-tree
- :init (global-undo-tree-mode 1)
- :config (setq undo-tree-show-minibuffer-help t))
-
-
 (use-package
  zoxide
+ ;; :disabled t
  :elpaca (zoxide :fetcher gitlab :repo "Vonfry/zoxide.el")
  :general
  ("C-c z" 'dired-jump-with-zoxide)
@@ -412,15 +544,57 @@
   centaur-tabs-style "bar"
   centaur-tabs-height 32
   centaur-tabs-set-icons t)
- :bind
- ("C-<prior>" . centaur-tabs-backward)
- ("C-<next>" . centaur-tabs-forward)
- ;; :general
- ;; ('normal "g t" 'centaur-tabs-forward)
- ;; ('normal "g T" 'centaur-tabs-backward)
- )
+ (setq uniquify-buffer-name-style 'forward)
+;;  (defun centaur-tabs-buffer-groups ()
+;;    "`centaur-tabs-buffer-groups' control buffers' group rules.
 
-(message "loaded tabs")
+;; Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+;; All buffer name start with * will group to \"Emacs\".
+;; Other buffer group by `centaur-tabs-get-group-name' with project name."
+;;    (list
+;;     (cond
+;;      ;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+;;      ;; "Remote")
+;;      ((or (string-equal "*" (substring (buffer-name) 0 1))
+;;           (memq
+;;            major-mode
+;;            '(magit-process-mode
+;;              magit-status-mode
+;;              magit-diff-mode
+;;              magit-log-mode
+;;              magit-file-mode
+;;              magit-blob-mode
+;;              magit-blame-mode)))
+;;       "Emacs")
+;;      ((derived-mode-p 'prog-mode)
+;;       "Editing")
+;;      ((derived-mode-p 'dired-mode)
+;;       "Dired")
+;;      ((memq major-mode '(helpful-mode help-mode))
+;;       "Help")
+;;      ((memq
+;;        major-mode
+;;        '(org-mode
+;;          org-agenda-clockreport-mode
+;;          org-src-mode
+;;          org-agenda-mode
+;;          org-beamer-mode
+;;          org-indent-mode
+;;          org-bullets-mode
+;;          org-cdlatex-mode
+;;          org-agenda-log-mode
+;;          diary-mode))
+;;       "OrgMode")
+;;      (t
+;;       (centaur-tabs-get-group-name (current-buffer))))))
+ :bind
+ ;; ("C-<prior>" . centaur-tabs-backward)
+ ;; ("C-<next>" . centaur-tabs-forward)
+ :general
+ ('normal "g t" 'centaur-tabs-forward)
+ ('normal "g T" 'centaur-tabs-backward))
+
+;; (message "loaded tabs")
 ;;;;;;;;;;
 ;; CRUX ;;
 ;;;;;;;;;;
@@ -451,14 +625,6 @@
  (set-face-background 'highlight-indent-guides-even-face "dimgray")
  (set-face-foreground
   'highlight-indent-guides-character-face "dimgray"))
-
-
-;;;;;;;;;;;;;;;
-;; RYO-MODAL ;;
-;;;;;;;;;;;;;;;
-;; (use-package misc
-;; :ensure t
-;; :commands forward-to-word)
 
 
 ;; Taken from http://endlessparentheses.com/emacs-narrow-or-widen-dwim.html
@@ -500,10 +666,7 @@ is already narrowed."
  :elpaca (selected :host github :repo "Kungsgeten/selected.el"))
 
 
-(use-package
- phi-search
- :bind (("C-s" . phi-search) ("C-r" . phi-search-backward)))
-
+(use-package undo-fu :ensure t)
 
 ;;;;;;;;;;
 ;; EVIL ;;
@@ -511,108 +674,92 @@ is already narrowed."
 
 (use-package
  evil
- :ensure t
- ;; :demand t
- :init
- ;; (setq evil-want-minibuffer t)
- ;; (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
- (setq evil-want-keybinding nil)
- :custom
- ;; (evil-want-integration t)
- (evil-undo-system 'undo-tree)
- :bind
- (("C-x e" . evil-mode)
-  ;; :map evil-normal-state-map ("gc" . comment-dwim)
-  :map evil-insert-state-map ("C-v" . yank)
-  ;; ("C-e" . nil)
-  ("C-p" . nil))
- :general
- ('(normal visual) "[ ]" 'evil-next-close-paren)
- ('(normal visual) "] [" 'evil-previous-open-paren)
- ('normal "j" 'evil-next-visual-line)
- ('normal "k" 'evil-previous-visual-line)
- ;; :hook (
- ;; )
+ ;; :hook (elpaca-after-init . evil-mode)
  :config
- (define-key evil-motion-state-map [down-mouse-1] nil)
- (evil-mode 1))
-
-;; Expands to: (elpaca evil (use-package evil :demand t))
-;; (use-package
-;;  evil
-;;  :demand t
-;;  :init (setq evil-want-keybinding nil)
-;;  :hook (after-init . evil-mode)
-;;  ;; :config (evil-mode)
-;;  )
-
+ (evil-set-undo-system 'undo-fu)
+ (evil-mode 1)
+ (evil-set-initial-state 'eshell-mode 'insert)
+ (evil-set-initial-state 'dired-mode 'insert)
+ :custom
+ (evil-respect-visual-line-mode t)
+ (evil-split-window-below t)
+ (evil-vsplit-window-right t)
+ (evil-want-integration t)
+ (evil-want-keybinding nil))
 
 (use-package
  evil-collection
- :after evil
- :ensure t
- ;; :init
- ;; (setq evil-collection-magit-use-z-for-folds nil)
- ;; (evil-collection-init)
- ;; :config (evil-collection-init)
+ :requires (evil)
+ :hook
+ (evil-mode
+  .
+  (lambda ()
+    (evil-collection-init)
+    (setopt evil-want-keybinding t)))
  :custom
- (evil-collection-elpaca-want-g-filters nil)
- (evil-collection-setup-minibuffer t)
- ;; ii(evil-collection-setup-minibuffer t "Add evil bindings to minibuffer")
- ;; (evil-collection-ement-want-auto-retro t)
- :custom (evil-collection-init))
-
-(use-package
- evil-surround
- :elpaca t
- :after evil
- :config (global-evil-surround-mode 1))
+ (evil-collection-magit-want-horizontal-movement t)
+ (evil-collection-magit-use-y-for-yank t))
 
 (use-package
  evil-snipe
  :elpaca (evil-snipe :host github :repo "hlissner/evil-snipe")
  :after evil
- :demand
+ :demand t
+ :custom
+ (evil-snipe-scope 'visible)
+ (evil-snipe-repeat-scope 'whole-visible)
+ (evil-snipe-spillover-scope nil)
  :config
+ (push '(?\[ "[[{(]") evil-snipe-aliases)
  (evil-snipe-mode +1)
  (evil-snipe-override-mode +1))
 
-(use-package evil-nerd-commenter :ensure t)
-;; visualize evil commands
+(use-package
+ evil-surround
+ :requires (evil)
+ :hook (evil-mode . global-evil-surround-mode))
+
+(use-package
+ evil-escape
+ :elpaca (evil-escape :type git :host github :repo "syl20bnr/evil-escape")
+ :after (evil)
+ :demand t
+ ;; :requires (evil)
+ :config (evil-escape-mode)
+ ;; :hook (evil-mode . evil-escape-mode)
+ :commands (evil-escape)
+ :custom
+ (evil-escape-key-sequence "jk")
+ (evil-escape-delay 0.2)
+ (evil-escape-unodered-key-sequence nil))
+
 (use-package
  evil-goggles
- :diminish evil-goggles-mode
- :after evil
- :defer 1
+ ;; :requires (evil)
  :config (evil-goggles-mode)
- (setq
-  evil-goggles-duration 0.8 ; show what I copied
-  evil-goggles-async-duration 0.8 ; affects indenting
-  evil-goggles-blocking-duration 0) ; don't want to wait when deleting
+ :custom
+ (evil-goggles-enable-delete nil)
+ (evil-goggles-duration 0.100)
+ (evil-goggles-async-duration 0.900)
  (evil-goggles-use-diff-faces))
 
+(use-package
+ evil-nerd-commenter
+ :requires (evil)
+ :general (general-nvmap "gc" 'evilnc-comment-operator)
+ :commands
+ (evilnc-comment-or-uncomment-lines
+  evilnc-comment-or-uncomment-paragraphs))
 
-(use-package evil-anzu :diminish t :after (evil anzu))
-;; (use-package evil-terminal-cursor-changer
-;;   :elpaca (evil-terminal-cursor-changer :host github :repo "7696122/evil-terminal-cursor-changer")
-;;   :config 
-;;   (unless (display-graphic-p)
-;;           (require 'evil-terminal-cursor-changer)
-;;           (evil-terminal-cursor-changer-activate) ; or (etcc-on)
-;;           ))
-;; (use-package evil-cleverparens
-;;   :elpaca (evil-cleverparens :host github :repo "emacs-evil/evil-cleverparens")
-;;   :hook (emacs-lisp-mode . evil-cleverparens-mode))
 
 (use-package anzu :diminish t :defer 10 :config (global-anzu-mode))
 
 
-(message "loaded evil")
+;; (message "loaded evil")
 
 (use-package
  ace-window
  :bind ("M-o" . ace-window) ("C-c w" . ace-window)
-
  :config (setq aw-dispatch-always t)
  (setq
   aw-dispatch-alist
@@ -630,14 +777,14 @@ is already narrowed."
     (?? aw-show-dispatch-help))
   aw-keys '(?1 ?2 ?3 ?4 ?5 ?6 ?7 ?8 ?9)))
 
-(use-package
- perspective
- :elpaca t
- :bind
- ("C-x C-b" . persp-list-buffers) ; or use a nicer switcher, see below
- :custom
- (persp-mode-prefix-key (kbd "C-c M-p")) ; pick your own prefix key here
- :init (persp-mode))
+;; (use-package
+;;  perspective
+;;  :elpaca t
+;;  :bind
+;;  ("C-x C-b" . persp-list-buffers) ; or use a nicer switcher, see below
+;;  :custom
+;;  (persp-mode-prefix-key (kbd "C-c M-p")) ; pick your own prefix key here
+;;  :init (persp-mode))
 
 
 ;;;;;;;;;;;;;;;;;;;
@@ -675,32 +822,27 @@ is already narrowed."
  tempel
  :elpaca (tempel :host github :repo "minad/tempel")
  ;; Require trigger prefix before template name when completing.
- ;; :custom
- ;; (tempel-trigger-prefix "<")
-
+ :custom
+ (tempel-trigger-prefix "<")
+ (tempel-path (concat user-emacs-directory "/snippets/*.eld"))
  :bind
  (("M-+" . tempel-complete) ;; Alternative tempel-expand
   ("M-*" . tempel-insert))
  :init
  ;; Setup completion at point
  (defun tempel-setup-capf ()
-   ;; Add the Tempel Capf to `completion-at-point-functions'.
-   ;; `tempel-expand' only triggers on exact matches. Alternatively use
-   ;; `tempel-complete' if you want to see all matches, but then you
-   ;; should also configure `tempel-trigger-prefix', such that Tempel
-   ;; does not trigger too often when you don't expect it. NOTE: We add
-   ;; `tempel-expand' *before* the main programming mode Capf, such
-   ;; that it will be tried first.
    (setq-local completion-at-point-functions
                (cons #'tempel-expand completion-at-point-functions)))
- :hook (prog-mode . tempel-setup-capf) (text-mode . tempel-setup-capf)
+ :hook
+ (prog-mode . tempel-setup-capf)
+ (text-mode . tempel-setup-capf))
 
 
- ;; Optionally make the Tempel templates available to Abbrev,
- ;; either locally or globally. `expand-abbrev' is bound to C-x '.
- ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
- ;; (global-tempel-abbrev-mode)
- )
+;; Optionally make the Tempel templates available to Abbrev,
+;; either locally or globally. `expand-abbrev' is bound to C-x '.
+;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+;; (global-tempel-abbrev-mode)
+
 
 ;; Optional: Add tempel-collection.
 ;; The package is young and doesn't have comprehensive coverage.
@@ -717,6 +859,7 @@ is already narrowed."
  cycle-at-point
  :general ('normal-state "M-z" 'cycle-at-point))
 
+
 (use-package
  corfu
  :elpaca
@@ -730,11 +873,12 @@ is already narrowed."
  (corfu-preselect 'prompt) ;; Always preselect the prompt
  (corfu-quit-at-boundary nil)
  (corfu-separator ?\s) ; Use space
- (corfu-quit-no-match 'separator) ; Don't quit if there is `corfu-separator' inserted
+ (corfu-quit-no-match t) ; Don't quit if there is `corfu-separator' inserted
  ;; (corfu-echo-documentation t)      ; Show documentation
  ;; (corfu-popupinfo-delay . 0.3)
  :init
  (global-corfu-mode)
+ (corfu-echo-mode)
  (corfu-history-mode t)
  (corfu-popupinfo-mode t)
  :bind
@@ -743,23 +887,19 @@ is already narrowed."
   ("TAB" . corfu-next)
   ([tab] . corfu-next)
   ("S-TAB" . corfu-previous)
-  ([backtab] . corfu-previous))
- ;; :config
- ;; ;; (global-corfu-mode)
- ;; (with-eval-after-load 'evil
- ;;   (setq evil-complete-next-func (lambda (_) (completion-at-point))))
- )
-(use-package
- corfu-terminal
- :elpaca
- (corfu-terminal
-  :repo "https://codeberg.org/akib/emacs-corfu-terminal.git")
- ;; :ensure t
- :after corfu
- :config
- (unless (display-graphic-p)
-   (corfu-terminal-mode +1)))
+  ([backtab] . corfu-previous)))
+;; The advices are only needed on Emacs 28 and older.
+(when (< emacs-major-version 29)
+  ;; Silence the pcomplete capf, no errors or messages!
+  (advice-add
+   'pcomplete-completions-at-point
+   :around #'cape-wrap-silent)
 
+  ;; Ensure that pcomplete does not write to the buffer
+  ;; and behaves as a pure `completion-at-point-function'.
+  (advice-add
+   'pcomplete-completions-at-point
+   :around #'cape-wrap-purify))
 
 (use-package
  cape
@@ -800,6 +940,8 @@ is already narrowed."
  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
  (add-to-list 'completion-at-point-functions #'cape-file)
  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+ (add-to-list 'completion-at-point-functions #'cape-history)
+ (add-to-list 'completion-at-point-functions #'cape-keyword)
  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster))
 
 (use-package pcmpl-args :ensure t)
@@ -855,12 +997,6 @@ is already narrowed."
   completion-styles '(orderless basic)
   completion-category-defaults nil
   completion-category-overrides '((file (styles partial-completion)))))
-;; (use-package company
-;;   :ensure t
-;;   :hook (after-init . global-company-mode)
-;;   :config (setq company-idle-delay 0
-;; 		company-minimum-prefix-length 1)
-;;   (company-tng-configure-default))
 
 
 (use-package marginalia :ensure t :config (marginalia-mode))
@@ -868,7 +1004,7 @@ is already narrowed."
 
 (use-package
  embark
- :ensure t
+ :elpaca (embark :type git :host github :repo "oantolin/embark")
  :bind
  (("C-." . embark-act) ;; pick some comfortable binding
   ("C-;" . embark-dwim) ;; good alternative: M-.
@@ -936,38 +1072,56 @@ is already narrowed."
  :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 
-(use-package
- consult-project-extra
- :ensure t
- :bind
- (("C-c p f" . consult-project-extra-find)
-  ("C-c p o" . consult-project-extra-find-other-window)))
-
 (use-package flycheck :init (global-flycheck-mode))
 
 ;;;;;;;;;
 ;; VCS ;;
 ;;;;;;;;;
-(use-package magit :ensure t :bind ("C-x g" . magit-status))
+
+;; (use-package magit
+;;   :ensure t)
+;; (use-package
+;;  magit
+;; ;; :elpaca t)
+;;  :elpaca (magit :type git :host github :repo "magit/magit"))
+ ;; :if (executable-find "git"))
+ ;; ;; :message ("loaded magit")
+ ;; :bind (("C-x g" . magit-status))
+ ;; :config (setq magit-status-buffer-switch-function 'switch-to-buffer)
+ ;; ;; :config
+ ;; ;; (setq magit-display-buffer-function
+ ;; ;;       #'magit-display-buffer-same-window-except-diff-v1)
+ ;; ;; (setq magit-diff-refine-hunk t)
+ ;; :custom (magit-auto-revert-mode nil)
+ ;; (magit-section-initial-visibility-alist
+ ;;  '((stashes . show)
+ ;;    (unpushed . show)
+ ;;    (pullreqs . show)
+ ;;    (issues . show)))
+ ;; (magit-display-buffer-function
+ ;;  'magit-display-buffer-same-window-except-diff-v1))
+;; (magit-display-buffer-function
+;;  #'magit-display-buffer-fullframe-status-v1)
+
 
 ;; shows git information on fringe
-(use-package
- diff-hl
- :hook (prog-mode . diff-hl-mode)
- ;; (dired-mode . diff-hl-dired-mode)
- ;; integration with magit
- (magit-pre-refresh . diff-hl-magit-pre-refresh)
- (magit-post-refresh . diff-hl-magit-post-refresh))
+;; (use-package
+;;  diff-hl
+;;  :hook (prog-mode . diff-hl-mode)
+;;  ;; (dired-mode . diff-hl-dired-mode)
+;;  ;; integration with magit
+;;  (magit-pre-refresh . diff-hl-magit-pre-refresh)
+;;  (magit-post-refresh . diff-hl-magit-post-refresh))
 
 
-(use-package
- perspective-el
- :elpaca (perspective-el :host github :repo "nex3/perspective-el")
- :bind
- ("C-x C-b" . persp-list-buffers) ; or use a nicer switcher, see below
- :custom
- (persp-mode-prefix-key (kbd "C-c M-p")) ; pick your own prefix key here
- :init (persp-mode))
+;; (use-package
+;;  perspective-el
+;;  :elpaca (perspective-el :host github :repo "nex3/perspective-el")
+;;  :bind
+;;  ("C-x C-b" . persp-list-buffers) ; or use a nicer switcher, see below
+;;  :custom
+;;  (persp-mode-prefix-key (kbd "C-c M-p")) ; pick your own prefix key here
+;;  :init (persp-mode))
 
 (use-package
  tree-sitter
@@ -982,8 +1136,22 @@ is already narrowed."
        '((cmake "https://github.com/uyha/tree-sitter-cmake")
          (css "https://github.com/tree-sitter/tree-sitter-css")
          (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+         (html "https://github.com/tree-sitter/tree-sitter-html")
+         (javascript
+          "https://github.com/tree-sitter/tree-sitter-javascript"
+          "master"
+          "src")
          (json "https://github.com/tree-sitter/tree-sitter-json")
+         (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+         (python "https://github.com/tree-sitter/tree-sitter-python")
+         (toml "https://github.com/tree-sitter/tree-sitter-toml")
          (make "https://github.com/alemuller/tree-sitter-make"))))
+
+(use-package
+ ts-fold
+ :elpaca (:host github :repo "emacs-tree-sitter/ts-fold")
+ :hook (tree-sitter-after-on . ts-fold-mode))
+
 ;; (use-package tree-sitter-langs)
 (use-package
  tree-sitter-langs
@@ -992,6 +1160,7 @@ is already narrowed."
  ( ;; replace XXX-mode with concrete major-mode(e. g. python-mode)
   (c-mode-common . tree-sitter-hl-mode)
   (python-mode . tree-sitter-hl-mode)))
+
 
 ;; use tree sitter as evil text objects
 (use-package
@@ -1030,68 +1199,155 @@ is already narrowed."
   "f"
   (evil-textobj-tree-sitter-get-textobj "function.inner")))
 
+;;;;;;;;;;;;;
+;; PROJECT ;;
+;;;;;;;;;;;;;
+;; (use-package
+;;  projection
+;;  :elpaca
+;;  (projection
+;;   :type git
+;;   :host github
+;;   :repo "mohkale/projection"
+;;   :files (*.el projection-multi/* projection-multi-embark/*))
+;;  ;; Enable the `projection-hook' feature.
+;;  :hook (after-init . global-projection-hook-mode)
+
+;;  ;; Require projections immediately after project.el.
+;;  :config
+;;  (with-eval-after-load 'project
+;;    (require 'projection))
+
+;;  ;; Access pre-configured projection commands from a keybinding of your choice.
+;;  ;; Run `M-x describe-keymap projection-map` for a list of available commands.
+;;  :bind-keymap ("C-x P" . projection-map))
+
+;; (use-package projection-multi :ensure t)
+;; Allow interactively selecting available compilation targets from the current
+;; project type.
+;; :init (define-key global-map "RET" #'projection-multi-compile))
+;; :bind ())
+
+
+;; (use-package
+;; projection-multi-embark
+;; :ensure t
+;;  :after embark
+;; :after projection-multi
+;; :demand t)
+;;  ;; Add the projection set-command bindings to `compile-multi-embark-command-map'.
+;;  :config (projection-multi-embark-setup-command-map))
+
+;;;;;;;;;;;;;;;
+;; FUNCTIONS ;;
+;;;;;;;;;;;;;;;
+
+
+(defun display-active-minor-modes ()
+  "Display a list of active minor modes in the current buffer."
+  (interactive)
+  (message "Active Minor Modes: %s" minor-mode-list))
+
+
+(defun my/get-project-url ()
+  "Get the URL associated with the current project and copy it to the clipboard."
+  (interactive)
+  (when-let ((project (project-current)))
+    (let ((url (project-get-property project 'url)))
+      (when url
+        (kill-new url)
+        (message "Project URL copied to clipboard: %s" url)))))
+
+(global-set-key (kbd "C-c p u") #'my/get-project-url)
+
 
 ;;;;;;;;;;;;;;;;;
 ;; PROGRAMMING ;;
 ;;;;;;;;;;;;;;;;;
 
-;;elisp
+;; C/C++
+(use-package
+ cc-mode
+ :elpaca nil
+ :hook (c-mode . electric-indent-mode))
+
+;; elisp
 (use-package
  elisp-autofmt
- :elpaca
- (emacs-elisp-autofmt
-  :type git
-  :host codeberg
-  :repo "ideasman42/emacs-elisp-autofmt")
+ :elpaca t
+ ;; (emacs-elisp-autofmt
+  ;; :type git
+  ;; :host codeberg
+  ;; :repo "ideasman42/emacs-elisp-autofmt")
  :commands (elisp-autofmt-mode elisp-autofmt-buffer)
- :hook (emacs-lisp-mode . elisp-autofmt-mode))
+ :hook
+ ((emacs-lisp-mode . elisp-autofmt-mode)
+  (emacs-lisp-mode . electric-pair-mode)))
+
+
+(use-package
+ parinfer-rust-mode
+ :hook
+ ((inferior-emacs-lisp-mode . parinfer-rust-mode)
+  (inferior-emacs-lisp-mode . (lambda () (electric-pair-mode -1))))
+ :custom
+ (parinfer-rust-auto-download t)
+ (no-littering-expand-var-file-name "parinfer-rust/"))
 
 ;;cmake
 (use-package
  cmake
  :elpaca nil
- :mode ("\\CMakeLists.txt\\'" . cmake-mode))
+ :mode ("\\CMakeLists.txt\\'" . cmake-mode)
+ :hook (cmake-mode . electric-pair-mode))
+
 
 ;;just files
-(use-package
- justl
- :ensure t
- :bind (("C-c j" . justl-exec-recipe-in-dir))
- :custom (justl-executable "/usr/bin/just"))
+;; (use-package
+;;  justl
+;;  :ensure t
+;;  :bind (("C-c j" . justl-exec-recipe-in-dir))
+;;  :hook (just-mode . electric-pair-mode)
+;;  :custom (justl-executable "/usr/bin/just"))
 
 (use-package just-mode :ensure t :defer t)
 
-(use-package
- cmake-mode
- :ensure t
- :defer t
- :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'")
- :elpaca t)
-
 ;;rust
-;; (use-package rust-mode :hook (rust-mode . rust-ts-mode))
 (use-package
  rustic
  :elpaca t
- :hook (rustic-mode . (lambda () (flymake-mode -1)))
+ :hook
+ ((rustic-mode . (lambda () (flymake-mode -1)))
+  (rustic-mode
+   .
+   (lambda ()
+     (setq-local electric-pair-pairs
+                 (append electric-pair-pairs '((?< . ?>)))))))
  :config
  (setq rustic-lsp-client 'eglot)
  (push 'rustic-clippy flycheck-checkers)
  (remove-hook 'rustic-mode-hook 'flycheck-mode))
 
+;;lua
+(use-package
+ lua-mode
+ :elpaca
+ (lua-mode :type git :host github :repo "immerrr/lua-mode")
+ :mode "\\.lua")
 
 ;;haskell
-(use-package haskell-mode :elpaca t :mode "\\.hs")
+(use-package
+ haskell-mode
+ :elpaca t
+ :mode "\\.hs"
+ :hook (haskell-mode . eglot-ensure))
 
 ;;python
 (use-package
  python
- :bind
- (:map
-  python-ts-mode-map ("<f5>" . recompile)
-  ;; ("<f6>" . eglot-format))
-  )
- :hook ((python-ts-mode . eglot-ensure))
+ :bind (:map python-ts-mode-map ("<f5>" . recompile))
+ ;; ("<f6>" . eglot-format))
+ :hook (python-mode . eglot-ensure)
  :mode (("\\.py\\'" . python-ts-mode)))
 
 ;; Python virtual environment interface for Emacs
@@ -1102,28 +1358,48 @@ is already narrowed."
  :hook (python-mode . pyvenv-mode))
 
 ;; edit .toml files
-(use-package toml-mode :mode "\\.toml")
+(use-package
+ toml-mode
+ :mode "\\.toml"
+ :hook (toml-mode . electric-pair-mode))
 
 ;; edit .yaml files
-(use-package yaml-mode :mode "\\.yaml")
+(use-package
+ yaml-mode
+ :mode "\\.yaml"
+ :hook (yaml-mode . electric-pair-mode))
 
-(use-package markdown-mode :mode "\\.yaml")
+(use-package
+ markdown-mode
+ :mode "\\.md"
+ :hook (markdown-mode . electric-pair-mode))
 
 
 (use-package
  nushell-mode
  :elpaca
- (nushell-mode :type git :host github :repo "mrkkrp/nushell-mode"))
+ (nushell-mode :type git :host github :repo "mrkkrp/nushell-mode")
+ :hook (nushell-mode . electric-pair-mode))
 
 (use-package
  fish-mode
  :elpaca
- (fish-mode :type git :host github :repo "wwwjfy/emacs-fish"))
+ (fish-mode :type git :host github :repo "wwwjfy/emacs-fish")
+ :hook (fish-mode . electric-pair-mode))
 
 (use-package
  jai-mode
  :elpaca (jai-mode :type git :host github :repo "krig/jai-mode"))
 
+;;csv
+(use-package
+ csv-mode
+ :mode "\\.csv\\'"
+ :custom
+ (csv-invisibility-default nil)
+ (csv-align-max-width 999))
+
+;;Text
 (defun +aviik-pdf-viewer ()
   (advice-add
    #'TeX-command-master
@@ -1132,7 +1408,7 @@ is already narrowed."
 
 (use-package
  auctex
- :ensure t
+ :elpaca nil
  :defer t
  :hook (LaTeX-mode . +aviik-pdf-viewer))
 
@@ -1146,15 +1422,6 @@ is already narrowed."
  :custom (typst-ts-mode-watch-options "--open"))
 
 
-;; (use-package
-;;  highlight-indent-guides
-;;  :ensure t
-;;  :hook (python-ts-mode . highlight-indent-guides-mode)
-;;  :config
-;;  (set-face-foreground 'highlight-indent-guides-character-face "white")
-;;  (setq highlight-indent-guides-method 'character))
-
-
 (use-package
  eglot
  :elpaca nil
@@ -1166,9 +1433,23 @@ is already narrowed."
                  #'eglot-completion-at-point
                  #'tempel-expand
                  #'cape-file))))
-
- :custom-face (eglot-highlight-symbol-face ((t (:underline t :weight bold))))
- :hook (eglot-managed-mode . kilo/eglot-capf)
+ ;; :pretty-hydra
+ ;; ((:title
+ ;;   (pretty-hydra-title "──｢ Coding: Eglot ｣──" 'faicon "nf-fa-code")
+ ;;   :color teal
+ ;;   :quit-key "q")
+ ;;  ("Actions" (("a" eglot-code-actions "Perform code-actions")
+ ;;    ("r" eglot-rename "Rename $SYMB")
+ ;;    ("f" eglot-format "Format buffer"))
+ ;;   "Look-up"
+ ;;   (("?" xref-find-references "Find -> references")
+ ;;    ("d" xref-find-definitions "Find -> definition")
+ ;;    ("/" xref-find-apropos "Find $SYMB <- pattern"))))
+ ;; :custom-face (eglot-highlight-symbol-face ((t (:underline t :weight bold))))
+ :hook
+ ((eglot-managed-mode . kilo/eglot-capf)
+  (c-mode . eglot-ensure)
+  (c++-mode . eglot-ensure))
  :bind
  (:map
   eglot-mode-map
@@ -1176,18 +1457,32 @@ is already narrowed."
   ("C-c a" . eglot-code-actions)
   ("C-c f" . flymake-show-buffer-diagnostics)
   ("C-c r" . eglot-rename))
- :config (add-to-list 'eglot-server-programs '(typst-mode . ("typst-lsp"))))
+ :config
+ (add-to-list 'eglot-server-programs '(typst-mode . ("typst-lsp"))
+              '(c-mode
+                c++-mode .
+                ("clangd"
+                 "-j=4"
+                 "--malloc-trim"
+                 "--log=error"
+                 "--background-index"
+                 "--clang-tidy"
+                 "--cross-file-rename"
+                 "--completion-style=detailed"
+                 "--pch-storage=memory"
+                 "--header-insertion=never"
+                 "--header-insertion-decorators=0"))))
 
-(use-package
- eldoc-box
- :elpaca (eldoc-box :host github :repo "casouri/eldoc-box")
- :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode)
- :after eglot)
+;; (use-package
+;;  eldoc-box
+;;  :elpaca (eldoc-box :host github :repo "casouri/eldoc-box")
+;;  :hook (eglot-managed-mode . eldoc-box-hover-at-point-mode)
+;;  :after eglot)
 
 (use-package
  consult-eglot
- :elpaca
- (consult-elgot :host github :repo "mohkale/consult-eglot")
+ :elpaca t
+ ;; (consult-elgot :type git :host github :repo "mohkale/consult-eglot")
  :after eglot
  :commands (consult-eglot-symbols))
 
@@ -1203,68 +1498,54 @@ is already narrowed."
 
 
 ;;https://karthinks.com/software/jumping-directories-in-eshell/
-(defun eshell/z (&optional regexp)
-  "Navigate to a previously visited directory in eshell, or to
-any directory proferred by `consult-dir'."
-  (let ((eshell-dirs
-         (delete-dups
-          (mapcar
-           'abbreviate-file-name
-           (ring-elements eshell-last-dir-ring)))))
-    (cond
-     ((and (not regexp) (featurep 'consult-dir))
-      (let* ((consult-dir--source-eshell
-              `(:name
-                "Eshell"
-                :narrow ?e
-                :category file
-                :face consult-file
-                :items ,eshell-dirs))
-             (consult-dir-sources
-              (cons consult-dir--source-eshell consult-dir-sources)))
-        (eshell/cd
-         (substring-no-properties
-          (consult-dir--pick "Switch directory: ")))))
-     (t
-      (eshell/cd
-       (if regexp
-           (eshell-find-previous-directory regexp)
-         (completing-read "cd: " eshell-dirs)))))))
+;; (defun eshell/z (&optional regexp)
+;;   "Navigate to a previously visited directory in eshell, or to
+;; any directory proferred by `consult-dir'."
+;;   (let ((eshell-dirs
+;;          (delete-dups
+;;           (mapcar
+;;            'abbreviate-file-name
+;;            (ring-elements eshell-last-dir-ring)))))
+;;     (cond
+;;      ((and (not regexp) (featurep 'consult-dir))
+;;       (let* ((consult-dir--source-eshell
+;;               `(:name
+;;                 "Eshell"
+;;                 :narrow ?e
+;;                 :category file
+;;                 :face consult-file
+;;                 :items ,eshell-dirs))
+;;              (consult-dir-sources
+;;               (cons consult-dir--source-eshell consult-dir-sources)))
+;;         (eshell/cd
+;;          (substring-no-properties
+;;           (consult-dir--pick "Switch directory: ")))))
+;;      (t
+;;       (eshell/cd
+;;        (if regexp
+;;            (eshell-find-previous-directory regexp)
+;;          (completing-read "cd: " eshell-dirs)))))))
 
 (use-package
  exec-path-from-shell
- :commands exec-path-from-shell-copy-env
- :config
- (when (memq window-system '(mac ns x))
-   (exec-path-from-shell-initialize)))
+ :ensure t
+ :commands exec-path-from-shell-copy-env)
 
-(use-package vterm :ensure t)
+;; :config
+;; (when (memq window-system '(mac ns x))
+;;   (exec-path-from-shell-initialize)))
 
-
-;; (use-package emacs-coterm
-;;   ;; :ensure t)
-;;   :elpaca (emacs-coterm :type git
-;; 			:repo "https://repo.or.cz/emacs-coterm.git"))
-
-
-;; (message "loaded terminals")
-;; ;; (use-package
-;; (message "loaded doom-themes")
-;; ;;  mistty
-;;  :elpaca (mistty :host github :repo "szermatt/mistty")
-;;  ;; :hook (mistty-mode . turn-off-evil-mode)
-;;  :bind
-;;  (("C-c x m" . mistty)
-
-;;   ;; bind here the shortcuts you'd like the
-;;   ;; shell to handle instead of Emacs.
-;;   :map mistty-prompt-map
-
-;;   ;; fish: directory history
-;;   ("M-<up>" . mistty-send-key)
-;;   ("M-<down>" . mistty-send-key)
-;;   ("M-<left>" . mistty-send-key)
-;;   ("M-<right>" . mistty-send-key)))
+(use-package
+ vterm
+ :ensure t
+ :custom (vterm-max-scrollback 100000) (vterm-buffer-name "vterm")
+ :hook
+ (vterm-mode
+  .
+  (lambda ()
+    (setq-local
+     global-hl-line-mode nil
+     show-trailing-whitespace nil))))
 
 
 (use-package
@@ -1309,47 +1590,54 @@ any directory proferred by `consult-dir'."
   ("<C-i> n" . jdm204-eat-nu)
   ("C-`" . eshell)))
 
+(use-package
+ shell-pop
+ :elpaca (shell-pop :type git :host github :repo "kyagi/shell-pop-el")
+ :custom (shell-pop-shell-type '("vterm" "*vterm*" (lambda () (vterm))))
+ :config
+ (setq
+  shell-pop-window-position "bottom"
+  shell-pop-set-internal-mode "ansi-term")
+ ;; shell-pop-universal-key "<f8>")
+ :bind ("M-t" . shell-pop))
 
 (use-package
- hl-todo
- :elpaca (hl-todo :type git :host github :repo "tarsius/hl-todo")
- :bind ("<C-c> i" . hl-todo-insert)
- :config (global-hl-todo-mode)
- ;; :hook (prog-mode . hl-todo-mode)
- ;; :custom
- ;; (setq hl-todo-keyword-faces
- ;;       '(("TODO" . "#FF0000")
- ;;         ("FIXME" . "#FF0000")
- ;;         ("DEBUG" . "#A020F0")
- ;;         ("GOTCHA" . "#FF4500")
- ;;         ("STUB" . "#1E90FF")))
- )
-;; (use-package
-;;  consult-todo
-;;  :elpaca
-;;  (consult-todo :host github :type git :repo "liuyinz/consult-todo")
-;;  :demand t)
+ c3po
+ :preface (load-file (concat user-emacs-directory "secrets.el"))
+ ;; (defun kilo/read_secret () (load-file (concat user-emacs-directory "secrets.el")))
+ :elpaca (c3po :host github :repo "d1egoaz/c3po.el")
+ :config (setq c3po-api-key chatgpt-api-key))
 
-(elpaca-wait)
-(use-package dired :elpaca nil)
+
 
 (use-package
  org
  :elpaca nil
- :ensure nil
+ ;; :ensure nil
  ;; :pre-build (message "loading orgmode")
  :hook
  (org-mode . visual-line-mode)
  (org-mode . variable-pitch-mode)
- :config
+ :init
  (setq org-directory
        (cond
         ((eq system-type 'gnu/linux)
-         "~/Notes")
+         "~/sync/org")
         ((eq system-type 'android)
          "/storage/emulated/0/Notes")
         (t
          "~/Notes")))
+ :custom
+ ;; Agenda styling
+ (org-agenda-current-time-string "────────── now ──────────")
+ (org-agenda-format-date
+  (lambda (date) (concat "\n" (org-agenda-format-date-aligned date))))
+ (org-agenda-prefix-format
+  '((agenda . "     %i %?-12t% s")
+    (todo . " %i %-12:c")
+    (tags . " %i %-12:c")
+    (search . " %i %-12:c")))
+ :config
  (setq
   ;; Edit settings
   org-auto-align-tags nil
@@ -1361,8 +1649,7 @@ any directory proferred by `consult-dir'."
   ;; Org styling, hide markup etc.
   org-hide-emphasis-markers t
   org-pretty-entities t
-  org-ellipsis "…"
-
+  org-ellipsis "…" ;; ↴, ▼, ▶, ⤵
   ;; Agenda styling
   org-agenda-tags-column 0
   org-agenda-block-separator ?─
@@ -1390,36 +1677,42 @@ any directory proferred by `consult-dir'."
  :init (add-hook 'org-mode-hook 'toc-org-enable))
 
 (use-package
- org-roam
- :after org
- :ensure t
- :custom (org-roam-directory (file-truename "~/OneDrive/org/OrgRoam"))
- ;; :general
- ;; ("C-c n l" 'org-roam-buffer-toggle)
- ;; ("C-c n f" 'org-roam-node-find)
- ;; ("C-c n g" 'org-roam-graph)
- ;; ("C-c n i" 'org-roam-node-insert)
- ;; ("C-c n c" 'org-roam-capture)
- ;; ;; Dailies
- ;;   ("C-c n j" 'org-roam-dailies-capture-today)
- :config
- ;; If you're using a vertical completion framework, you might want a more informative completion interface
- (setq org-roam-node-display-template
-       (concat
-        "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
- (org-roam-db-autosync-mode))
+ org-bullets
+ :custom (org-bullets-bullet-list '("⁖"))
+ ;;;; Alternatives
+ ;; (org-bullets-bullet-list '("①" "②" "③" "④" "⑤" "⑥" "⑦" "⑧" "⑨"))
+ ;; (org-bullets-bullet-list '("➀" "➁" "➂" "➃" "➄" "➅" "➆" "➇" "➈"))
+ ;; (org-bullets-bullet-list '("❶" "❷" "❸" "❹" "❺" "❻" "❼" "❽" "❾"))
+ ;; (org-bullets-bullet-list '("➊" "➋" "➌" "➍" "➎" "➏" "➐" "➑" "➒"))
+ ;; (org-bullets-bullet-list '("⒈" "⒉" "⒊" "⒋" "⒌" "⒍" "⒎" "⒏" "⒐"))
+ :hook (org-mode . org-bullets-mode))
+;; (use-package
+;;  org-roam
+;;  :after org
+;;  :ensure t
+;;  :custom (org-roam-directory (file-truename "~/OneDrive/org/OrgRoam"))
+;;  ;; :general
+;;  ;; ("C-c n l" 'org-roam-buffer-toggle)
+;;  ;; ("C-c n f" 'org-roam-node-find)
+;;  ;; ("C-c n g" 'org-roam-graph)
+;;  ;; ("C-c n i" 'org-roam-node-insert)
+;;  ;; ("C-c n c" 'org-roam-capture)
+;;  ;; ;; Dailies
+;;  ;;   ("C-c n j" 'org-roam-dailies-capture-today)
+;;  :config
+;;  ;; If you're using a vertical completion framework, you might want a more informative completion interface
+;;  (setq org-roam-node-display-template
+;;        (concat
+;;         "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+;;  (org-roam-db-autosync-mode))
 
 ;; tl;dr “<” to trigger org block completion at point.
 (use-package
  org-block-capf
  :elpaca (:host github :repo "xenodium/org-block-capf"))
 
-(load (expand-file-name "secrets.el" user-emacs-directory) 'noerror)
+;; (load (expand-file-name "secrets.el" user-emacs-directory) 'noerror)
 
-(use-package
- c3po
- :elpaca (c3po :host github :repo "d1egoaz/c3po.el")
- :config (setq c3po-api-key #'chatgpt-api-key))
 
 (use-package
  password-generator
@@ -1435,3 +1728,70 @@ any directory proferred by `consult-dir'."
 ;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
 (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
 ;; ## end of OPAM user-setup addition for emacs / base ## keep this line
+(use-package
+ newsticker
+ :elpaca nil
+ :custom
+ (newsticker-url-list-defaults nil)
+ (newsticker-wget-name "curl")
+ (newsticker-url-list
+  '(("Planet Emacslife" "https://planet.emacslife.com/atom.xml")
+    ("Sacha Chua" "https://sachachua.com/blog/feed/")
+    ("Mastering Emacs" "http://www.masteringemacs.org/feed/"))))
+
+(use-package
+ org-roam
+ :elpaca
+ (org-roam
+  :type git
+  :host github
+  :repo "org-roam/org-roam"
+  :files (:defaults "extensions/*"))
+ :bind
+ (("C-c n l" . org-roam-buffer-toggle)
+  ("C-c n f" . org-roam-node-find)
+  ("C-c n g" . org-roam-graph)
+  ("C-c n i" . org-roam-node-insert)
+  ("C-c n c" . org-roam-capture)
+  ;; Dailies
+  ("C-c n j" . org-roam-dailies-capture-today))
+ :custom
+ (org-roam-directory
+  (concat (file-name-as-directory org-directory) "roam"))
+ (org-roam-completion-everywhere t)
+ (org-roam-capture-templates
+  `(("d" "default" plain "%?"
+     :if-new
+     (file+head
+      "%<%Y%m%d%H%M%S>-${slug}.org"
+      ,(let ((options
+              '("#+options: _:{}"
+                "#+options: ^:{}"
+                "#+startup: latexpreview"
+                "#+startup: entitiespretty"
+                "#+startup: inlineimages"
+                "#+title: ${title}")))
+         (mapconcat 'identity options "\n")))
+     :unnarrowed t)))
+ (org-roam-node-display-template "${title}")
+ :config (org-roam-db-autosync-mode) (require 'org-roam-protocol))
+
+;; :NOTE| A GUI for Org-Roam to reduce the burden of browsing
+(use-package
+ org-roam-ui
+ :requires (org-roam)
+ :custom
+ (org-roam-ui-sync-theme t)
+ (org-roam-ui-follow t)
+ (org-roam-ui-update-on-save t)
+ (org-roam-ui-open-on-start nil))
+
+(use-package seq
+  :elpaca t)
+
+(use-package magit
+  :elpaca t)
+(use-package transient
+  :elpaca t)
+
+(elpaca-wait)
