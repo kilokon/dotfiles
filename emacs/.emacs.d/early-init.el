@@ -30,7 +30,7 @@
 ;; Silence compiler warnings as they can be pretty disruptive
 (setq native-comp-async-report-warnings-errors nil)
 
-;; Save all tempfiles in $TMPDIR/emacs$UID/                                                        
+;; Save all tempfiles in $TMPDIR/emacs$UID/
 (defconst emacs-tmp-dir
   (expand-file-name (format "emacs%d" (user-uid))
                     temporary-file-directory))
@@ -66,9 +66,9 @@
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 
-(recentf-mode 1)
+;; (recentf-mode 1)
 ;; Remember and restore the last cursor location of opened files
-(save-place-mode 1)
+;; (save-place-mode 1)
 (setq
  debug-on-error t
  package-enable-at-startup nil)
