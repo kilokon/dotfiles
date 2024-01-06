@@ -25,11 +25,15 @@ config.font = wezterm.font_with_fallback({
 		family = "RobotoMono Nerd Font",
 		harfbuzz_features = { "calt=0", "clig=0", "liga=0" },
 	},
-	{ family = "JetBrainsMonoNL Nerd Font Mono" },
+	{
+		family = "Iosevka Aile",
+		harfbuzz_features = { "calt=0", "clig=0", "liga=0" },
+	},
+	-- { family = "JetBrainsMonoNL Nerd Font Mono" },
 	-- { family = "Operator Mono SSm Lig", weight = "Bold" },
 })
 -- config.font = wezterm.font("RobotoMono Nerd Font")
-config.font_size = 11
+config.font_size = 12
 config.color_scheme = "tokyonight-storm"
 config.hide_tab_bar_if_only_one_tab = true
 config.window_background_opacity = 0.85
@@ -50,6 +54,7 @@ config.leader = { key = "VoidSymbol", mods = "", timeout_milliseconds = 1000 }
 config.keys = wezKeys.keys()
 config.key_tables = wezKeys.key_tables()
 config.window_frame = {
+	-- font = wezterm.font({ family = "Iosevka Aile" }),
 	font = wezterm.font({ family = "JetBrains Mono", weight = "Bold" }),
 	font_size = 11.0,
 	border_left_width = "0.0cell",

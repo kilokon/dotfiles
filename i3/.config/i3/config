@@ -47,7 +47,7 @@ exec_always --no-startup-id i3-layouts
 floating_modifier $mod
 for_window [class=".*"] border pixel 2
 # gaps inner 7px
-gaps inner 3
+gaps inner 5
 # #
 smart_gaps on
 smart_gaps inverse_outer
@@ -106,6 +106,7 @@ tiling_drag modifier titlebar
 
 # start a terminal
 bindsym $mod+Return exec wezterm 
+bindsym $mod+Shift+Return exec --no-startup-id /usr/bin/emacsclient -c
 
 # kill focused window
 bindsym $sup+q kill
@@ -152,10 +153,11 @@ bindsym $mod+Shift+Left move left
 bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
-# bindsym $mod+Shift+semicolon move container to output HDMI-1
-# bindsym $mod+Shift+period move container to DP-0
-bindsym $mod+x move container to output DP-2 DP-0
-bindsym $mod+z focus output DP-2 DP-0
+
+
+
+bindsym $mod+x move container to output DP-0 DP-2
+bindsym $mod+z focus output DP-0 DP-2
 
 # split in horizontal orientation
 bindsym $mod+h split h
@@ -239,7 +241,7 @@ bindsym $mod+Shift+0 move container to workspace number $ws10
 set $i3l spiral 0.6 to workspace number $ws1
 set $i3l 3columns 0.66 0.5 2 left to workspace $ws2
 
-# move $ws3 to output DP-1
+# 2ove $ws3 to output DP-1
 
 # bindsym $mod+j exec i3l move left
 # bindsym $mod+k exec i3l move down
@@ -256,17 +258,18 @@ bindsym $mod+Shift+r restart
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 
-# Monitor Specific Start-Up
-workspace 1 output primary
-workspace 2 output nonprimary
+# # Monitor Specific Start-Up
+# workspace 1 output primary
+# workspace 2 output nonprimary
 
 
-
+# Moving workspaces between screens 
+# bindsym $mod+p move workspace to output right
 
 
 bindsym $mod+Shift+w exec "feh --bg-fill --randomize ~/.config/wallpapers/* ~/.config/wallpapers/*" 
 
-exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/microsoft-edge-dev; workspace 2; exec wezterm'
+# exec --no-startup-id i3-msg 'workspace 1; exec /usr/bin/microsoft-edge-dev; workspace 2; exec wezterm'
 
 
 # resize window (you can also use the mouse for that)

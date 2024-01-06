@@ -108,6 +108,7 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias dev="cd $HOME/Dev/"
+# alias emacstabs='emacs --eval "(setq display-buffer-base-action '(display-buffer-in-tab))"
 alias gg="emacsclient -c -e '(magit-status)'" # magit
 alias emacn="emacsclient -nw"
 alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
@@ -144,6 +145,12 @@ man() {
 #------------------------------
 # ShellFuncs
 #------------------------------
+function mkcd(){
+  mkdir -p $@ && cd ${@:$#}
+}
+
+
+
 # -- coloured manuals
 man() {
   env \
@@ -282,3 +289,6 @@ else
   alias m='more'
   fi
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ '
+
+# opam configuration
+[[ ! -r /home/aviik/.opam/opam-init/init.zsh ]] || source /home/aviik/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null

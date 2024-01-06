@@ -36,6 +36,9 @@ map("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", opts)
 map("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "Previous Buffer" })
 
+map("n", "<right>", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "<left>", "<cmd>bprevious<cr>", { desc = "Previous Buffer" })
+
 -- Move to start/end on line in command mode
 map("i", "<C-a>", "<home>", { desc = "Move to end of line" })
 map("i", "<C-e>", "<end>", { desc = "Move to begining of line" })

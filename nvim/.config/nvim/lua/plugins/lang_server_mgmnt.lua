@@ -126,7 +126,7 @@ return {
 					-- { name = "conjure" },
 				},
 				completion = {
-          keyword_length = 2,
+					keyword_length = 2,
 					-- autocomplete = true
 					completeopt = "menu,menuone,noinsert",
 				},
@@ -456,21 +456,6 @@ return {
 						})
 					end,
 
-					-- ccls = function()
-					-- 	require("lspconfig").ccls.setup({
-					-- 		cmd = { "ccls" },
-					-- 		init_options = {
-					-- 			compilationDatabaseDirectory = "build",
-					-- 			index = {
-					-- 				threads = 0,
-					-- 			},
-					-- 			clang = {
-					-- 				excludeArgs = { "-frounding-math" },
-					-- 			},
-					-- 		},
-					-- 	})
-					-- end,
-
 					-- CMake File LSP
 					neocmake = function()
 						require("lspconfig").neocmake.setup({
@@ -480,6 +465,16 @@ return {
 								return lsp_zero.dir.find_first({ ".git", "cmake" })
 							end,
 							single_file_support = true, -- suggested
+						})
+					end,
+
+					-- Typst
+					typst_lsp = function()
+						require("lspconfig").typst_lsp.setup({
+							settings = {
+								exportPdf = "onType", -- Choose onType, onSave or never.
+								-- serverPath = "" -- Normally, there is no need to uncomment it.
+							},
 						})
 					end,
 				},
@@ -730,6 +725,14 @@ return {
 				cmake_build_directory = "build",
 			})
 		end,
+	},
+	{
+		"Mythos-404/xmake.nvim",
+		branch = "v1",
+		lazy = true,
+		event = "BufReadPost xmake.lua",
+		config = true,
+		dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
 	},
 	{
 		"mrcjkb/haskell-tools.nvim",
