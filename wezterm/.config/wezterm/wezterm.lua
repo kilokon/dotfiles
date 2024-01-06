@@ -94,6 +94,31 @@ config.underline_position = -2.0
 --   end
 -- )
 
+-- Check whether the given file exists
+function file_exists(name)
+  local f = io.open(name, "r")
+  if f ~= nil then
+    io.close(f)
+    return true
+  else
+    return false
+  end
+end
+
+function wezterm_terminfo_installed()
+  return file_exists("/usr/share/terminfo/w/wezterm")
+end
+
+-- Determine what to set $TERM to
+function determine_term_value()
+  if wezterm_terminfo_installed() then
+    return "wezterm"
+  end
+  return "xterm-256color"
+end
+
+
+
 -- helpers.apply_to_config(config)
 wezterm.log_info("hellos")
 
