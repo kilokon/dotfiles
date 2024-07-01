@@ -82,12 +82,12 @@ M.keys = function()
 		{ key = "L", mods = "CTRL", action = wezterm.action.ShowDebugOverlay },
 		{
 			key = "\\",
-			mods = "ALT|CTRL",
+			mods = "LEADER",
 			action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
 		},
 		{
 			key = "-",
-			mods = "ALT|CTRL",
+			mods = "LEADER",
 			-- mods = "LEADER",
 			action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
 		},

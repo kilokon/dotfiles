@@ -1,0 +1,11 @@
+{
+  "minimum version": {
+    "prefix": "cmake",
+    "body": [
+      "cmake_minimum_required (VERSION $1)"
+      "project($2 VERSION 0.1.0 LANGUAGES CXX)"
+      "add_executable($3)"
+    ],
+    "description": "Cmake Basic Setup"
+  }
+}

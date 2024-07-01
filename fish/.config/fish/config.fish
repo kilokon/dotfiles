@@ -5,6 +5,8 @@ end
 function fish_greeting
 end
 
+set -x EDITOR nvim
+set -x VISUAL nvim
 
 alias vi="nvim"
 alias cls="clear"
@@ -19,6 +21,8 @@ alias cd..="cd .."
 alias cd...="cd ../.."
 alias cd....="cd ../../.."
 alias dev="cd $HOME/Dev/"
+alias zj="zellij"
+# alias fx="felix"
 # alias hx="helix"
 
 
@@ -37,19 +41,36 @@ direnv hook fish | source
 
 ###############
 
+function felix
+    bass "source <(fx --init); fx $argv"
+end
 
-load_nvm > /dev/stderr
+alias fx="felix"
+# load_nvm > /dev/stderr
 
 if not set -q $WEZTERM_PANE
   set -x NVIM_LISTEN_ADDRESS "/tmp/nvim$WEZTERM_PANE"
 end
-# Load pyenv automatically by appending
-# the following to ~/.config/fish/config.fish:
 
-pyenv init - | source
-status --is-interactive; and pyenv virtualenv-init - | source
+
+# pyenv init - | source
+# status --is-interactive; and pyenv virtualenv-init - | source
 ###########
+
+atuin init fish | source
+# bass (fx --init) | source
+
+
+
 
   # Restart your shell for the changes to take effect.
 #set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; set -gx PATH $HOME/.cabal/bin $PATH /home/aviik/.ghcup/bin # ghcup-env
 # pijul alias --shell=fish | source
+
+mise activate fish | source
+
+if status is-interactive
+  mise activate fish | source
+else
+  mise activate fish --shims | source
+end

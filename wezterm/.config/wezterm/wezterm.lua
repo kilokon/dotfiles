@@ -13,7 +13,8 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
-config.default_prog = { "/usr/bin/zsh", "-l" }
+-- config.default_prog = { "/usr/bin/zsh", "-l" }
+config.default_prog = { "/usr/bin/fish", "-l" }
 config.default_cursor_style = "SteadyBar"
 config.font = wezterm.font_with_fallback({
 	-- {
@@ -22,18 +23,18 @@ config.font = wezterm.font_with_fallback({
 	-- harfbuzz_features = { "calt=0", "clig=0", "liga=0" },
 	-- },
 	{
-		family = "RobotoMono Nerd Font",
-		harfbuzz_features = { "calt=0", "clig=0", "liga=0" },
+		family = "JetBrains Mono",
+		harfbuzz_features = { "calt=1", "clig=0", "liga=0" },
 	},
 	{
-		family = "Iosevka Aile",
-		harfbuzz_features = { "calt=0", "clig=0", "liga=0" },
+		family = "Iosevka",
+		harfbuzz_features = { "calt=1", "clig=1", "liga=1" },
 	},
 	-- { family = "JetBrainsMonoNL Nerd Font Mono" },
 	-- { family = "Operator Mono SSm Lig", weight = "Bold" },
 })
 -- config.font = wezterm.font("RobotoMono Nerd Font")
-config.font_size = 12
+config.font_size = 11
 config.color_scheme = "tokyonight-storm"
 config.hide_tab_bar_if_only_one_tab = true
 config.window_background_opacity = 0.85
@@ -96,28 +97,26 @@ config.underline_position = -2.0
 
 -- Check whether the given file exists
 function file_exists(name)
-  local f = io.open(name, "r")
-  if f ~= nil then
-    io.close(f)
-    return true
-  else
-    return false
-  end
+	local f = io.open(name, "r")
+	if f ~= nil then
+		io.close(f)
+		return true
+	else
+		return false
+	end
 end
 
 function wezterm_terminfo_installed()
-  return file_exists("/usr/share/terminfo/w/wezterm")
+	return file_exists("/usr/share/terminfo/w/wezterm")
 end
 
 -- Determine what to set $TERM to
 function determine_term_value()
-  if wezterm_terminfo_installed() then
-    return "wezterm"
-  end
-  return "xterm-256color"
+	if wezterm_terminfo_installed() then
+		return "wezterm"
+	end
+	return "xterm-256color"
 end
-
-
 
 -- helpers.apply_to_config(config)
 wezterm.log_info("hellos")

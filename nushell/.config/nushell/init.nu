@@ -1,14 +1,13 @@
-
 # ~/.config/nushell/init.nu
 #
 # Init module that exports commands and environment variables wanted at startup
 
 # commands
-# export def egd [...rest] {
-#     with-env [GIT_EXTERNAL_DIFF 'difft'] { git diff $rest }
-# }
+export def egd [...rest] {
+    with-env [GIT_EXTERNAL_DIFF 'difft'] { git diff $rest }
+}
 
-# we need to export the env we create witk load-env
+# we need to export the env we create with load-env
 # because we are `use`-ing here and not `source`-ing this file
 export-env {
     load-env {
@@ -31,32 +30,4 @@ export-env {
     }
 }
 
-#Prompt
-# source ~/.cache/starship/init.nu
-
-
-
-# prompt
-# PROMPT_COMMAND: { build-prompt }
-
-#     let usr_str = (if $env.SHOW_USER {
-#         [
-#             $env.USER
-#             '@'
-#             $env.HOSTNAME
-#             ':'
-#         ] | str join
-#     } else {
-#         ''
-#     })
-#
-#     let pwd_str = (if (pwd | str starts-with $env.HOME) {
-#         (pwd | str replace $env.HOME '~' | str trim)
-#     } else {
-#         pwd
-#     })
-#
-#     [ $usr_str $pwd_str ' ' ] | str join
-# }
-# Footer
 

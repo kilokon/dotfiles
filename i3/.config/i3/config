@@ -78,9 +78,9 @@ for_window [window_type="menu"] floating enable
 
 
 
-for_window [title="Hello*"] floating enable, border pixel 3
-for_window [title="Vulkan*"] floating enable
-for_window [title="Bevy*"] floating enable, border pixel 3
+# for_window [title="Hello*"] floating enable, border pixel 3
+# for_window [title="Vulkan*"] floating enable
+# for_window [title="Bevy*"] floating enable, border pixel 3
 for_window [class="feh"] floating enable, border pixel 3
 for_window [class="love"] floating enable, border pixel 3
 for_window [class="code-oss"] floating enable, border pixel 1
@@ -95,6 +95,8 @@ for_window [title="Blender Render"] floating enable
 for_window [title="*Viewport*"] floating enable
 for_window [title="Viewport"] floating enable
 for_window [title="NodeGraph"] floating enable
+for_window [title="Spaceship Game"] floating enable, resize set 640 960
+# for_window [title="wezterm"] floating enable, resize set 1300 900
 # for_window [instance="tabme"] move window to mark target
 #make VS code floating and borderless
 
@@ -105,8 +107,9 @@ for_window [title="NodeGraph"] floating enable
 tiling_drag modifier titlebar
 
 # start a terminal
-bindsym $mod+Return exec wezterm 
-bindsym $mod+Shift+Return exec --no-startup-id /usr/bin/emacsclient -c
+bindsym $mod+Return exec wezterm
+# bindsym $mod+Shift+Return exec --no-startup-id /usr/bin/emacsclient -c
+bindsym $mod+Shift+Return exec warp-terminal
 
 # kill focused window
 bindsym $sup+q kill
@@ -186,6 +189,18 @@ bindsym $mod+a focus parent
 #
 # # focus the child container
 # bindsym $mod+ focus child
+
+set $mode_launcher Launch: [e]dge [f]irefox
+bindsym $mod+c mode "$mode_launcher"
+
+mode "$mode_launcher" {
+    bindsym f exec firefox
+    bindsym e exec microsoft-edge-dev
+
+    bindsym Escape mode "default"
+    bindsym Return mode "default"
+}
+
 
 
 popup_during_fullscreen smart
@@ -322,4 +337,6 @@ bar {
     }
 }
 
-
+# AUTOSTART
+exec --no-startup-id picom -b
+exec_always --no-startup-id "setxkbmap -option caps:none"

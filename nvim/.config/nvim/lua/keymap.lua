@@ -17,11 +17,6 @@ map("n", "<right>", "<Nop>", opts)
 map("n", "<up>", "<Nop>", opts)
 map("n", "<down>", "<Nop>", opts)
 
-map("i", "<left>", "<Nop>", opts)
-map("i", "<right>", "<Nop>", opts)
-map("i", "<up>", "<Nop>", opts)
-map("i", "<down>", "<Nop>", opts)
-
 -- ^ is nuts
 map("n", "H", "^")
 map("n", "L", "g_")

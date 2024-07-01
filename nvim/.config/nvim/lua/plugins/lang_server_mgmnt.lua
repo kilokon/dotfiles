@@ -8,21 +8,35 @@ return {
 			-- Disable automatic setup, we are doing it manually
 			-- vim.g.lsp_zero_extend_cmp = 0
 			-- vim.g.lsp_zero_extend_lspconfig = 0
-			-- vim.b.lsp_zero_enable_autoformat = 0
+			vim.b.lsp_zero_enable_autoformat = 1
 		end,
 	},
+
 	{
 		"L3MON4D3/LuaSnip",
-		version = "2.*",
-		dependencies = { "rafamadriz/friendly-snippets" },
-		-- build = "make install_jsregexp",
-		event = { "InsertEnter" },
+		version = "v2.*",
+		dependencies = {
+			"rafamadriz/friendly-snippets",
+			"zeioth/NormalSnippets",
+			"benfowler/telescope-luasnip.nvim",
+		},
+		-- event = { "InsertEnter" },
+		--     opts = {
+		--   history = true,
+		--   delete_check_events = "TextChanged",
+		--   region_check_events = "CursorMoved",
+		-- },
+		event = "User BaseFile",
 		config = function()
 			local ls = require("luasnip")
 			local types = require("luasnip.util.types")
 
 			ls.config.set_config({
 				history = true,
+				-- Snippets aren't automatically removed if their text is deleted.
+				-- `delete_check_events` determines on which events (:h events) a check for
+				-- deleted snippets is performed.
+				-- This can be especially useful when `history` is enabled.
 				delete_check_events = "TextChanged",
 				ext_opts = {
 					[types.choiceNode] = {
@@ -38,36 +52,38 @@ return {
 				enable_autosnippets = true,
 				-- mapping for cutting selected text so it's usable as SELECT_DEDENT,
 				-- SELECT_RAW or TM_SELECTED_TEXT (mapped via xmap).
-				store_selection_keys = "<Tab>",
+				store_selection_keys = "<c-k>",
 			})
+			vim.tbl_map(function(type)
+				require("luasnip.loaders.from_" .. type).lazy_load()
+			end, { "vscode", "snipmate", "lua" })
 
-			require("luasnip.loaders.from_lua").lazy_load()
+			require("luasnip.loaders.from_lua").lazy_load({ paths = { vim.fn.stdpath("config") .. "/snippets" } })
 
 			-- <c-l> is selecting within a list of options.
-			-- vim.keymap.set({ "s", "i" }, "<c-l>", function()
-			--   if ls.choice_active() then
-			--     ls.change_choice(1)
-			--   end
-			-- end, { desc = "Scroll through choice nodes" })
+			vim.keymap.set({ "s", "i" }, "<c-l>", function()
+				if ls.choice_active() then
+					ls.change_choice(1)
+				end
+			end, { desc = "Scroll through choice nodes" })
 
-			--   vim.keymap.set("i", "<Tab>", function()
-			--     return ls.expand_or_jumpable() and "<Plug>luasnip-expand-or-jump" or "<Tab>"
-			--   end, { desc = "Expand or jump snippet", expr = true, silent = true })
-			--
-			--   vim.keymap.set("i", "<S-Tab>", function()
-			--     if ls.jumpable(-1) then
-			--       ls.jump(-1)
-			--     end
-			--   end, { desc = "Jump backwards snippet" })
+			-- <c-k> is my expansion key
+			-- this will expand the current item or jump to the next item within the snippet.
+			vim.keymap.set({ "i", "s" }, "<c-k>", function()
+				if ls.expand_or_jumpable() then
+					ls.expand_or_jump()
+				end
+			end, { silent = true })
+
+			-- <c-j> is my jump backwards key.
+			-- this always moves to the previous item within the snippet
+			vim.keymap.set({ "i", "s" }, "<c-j>", function()
+				if ls.jumpable(-1) then
+					ls.jump(-1)
+				end
+			end, { silent = true })
 		end,
 	},
-	-- {
-	--   "L3MON4D3/LuaSnip",
-	--   event = "VeryLazy",
-	--   config = function()
-	--     require("luasnip.loaders.from_lua").load({ paths = "./snippets" })
-	--   end,
-	-- },
 
 	-- Autocompletion
 	{
@@ -79,13 +95,6 @@ return {
 			{ "hrsh7th/cmp-cmdline" }, -- vim/n}eovim snippet stuffs
 			{ "saadparwaiz1/cmp_luasnip" },
 			{ "hrsh7th/cmp-nvim-lsp-signature-help" },
-			-- {
-			-- 	"windwp/nvim-autopairs",
-			-- 	event = "InsertEnter",
-			-- 	opts = {}, -- this is equalent to setup({}) function
-			-- },
-			-- { "windwp/nvim-autopairs" }, -- Auto }pairs
-			-- { "PaterJason/cmp-conjure" },
 		},
 		config = function()
 			-- Here is where you configure the autocompletion settings.
@@ -205,7 +214,33 @@ return {
 			{ "williamboman/mason-lspconfig.nvim", enabled = true },
 			-- { "simrat39/inlay-hints.nvim" },
 			{ "lvimuser/lsp-inlayhints.nvim" },
-			{ "mfussenegger/nvim-lint" },
+			-- {
+			-- 	"mfussenegger/nvim-lint",
+			-- 	event = { "BufReadPre", "BufNewFile" },
+			-- 	config = function()
+			-- 		local lint = require("lint")
+			-- 		lint.linters_by_ft = {
+			-- 			markdown = { "markdownlint" },
+			-- 			cmake = { "cmakelint" },
+			-- 			cpp = { "clang-tidy" },
+			-- 		}
+			-- 	end,
+			-- }, -- {
+			-- {
+			-- 	"rshkarin/mason-nvim-lint",
+			-- 	--   dependencies = {
+			-- 	--   "mfussenegger/nvim-lint",
+			-- 	--   },
+			-- 	opts = {
+			-- 		ensure_installed = {
+			-- 			"clang-tidy",
+			-- 			"cmakelint",
+			-- 			"eslint_d",
+			-- 			"jsonlint",
+			-- 			"Ruff",
+			-- 		},
+			-- 	},
+			-- },
 			{ "hrsh7th/cmp-nvim-lsp" },
 			{ "lukas-reineke/lsp-format.nvim" },
 			{ "onsails/lspkind.nvim" },
@@ -332,6 +367,7 @@ return {
 					"fennel_language_server",
 					-- "hls",
 					"lua_ls",
+					"cmake",
 					"neocmake",
 					"powershell_es",
 					"pylsp",
@@ -367,6 +403,19 @@ return {
 									},
 									diagnostics = {
 										globals = { "vim" },
+									},
+									disable = {
+										"luadoc-miss-see-name",
+										"undefined-field",
+									},
+									runtime = {
+										version = "LuaJIT",
+									},
+									workspace = {
+										library = {
+											vim.env.VIMRUNTIME .. "/lua",
+										},
+										checkThirdParty = "Disable",
 									},
 								},
 							},
@@ -457,16 +506,23 @@ return {
 					end,
 
 					-- CMake File LSP
-					neocmake = function()
-						require("lspconfig").neocmake.setup({
-							cmd = { "neocmakelsp", "--stdio" },
-							filetypes = { "cmake" },
-							root_dir = function()
-								return lsp_zero.dir.find_first({ ".git", "cmake" })
-							end,
-							single_file_support = true, -- suggested
-						})
-					end,
+					-- neocmake = function()
+					-- 	require("lspconfig").neocmake.setup({
+					-- 		cmd = { "neocmakelsp", "--stdio" },
+					-- 		filetypes = { "cmake" },
+					-- 		init_options = {
+					-- 			format = {
+					-- 				enable = true,
+					-- 			},
+					-- 			scan_cmake_in_package = true, -- default is true
+					-- 		},
+					-- 		root_dir = function()
+					-- 			return lsp_zero.dir.find_first({ ".git", "cmake" })
+					-- 		end,
+					-- 		single_file_support = true, -- suggested
+					-- 		semantic_token = false,
+					-- 	})
+					-- end,
 
 					-- Typst
 					typst_lsp = function()
@@ -483,6 +539,67 @@ return {
 			lsp_zero.setup()
 		end,
 	},
+	{
+		"mfussenegger/nvim-lint",
+		event = { "BufReadPre", "BufNewFile" },
+		config = function()
+			local lint = require("lint")
+			lint.linters_by_ft = {
+				markdown = { "markdownlint" },
+				cmake = { "cmakelint" },
+				-- cpp = { "clang-tidy" },
+			}
+		end,
+	},
+	--    {
+	-- 	"mfussenegger/nvim-lint",
+	-- 	event = { "BufReadPre", "BufNewFile" },
+	-- 	dependencies = { "rshkarin/mason-nvim-lint", dependencies = "williamboman/mason.nvim" },
+	-- 	config = function()
+	-- 		local lint = require("lint")
+	--
+	-- 		-- lint.linters_by_ft = {
+	-- 		-- 	c = { "trivy" },
+	-- 		-- 	cpp = { "trivy" },
+	-- 		-- 	rust = { "trivy" },
+	-- 		-- 	python = { "trivy" },
+	-- 		-- 	java = { "trivy" },
+	-- 		-- 	javascript = { "trivy" },
+	-- 		-- 	typescript = { "trivy" },
+	-- 		-- }
+	--
+	-- 		-- Install linters with mason
+	-- 		require("mason-nvim-lint").setup()
+	--
+	-- 		-- Lint on entering buffer, saving and leaging insert mode
+	-- 		local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+	-- 		vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave", "TextChanged" }, {
+	-- 			group = lint_augroup,
+	-- 			callback = function()
+	-- 				lint.try_lint()
+	-- 			end,
+	-- 		})
+	--
+	-- 		vim.keymap.set("n", "<leader>io", function()
+	-- 			lint.try_lint()
+	-- 		end, { desc = "Lint buffer" })
+	-- 	end,
+	-- },
+	-- {
+	--   "rshkarin/mason-nvim-lint",
+	--   dependencies = {
+	--   "mfussenegger/nvim-lint",
+	--   },
+	--   opts = {
+	--     ensure_installed = {
+	--       "clang-tidy",
+	--       "cmakelint",
+	--       "eslint_d",
+	--       "jsonlint",
+	--       "Ruff",
+	--     }
+	--   }
+	-- },
 
 	-- DAPS
 	{
@@ -491,6 +608,7 @@ return {
 		dependencies = {
 			{ "theHamsta/nvim-dap-virtual-text", config = true },
 			{ "jbyuki/one-small-step-for-vimkind" },
+			{ "nvim-neotest/nvim-nio" },
 			{
 				"jay-babu/mason-nvim-dap.nvim",
 				opts = {
@@ -638,71 +756,21 @@ return {
 		requires = { "nvim-lua/plenary.nvim" },
 	},
 
-	{ "Olical/nfnl", ft = "fennel" },
-	-- { "Olical/aniseed" },
-	{
-		"Olical/conjure",
-		lazy = true,
-		ft = { "clojure", "fennel" }, -- etc
-		-- [Optional] cmp-conjure for cmp
-		dependencies = {
-			{
-				"PaterJason/cmp-conjure",
-				config = function()
-					local cmp = require("cmp")
-					local config = cmp.get_config()
-					table.insert(config.sources, {
-						name = "buffer",
-						option = {
-							sources = {
-								{ name = "conjure" },
-							},
-						},
-					})
-					cmp.setup(config)
-				end,
-			},
-		},
-		config = function(_, _)
-			require("conjure.main").main()
-			require("conjure.mapping")["on-filetype"]()
-		end,
-		init = function()
-			-- Set configuration options here
-			vim.g["conjure#debug"] = true
-		end,
-	},
 	{
 		"linux-cultist/venv-selector.nvim",
 		dependencies = {
 			"neovim/nvim-lspconfig",
-			"nvim-telescope/telescope.nvim",
-			"mfussenegger/nvim-dap-python",
+			"mfussenegger/nvim-dap",
+			"mfussenegger/nvim-dap-python", --optional
+			{ "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } },
 		},
-		opts = {
-			-- Your options go here
-			-- name = "venv",
-			-- auto_refresh = false
-		},
-		enabled = true,
-		event = "VeryLazy", -- Optional: needed only if you want to type `:VenvSelect` without a keymapping
+		lazy = false,
+		branch = "regexp", -- This is the regexp branch, use this for the new version
+		config = function()
+			require("venv-selector").setup()
+		end,
 		keys = {
-			{
-				-- Keymap to open VenvSelector to pick a venv.
-				"<leader>vs",
-				"<cmd>:VenvSelect<cr>",
-				-- Keymap to retrieve the venv from a cache (the one previously used for the same project directory).
-				"<leader>vc",
-				"<cmd>:VenvSelectCached<cr>",
-			},
-		},
-		config = {
-			function()
-				require("venv-selector").setup({
-
-					notify_user_on_activate = true,
-				})
-			end,
+			{ ",v", "<cmd>VenvSelect<cr>" },
 		},
 	},
 	{
@@ -721,8 +789,15 @@ return {
 			"stevearc/overseer.nvim",
 		},
 		config = function()
+			local osys = require("cmake-tools.osys")
 			require("cmake-tools").setup({
-				cmake_build_directory = "build",
+				cmake_build_directory = function()
+					if osys.iswin32 then
+						return "out\\${variant:buildType}"
+					end
+					return "out/${variant:buildType}"
+				end,
+				-- cmake_build_directory = "build",
 			})
 		end,
 	},
@@ -753,9 +828,21 @@ return {
 		config = function()
 			local ft = require("guard.filetype")
 
-			ft("c"):fmt("clang-format")
-			ft("python"):fmt("black")
-			ft("lua"):fmt("stylua")
+			-- ft("c"):fmt("clang-format"):lint("clang-tidy")
+			-- ft("cpp"):fmt("clang-format"):lint("clang-tidy")
+			ft("c,cpp"):fmt({
+				cmd = "clang-format",
+				stdin = true,
+				ignore_patterns = { "neovim", "vim" },
+			})
+			ft("python"):fmt("black"):lint("ruff")
+			ft("lua"):fmt({
+				cmd = "stylua",
+				args = { "-" },
+				stdin = true,
+				ignore_patterns = "%w_spec%.lua",
+			})
+			ft("rust"):fmt("rustfmt")
 			ft("html, css, scss, less, md, yaml, json, xml, typescript, javascript, typescriptreact"):fmt("prettier")
 
 			-- Call setup() LAST!
@@ -767,6 +854,7 @@ return {
 			})
 		end,
 	},
+	--
 	{
 		"p00f/clangd_extensions.nvim",
 		event = "VeryLazy",
@@ -783,32 +871,44 @@ return {
 	{ -- This plugin
 		"Zeioth/compiler.nvim",
 		cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
-		dependencies = {
-			{ -- The task runner we use
-				"stevearc/overseer.nvim",
-				commit = "19aac0426710c8fc0510e54b7a6466a03a1a7377",
-				cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
-				opts = {
-					task_list = {
-						direction = "bottom",
-						min_height = 25,
-						max_height = 25,
-						default_detail = 1,
-						bindings = {
-							["q"] = function()
-								vim.cmd("OverseerClose")
-							end,
-						},
-					},
-				},
-			},
-		},
+		dependencies = { "stevearc/overseer.nvim", "nvim-telescope/telescope.nvim" },
 		opts = {},
 		keys = {
 			{ "<leader>cc", "<cmd>CompilerOpen<CR>" },
+			{ "<leader>cs", "<cmd>CompilerStop<CR>" },
+			{ "<leader>ct", "<cmd>CompilerToggleResults<CR>" },
+			{ "<leader>cr", "<cmd>CompilerStop<CR><cmd>CompilerRedo<CR>" },
 		},
 	},
-	{ "krady21/compiler-explorer.nvim" },
+	{ -- The task runner we use
+		"stevearc/overseer.nvim",
+		commit = "6271cab7ccc4ca840faa93f54440ffae3a3918bd",
+		cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
+		lazy = false,
+		opts = {
+			strategy = {
+				"toggleterm",
+			},
+			task_list = {
+				direction = nil,
+				-- direction = "bottom",
+				min_height = 25,
+				max_height = 25,
+				default_detail = 1,
+				bindings = {
+					["q"] = function()
+						vim.cmd("OverseerClose")
+					end,
+				},
+			},
+		},
+		config = function()
+			require("overseer").setup({
+				templates = { "builtin", "user.run_script", "user.cpp_build" },
+			})
+		end,
+	},
+	-- { "krady21/compiler-explorer.nvim" },
 	{
 		"j-hui/fidget.nvim",
 		tag = "legacy",
@@ -838,4 +938,46 @@ return {
 			cmp.setup(config)
 		end,
 	},
+	{
+		"zeioth/garbage-day.nvim",
+		dependencies = "neovim/nvim-lspconfig",
+		event = "VeryLazy",
+		opts = {
+			-- your options here
+		},
+	},
+	{ "VidocqH/lsp-lens.nvim" },
+	{
+		"soulis-1256/eagle.nvim",
+		config = function()
+			require("eagle").setup({
+				-- override the default values found in config.lua
+			})
+		end,
+	},
+	-- {
+	-- 	"piersolenski/wtf.nvim",
+	-- 	dependencies = {
+	-- 		"MunifTanjim/nui.nvim",
+	-- 	},
+	-- 	opts = {},
+	-- 	keys = {
+	-- 		{
+	-- 			"gw",
+	-- 			mode = { "n", "x" },
+	-- 			function()
+	-- 				require("wtf").ai()
+	-- 			end,
+	-- 			desc = "Debug diagnostic with AI",
+	-- 		},
+	-- 		{
+	-- 			mode = { "n" },
+	-- 			"gW",
+	-- 			function()
+	-- 				require("wtf").search()
+	-- 			end,
+	-- 			desc = "Search diagnostic with Google",
+	-- 		},
+	-- 	},
+	-- },
 }

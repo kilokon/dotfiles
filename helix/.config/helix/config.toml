@@ -72,8 +72,8 @@ pageup = "no_op"
 pagedown = "no_op"
 # Clipboards over registers 
 # x = "delete_selection"
-# p = "paste_clipboard_after"
-# P = "paste_clipboard_before"
+p = "paste_clipboard_after"
+P = "paste_clipboard_before"
 y = [
         "yank_main_selection_to_clipboard",
         "normal_mode",
@@ -110,8 +110,6 @@ pagedown = "no_op"
 
 
 [keys.select]
-p = ":clipboard-paste-replace"                               # No life without this
-P = ":clipboard-paste-after"
 d = ["yank_main_selection_to_clipboard", "delete_selection"]
 # x = ["yank_main_selection_to_clipboard", "delete_selection"]
 y = [
