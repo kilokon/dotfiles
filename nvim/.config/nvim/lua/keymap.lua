@@ -16,6 +16,14 @@ map("n", "<left>", "<Nop>", opts)
 map("n", "<right>", "<Nop>", opts)
 map("n", "<up>", "<Nop>", opts)
 map("n", "<down>", "<Nop>", opts)
+map("n", "<C-left>", "<Nop>", opts)
+map("n", "<C-right>", "<Nop>", opts)
+map("n", "<C-up>", "<Nop>", opts)
+map("n", "<C-down>", "<Nop>", opts)
+map("i", "<C-left>", "<Nop>", opts)
+map("i", "<C-right>", "<Nop>", opts)
+map("i", "<C-up>", "<Nop>", opts)
+map("i", "<C-down>", "<Nop>", opts)
 
 -- ^ is nuts
 map("n", "H", "^")
@@ -31,8 +39,8 @@ map("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", opts)
 map("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
 map("n", "[b", "<cmd>bprevious<cr>", { desc = "Previous Buffer" })
 
-map("n", "<right>", "<cmd>bnext<cr>", { desc = "Next buffer" })
-map("n", "<left>", "<cmd>bprevious<cr>", { desc = "Previous Buffer" })
+map("n", "gt", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "gT", "<cmd>bprevious<cr>", { desc = "Previous Buffer" })
 
 -- Move to start/end on line in command mode
 map("i", "<C-a>", "<home>", { desc = "Move to end of line" })
@@ -47,6 +55,10 @@ map("c", "W", "w", { desc = "Always write w" })
 map("v", "<", "<gv", opts)
 map("v", ">", ">gv", opts)
 
+map("n", "<left>", "<C-w><left>", opts)
+map("n", "<right>", "<C-w><right>", opts)
+map("n", "<up>", "<C-w><up>", opts)
+map("n", "<down>", "<C-w><down>", opts)
 --smartquit
 map("n", "qq", '<cmd>lua require("smart_quit")()<CR>')
 

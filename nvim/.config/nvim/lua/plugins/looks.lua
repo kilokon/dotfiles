@@ -137,33 +137,33 @@ return {
     opts = {},
   },
   -- { "akinsho/bufferline.nvim", version = "*", dependencies = "nvim-tree/nvim-web-devicons" },
-  {
-    -- TODO: Mike, fork this and make it stable maybe?
-    "edluffy/specs.nvim",
-    config = function()
-      local success, colors = pcall(require, "vscode.colors")
-      local bg = colors and colors.Violet or "#646695"
-      local fg = colors and colors.Gray or "#808080"
-      vim.api.nvim_set_hl(0, "Specs", {
-        fg = fg,
-        bg = bg,
-      })
-      local specs = require("specs")
-      specs.setup({
-        show_jumps = true,
-        popup = {
-          delay_ms = 5,
-          inc_ms = 10,
-          width = 20,
-          fader = specs.pulse_fader,
-          resizer = specs.slide_resizer,
-          winhl = "Specs",
-        },
-        -- ignore_filetypes = excluded_filetypes_array,
-        ignore_buftypes = { nofile = true, prompt = true },
-      })
-    end,
-  },
+  -- {
+  --   -- TODO: Mike, fork this and make it stable maybe?
+  --   "edluffy/specs.nvim",
+  --   config = function()
+  --     local success, colors = pcall(require, "vscode.colors")
+  --     local bg = colors and colors.Violet or "#646695"
+  --     local fg = colors and colors.Gray or "#808080"
+  --     vim.api.nvim_set_hl(0, "Specs", {
+  --       fg = fg,
+  --       bg = bg,
+  --     })
+  --     local specs = require("specs")
+  --     specs.setup({
+  --       show_jumps = true,
+  --       popup = {
+  --         delay_ms = 5,
+  --         inc_ms = 10,
+  --         width = 20,
+  --         fader = specs.pulse_fader,
+  --         resizer = specs.slide_resizer,
+  --         winhl = "Specs",
+  --       },
+  --       -- ignore_filetypes = excluded_filetypes_array,
+  --       ignore_buftypes = { nofile = true, prompt = true },
+  --     })
+  --   end,
+  -- },
   { "lewis6991/satellite.nvim" }, -- satellite.nvim is a Neovim plugin that displays decorated scrollbars.
   { "echasnovski/mini.trailspace", version = false },
   {

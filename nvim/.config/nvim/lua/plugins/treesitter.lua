@@ -27,6 +27,7 @@ return {
 			-- { "/nvim-ts-rainbow2", event = "VeryLazy" },
 
 			{ "mimmanuel/nvim-treesitter-powershell" },
+			{ "nushell/tree-sitter-nu" },
 		},
 		build = ":TSUpdate",
 		config = function()
