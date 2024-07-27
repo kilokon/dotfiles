@@ -1,5 +1,6 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
+-- local session_manager = require("wezterm-session-manager")
 
 wezterm.on("update-right-status", function(window, pane)
 	local name = window:active_key_table()
@@ -8,6 +9,16 @@ wezterm.on("update-right-status", function(window, pane)
 	end
 	window:set_right_status(name or "")
 end)
+
+-- wezterm.on("save_session", function(window)
+-- 	session_manager.save_state(window)
+-- end)
+-- wezterm.on("load_session", function(window)
+-- 	session_manager.load_state(window)
+-- end)
+-- wezterm.on("restore_session", function(window)
+-- 	session_manager.restore_state(window)
+-- end)
 
 -- local function is_vim(pane)
 --   -- this is set by the plugin, and unset on ExitPre in Neovim
@@ -58,6 +69,13 @@ end
 local M = {}
 M.keys = function()
 	return {
+		-- Session Manager
+		-- { key = "S", mods = "LEADER", action = wezterm.action({ EmitEvent = "save_session" }) },
+		-- { key = "L", mods = "LEADER", action = wezterm.action({ EmitEvent = "load_session" }) },
+		-- { key = "R", mods = "LEADER", action = wezterm.action({ EmitEvent = "restore_session" }) },
+
+		-- Launcher Menu
+		{ key = "l", mods = "ALT", action = act.ShowLauncher },
 		-- move between split panes
 		split_nav("move", "h"),
 		split_nav("move", "j"),
@@ -125,8 +143,8 @@ M.keys = function()
 		},
 		{ key = ")", mods = "CTRL", action = "SpawnWindow" },
 		{
-			key = "9",
-			mods = "ALT",
+			key = "w",
+			mods = "LEADER",
 			action = act({
 				ShowLauncherArgs = { flags = "FUZZY|WORKSPACES" },
 			}),
@@ -138,11 +156,11 @@ M.keys = function()
 				SwitchWorkspaceRelative = 1,
 			}),
 		},
-		-- {
-		--         key = "P",
-		--         mods = "CTRL",
-		--         action = wezterm.action({ SwitchWorkspaceRelative = -1 }),
-		-- },
+		{
+			key = "P",
+			mods = "LEADER",
+			action = wezterm.action({ SwitchWorkspaceRelative = -1 }),
+		},
 
 		{
 			key = "a",
@@ -166,6 +184,31 @@ M.keys = function()
 		{ key = "6", mods = "CTRL|ALT", action = act.ActivateTab(5) },
 		{ key = "7", mods = "CTRL|ALT", action = act.ActivateTab(6) },
 		{ key = "8", mods = "CTRL|ALT", action = act.ActivateTab(7) },
+		{
+			key = "W",
+			-- mods = "CTRL|SHIFT",
+			mods = "LEADER",
+			action = act.PromptInputLine({
+				description = wezterm.format({
+					{ Attribute = { Intensity = "Bold" } },
+					{ Foreground = { AnsiColor = "Fuchsia" } },
+					{ Text = "Enter name for new workspace" },
+				}),
+				action = wezterm.action_callback(function(window, pane, line)
+					-- line will be `nil` if they hit escape without entering anything
+					-- An empty string if they just hit enter
+					-- Or the actual line of text they wrote
+					if line then
+						window:perform_action(
+							act.SwitchToWorkspace({
+								name = line,
+							}),
+							pane
+						)
+					end
+				end),
+			}),
+		},
 	}
 end
 M.key_tables = function()

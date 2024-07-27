@@ -31,7 +31,7 @@ local options = {
 	cursorline = true, -- highlight the current line
 	number = true, -- set numbered lines
 	relativenumber = true, -- set relative numbered lines
-	numberwidth = 3, -- set number column width to 2 {default 4}
+	-- numberwidth = 3, -- set number column width to 2 {default 4}
 	scrolloff = 8,
 	sidescrolloff = 8,
 	errorbells = false, -- no error bells
@@ -58,8 +58,8 @@ for k, v in pairs(options) do
 	vim.opt[k] = v
 end
 
-vim.g.rust_recommended_style = false
-vim.g.python3_host_prog = "/usr/bin/python3"
+-- vim.g.rust_recommended_style = false
+-- vim.g.python3_host_prog = "/usr/bin/python3"
 
 -- if vim.fn.has("nvim-0.9") == 1 and not vim.opt.diff:get() then
 --   vim.opt.signcolumn = "yes:1"

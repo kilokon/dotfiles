@@ -8,7 +8,7 @@ return {
       -- Disable automatic setup, we are doing it manually
       -- vim.g.lsp_zero_extend_cmp = 0
       -- vim.g.lsp_zero_extend_lspconfig = 0
-      vim.b.lsp_zero_enable_autoformat = 1
+      -- vim.b.lsp_zero_enable_autoformat = 1
     end,
   },
   {
@@ -76,36 +76,14 @@ return {
       { "gM", "<CMD>Glance implementations<CR>" },
     },
   },
-  -- {
-  -- 	"mfussenegger/nvim-lint",
-  -- 	event = { "BufReadPre", "BufNewFile" },
-  -- 	config = function()
-  -- 		local lint = require("lint")
-  -- 		lint.linters_by_ft = {
-  -- 			markdown = { "markdownlint" },
-  -- 			cmake = { "cmakelint" },
-  -- 			-- cpp = { "clang-tidy" },
-  -- 		}
-  -- 	end,
-  -- },
+
 
   { "lvimuser/lsp-inlayhints.nvim" },
-  --   {
-  --   'felpafel/inlay-hint.nvim',
-  --   event = 'LspAttach',
-  --   config = true,
-  -- },
 
   {
     "neovim/nvim-lspconfig",
     cmd = { "LspInfo", "LspInstall", "LspStart" },
-    -- event = { "BufReadPre" },
     event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-
-
-    },
-
     config = function()
       vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
       vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
@@ -142,10 +120,7 @@ return {
       })
 
       vim.g.rustaceanvim = {
-        -- inlay_hints = {
-        --   -- auto = false,
-        --   highlight = "NonText",
-        -- },
+
         tools = {
           hover_actions = {
             auto_focus = true,
@@ -314,16 +289,16 @@ return {
           end,
 
           -- Python Ruff Linter and Formatter
-          ruff_lsp = function()
-            require("lspconfig").ruff_lsp.setup({
-              init_options = {
-                settings = {
-                  -- Any extra CLI arguments for `ruff` go here.
-                  args = {},
-                },
-              },
-            })
-          end,
+          -- ruff_lsp = function()
+          --   require("lspconfig").ruff_lsp.setup({
+          --     init_options = {
+          --       settings = {
+          --         -- Any extra CLI arguments for `ruff` go here.
+          --         args = {},
+          --       },
+          --     },
+          --   })
+          -- end,
 
           -- C/C++ LSP
           clangd = function()
@@ -336,10 +311,31 @@ return {
                 "--header-insertion=iwyu",
               },
               filetypes = { "c", "cpp", "objc", "objcpp", "h", "hpp" },
-              on_attach = function(_, _)
-                require("clangd_extensions.inlay_hints").setup_autocmd()
-                require("clangd_extensions.inlay_hints").set_inlay_hints()
+              on_attach = function(_, buf)
+                local group = vim.api.nvim_create_augroup("clangd_no_inlay_hints_in_insert", { clear = true })
+
+                vim.keymap.set("n", "<leader>lh", function()
+                  if require("clangd_extensions.inlay_hints").toggle_inlay_hints() then
+                    vim.api.nvim_create_autocmd("InsertEnter", {
+                      group = group,
+                      buffer = buf,
+                      callback = require("clangd_extensions.inlay_hints").disable_inlay_hints
+                    })
+                    vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, {
+                      group = group,
+                      buffer = buf,
+                      callback = require("clangd_extensions.inlay_hints").set_inlay_hints
+                    })
+                  else
+                    vim.api.nvim_clear_autocmds({ group = group, buffer = buf })
+                  end
+                end, { buffer = buf, desc = "[l]sp [h]ints toggle" })
               end,
+              -- on_attach = function(_, _)
+              --   require("clangd_extensions.inlay_hints").setup_autocmd()
+              --   require("clangd_extensions.inlay_hints").set_inlay_hints()
+              --
+              -- end,
             })
           end,
 
@@ -359,9 +355,6 @@ return {
       lsp_zero.setup()
     end,
   },
-
-  -- { "VidocqH/lsp-lens.nvim" },
-
   {
     "linux-cultist/venv-selector.nvim",
     dependencies = {
@@ -407,17 +400,6 @@ return {
       })
     end,
   },
-  -- {
-  --   "iamcco/markdown-preview.nvim",
-  --   cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-  --   ft = { "markdown" },
-  --   build = function()
-  --     vim.fn["mkdp#util#install"]()
-  --   end,
-  --   opts = {
-  --     mkdp_auto_start = 1,
-  --   }
-  -- },
   {
     "mrcjkb/rustaceanvim",
     version = "^4", -- Recommended
@@ -526,40 +508,11 @@ return {
           hover = true,
         },
       })
-      --   }
-      -- )
-
-      -- completion = {
-      -- 	cmp = {
-      -- 		enabled = true,
-      -- 	},
-      -- }
-
-      -- local cmp = require("cmp")
-      -- local config = cmp.get_config()
-      -- table.insert(config.sources, {
-      -- 	name = "buffer",
-      -- 	option = {
-      -- 		sources = {
-      -- 			{ name = "conjure" },
-      -- 		},
-      -- 	},
-      -- })
-      -- cmp.setup(config)
     end,
   },
-  -- a custom floating (popup) window that displays any Diagnostic (Error, Warning, Hint) with the help of the Diagnostic API of Neovim,
-  -- {
-  --   "soulis-1256/eagle.nvim",
-  --   config = function()
-  --     require("eagle").setup({
-  --       -- override the default values found in config.lua
-  --     })
-  --   end,
-  -- },
   {
     "lewis6991/hover.nvim",
-    keys= {
+    keys = {
       -- {'<MouseMove>', "<cmd> :lua require('hover').hover_mouse<CR>"}
     },
     config = function()

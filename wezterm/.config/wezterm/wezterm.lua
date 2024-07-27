@@ -1,10 +1,42 @@
 -- WezTerm configuration
 ---------------------------------------------------------------
 
-print("hello")
+-- print("hello")
 local wezterm = require("wezterm")
 local wezKeys = require("keymap")
-local helpers = require("helpers")
+-- local helpers = require("helpers")
+-- local session_manager = require("wezterm-session-manager")
+
+local function is_found(str, pattern)
+	return string.find(str, pattern) ~= nil
+end
+
+local function platform()
+	return {
+		is_win = is_found(wezterm.target_triple, "windows"),
+		is_linux = is_found(wezterm.target_triple, "linux"),
+		is_mac = is_found(wezterm.target_triple, "apple"),
+	}
+end
+
+wezterm.on("update-right-status", function(window, pane)
+	window:set_right_status(window:active_workspace())
+end)
+
+
+local sesh = require("sesh")
+
+wezterm.on("augment-command-palette", function(_window, _pane)
+    return {
+        -- Create a session and interactively name it
+        sesh.create,
+        -- Use wezterm's InputSelector to attach to available sessions
+        sesh.attach,
+        --
+        -- ... the rest of your augment-command-palette config
+    }
+end)
+
 
 local config = {}
 -- local nf = wezterm.nerdfonts
@@ -13,8 +45,9 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
--- config.default_prog = { "/usr/bin/zsh", "-l" }
-config.default_prog = { "/usr/bin/fish", "-l" }
+-- config.default_prog = {"/usr/bin/nu", "-l"}
+config.default_prog = { "/usr/bin/zsh", "-l"}
+-- config.default_prog = { "/usr/bin/fish", "-l" }
 config.default_cursor_style = "SteadyBar"
 config.font = wezterm.font_with_fallback({
 	-- {
@@ -67,33 +100,19 @@ config.window_frame = {
 config.underline_thickness = 1
 config.underline_position = -2.0
 
--- wezterm.on(
---   'format-tab-title',
---   function(tab, tabs, panes, conf, hover, max_width)
---     local has_unseen_output = false
---     if not tab.is_active then
---       for _, pane in ipairs(tab.panes) do
---         if pane.has_unseen_output then
---           has_unseen_output = true
---           break
---         end
---       end
---     end
---
---     local title = string.format(' %s ~ %s  ', get_process(tab), get_current_working_dir(tab))
---
---     if has_unseen_output then
---       return {
---         { Foreground = { Color = 'Orange' } },
---         { Text = title },
---       }
---     end
---
---     return {
---       { Text = title },
---     }
---   end
--- )
+config.launch_menu = {
+
+	{
+		label = "Felix Dotfiles",
+		args = { "zsh", "-c", "fx", "~/dotfiles" },
+	},
+	{
+		label = "Felix Dev",
+		args = { "fx", "~/sync/NO_LOGIC_HERE" },
+	},
+}
+
+
 
 -- Check whether the given file exists
 function file_exists(name)
@@ -119,6 +138,6 @@ function determine_term_value()
 end
 
 -- helpers.apply_to_config(config)
-wezterm.log_info("hellos")
+-- wezterm.log_info("hellos")
 
 return config

@@ -1,260 +1,294 @@
-setopt COMBINING_CHARS
-# echo "Loading zshrc"
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
-# History stuff =============================================
-#------------------------------
-HISTFILE=~/.histfile
-HISTSIZE=1000
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time Oh My Zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+ZSH_THEME="robbyrussell"
+
+
+# history setup
+HISTFILE=$HOME/.zhistory
 SAVEHIST=1000
+HISTSIZE=1000
+setopt share_history
+setopt hist_expire_dups_first
+setopt hist_ignore_dups
+setopt hist_verify
 
-setopt hist_ignore_dups  # Collapse two consecutive idential commands.
-setopt hist_find_no_dups  # Ignore duplicates when searching history.
-setopt share_history  # Share across concurrent sessions (append immediately, read from files, add timestamps).
-setopt hist_ignore_space  # Lines that begin with space are not recorded.
-setopt hist_verify  # Don't auto-execute selected history entry.
-setopt hist_ignore_all_dups  # If a history entry would be duplicate, delete older copies.
+# completion using arrow keys (based on history)
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
 
-# Comletion =====================================================
-# ------------------------------
-if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-       . /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# History settings.
+# export HISTFILE="${XDG_CACHE_HOME}/zsh/.history"
+export HISTTIMEFORMAT="%Y/%m/%d %H:%M:%S:   "
+setopt INC_APPEND_HISTORY   # Immediately append commands to history file.
+setopt HIST_IGNORE_ALL_DUPS # Never add duplicate entries.
+setopt HIST_IGNORE_SPACE    # Ignore commands that start with a space.
+setopt HIST_REDUCE_BLANKS   # Remove unnecessary blank lines.
+
+# DIRECTORY STACK
+setopt auto_pushd        # automatically push previous directory to the stack
+setopt pushd_ignore_dups # ignore duplicates in directory stack
+setopt pushd_minus       # swap + and -
+setopt pushd_silent      # silend pushd and popd
+setopt pushd_to_home     # pushd defaults to $HOME
+DIRSTACKSIZE=12
+
+# GENERAL
+# setopt menu_complete            # insert first match of the completion
+setopt list_packed          # fit more completions on the screen
+setopt auto_cd              # change directory by writing the directory name
+setopt notify               # report job status immediately
+setopt no_flow_control      # disable flow control - Ctrl+S and Ctrl+Q keys
+setopt interactive_comments # allow comments
+setopt noclobber            # >! or >| for existing files
+
+# Customize spelling correction prompt.
+SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
+
+#
+# zsh-autosuggestions
+#
+
+# Customize the style that the suggestions are shown with.
+# See https://github.com/zsh-users/zsh-autosuggestions/blob/master/README.md#suggestion-highlight-style
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='bold'
+
+#
+# zsh-syntax-highlighting
+#
+
+# Set what highlighters will be used.
+# See https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
+
+# Customize the main highlighter styles.
+# See https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters/main.md#how-to-tweak-it
+typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_STYLES[comment]='fg=242'
+
+export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE='50'       # only show suggestions when the command is less than 50 characters long
+export ZSH_AUTOSUGGEST_MANUAL_REBIND='true'       # can be set to true for better performance.
+export ZSH_AUTOSUGGEST_HISTORY_IGNORE="?(#c200,)" # ignore history entries that are longer than 200 characters
+
+# Rust debug for tracing and other logging
+export RUST_LOG=debug
+
+
+
+if [[ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions ]]; then
+  echo "Installing zsh-autosuggestions"
+  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 fi
 
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ~/.zsh/cache
-zstyle ':completion:*:(all-|)files' ignored-patterns '(|*/)CVS'
-zstyle ':completion:*:cd:*' ignored-patterns '(*/)#CVS'
+if [[ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting ]]; then
+  echo "Installing zsh-syntax-highlighting"
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+fi
+
+if [[ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-completions ]]; then
+  echo "Installing zsh-completions"
+  git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions
+fi
 
 
-# Fuzzy matching of completions for when you mistype them:
-zstyle ':completion:*' completer _complete _match _approximate
-zstyle ':completion:*:match:*' original only
-zstyle ':completion:*:approximate:*' max-errors 1 numeric
+source "$HOME/.cargo/env"
 
-zstyle -e ':completion:*:approximate:*' \
-        max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3))numeric)'
-# Ignore completion functions for commands you don’t have
-zstyle ':completion:*:functions' ignored-patterns '_*'
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in $ZSH/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
-zstyle ':completion:*:*:kill:*' menu yes select
-zstyle ':completion:*:kill:*'   force-list always
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
 
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
 
-autoload -U compinit && compinit -u
-# zstyle ':completion:*' menu select
-# # Auto complete with case insenstivity
-# #zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-# zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
-# zstyle ':completion::complete:*' use-cache on
-# zstyle ':completion::complete:*' cache-path ~/.cache/zsh_completion
-# # Make completion match at any part of the string (not just the beginning).
-# # (Note this isn't fuzzy though; it looks for an exact match).
-# zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
-# # Shift tab to navigate backwards
-# bindkey '^[[Z' reverse-menu-complete
+# Uncomment one of the following lines to change the auto-update behavior
+# zstyle ':omz:update' mode disabled  # disable automatic updates
+# zstyle ':omz:update' mode auto      # update automatically without asking
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
+# Uncomment the following line to change how often to auto-update (in days).
+# zstyle ':omz:update' frequency 13
 
-zmodload zsh/complist
-compinit
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS="true"
 
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
 
-_comp_options+=(globdots)		# Include hidden files.
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
 
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
 
-# Colors ==================================================================
-#------------------------------
+# Uncomment the following line to display red dots whilst waiting for completion.
+# You can also set it to another string to have that shown instead of the default red dots.
+# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+# COMPLETION_WAITING_DOTS="true"
 
-source ~/repos/sourcing/F-Sy-H/F-Sy-H.plugin.zsh
-autoload -U colors && colors
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
 
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
 
-# Globals ========================================================
-# -----------------------------
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
 
-# export EDITOR="nvim"
-# export VISUAL="nvim"
-EDITOR=emacsclient
-GIT_EDITOR=$EDITOR
-export STARSHIP_CONFIG=~/.config/zsh_starship.toml
-export BROWSER="microsoft-edge-dev"
-
-# Vim Mode =======================================================
-# -----------------------------
-#source "$HOME/repos/zsh-vim-mode/zsh-vim-mode.plugin.zsh"
-
-# https://github.com/jeffreytse/zsh-vi-mode
-source "$HOME/repos/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
-
-# Alias ===========================================================
-# -----------------------------
-
-alias zrc="$EDITOR ~/.zshrc"
-alias grep='grep --color=auto'
-alias vi="nvim"
-alias cls="clear"
-alias gu="gitui"
-alias ga="git add"
-alias nel="nvim ~/.config/nvim/lua/plugins/lang_server_mgmnt.lua"
-alias nei="nvim ~/.config/nvim/lua/plugins/init.lua"
-alias ls="eza -1"
-alias ll="eza -alh --git"
-alias tree="eza --tree"
-alias lfancy="eza --icons"
-alias ef="exec fish"
-alias eb="exec bash"
-alias ez="exec zsh"
-alias en="exec nu"
-alias j="just"
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias dev="cd $HOME/Dev/"
-# alias emacstabs='emacs --eval "(setq display-buffer-base-action '(display-buffer-in-tab))"
-alias gg="emacsclient -c -e '(magit-status)'" # magit
-alias emacn="emacsclient -nw"
-alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
-#alias emacs="emacs -nw"
-# alias emacs29="emacs -nw --init-directory ~/dotfiles/emacs/emacs29"
-# alias hx="helix"
-alias nvdot="nvim ~/.dotfiles/"
-#alias emac="emacsclient -c ~/.dotfiles/emacs/.emacs.d/init.el &"
-#alias dotfiles="$EDITOR $DOTFILES_DIR"
-alias pl="ps aux | grep"
-alias k="kill -9"
-alias sync_notes="onedrive --synchronize --single-directory 'mynotes'"
-alias sync_dev="onedrive --synchronize --single-directory 'dev'"
-#alias kmo="kmonad $DOTFILES/kmonad/.config/kmonad/ansi_qwerty_circle_87keys.kbd"
-alias bevc="gh gist view 9c7afb882391fcc1264b8a7d4f8dcb6e | xsel -ib"
-# alias nvim="nvim -p"
-alias code="code --profile aviik"
-#------------------------------
-# ShellFuncs
-#------------------------------
-# -- coloured manuals
-man() {
-  env \
-    LESS_TERMCAP_mb=$(printf "\e[1;31m") \
-    LESS_TERMCAP_md=$(printf "\e[1;31m") \
-    LESS_TERMCAP_me=$(printf "\e[0m") \
-    LESS_TERMCAP_se=$(printf "\e[0m") \
-    LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
-    LESS_TERMCAP_ue=$(printf "\e[0m") \
-    LESS_TERMCAP_us=$(printf "\e[1;32m") \
-    man "$@"
-}
-
-#------------------------------
-# ShellFuncs
-#------------------------------
-function mkcd(){
-  mkdir -p $@ && cd ${@:$#}
-}
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=( 
+  archlinux 
+  aliases
+  zsh-autosuggestions 
+  zsh-completions
+  zsh-syntax-highlighting 
+  cabal
+  colored-man-pages
+  copybuffer
+  docker 
+  dotenv 
+  extract
+  fzf
+  git
+  mise
+  rust
+  starship
+  zoxide
+  )
 
 
+if [[ -z "$ZDOTDIR" ]]; then
+  # If ZDOTDIR is not set, assign it to $HOME
+  ZDOTDIR="$HOME"
+fi
 
-# -- coloured manuals
-man() {
-  env \
-    LESS_TERMCAP_mb=$(printf "\e[1;31m") \
-    LESS_TERMCAP_md=$(printf "\e[1;31m") \
-    LESS_TERMCAP_me=$(printf "\e[0m") \
-    LESS_TERMCAP_se=$(printf "\e[0m") \
-    LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
-    LESS_TERMCAP_ue=$(printf "\e[0m") \
-    LESS_TERMCAP_us=$(printf "\e[1;32m") \
-    man "$@"
-}
+
+fpath+=${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions/src
+
+ZSH_DOTENV_FILE=.dotenv
 
 [ -n "$WEZTERM_PANE" ] && export NVIM_LISTEN_ADDRESS="/tmp/nvim$WEZTERM_PANE"
 
-
 #Direnv 
-eval "$(direnv hook zsh)"
-
-#Pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(direnv hook zsh)"``
 
 # Zoxide
 eval "$(zoxide init zsh)"
-source ~/repos/sourcing/zabb/zabb.plugin.zsh
 
-# Starship
-eval "$(starship init zsh)"
-
-# Pyenv
-eval "$(pyenv init -)"
-eval "$(pyenv init - --no-rehash zsh)"
-eval "$(pyenv virtualenv-init -)"
-
+eval "$(mise activate zsh)"
 # Atuin
-export ATUIN_NOBIND="true"
+# export ATUIN_NOBIND="true"
 eval "$(atuin init zsh)"
 
 # felix
 source <(command fx --init)
 
+# opam configuration
+[[ ! -r /home/aviik/.opam/opam-init/init.zsh ]] || source /home/aviik/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
 
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+source $ZSH/oh-my-zsh.sh
+
+autoload -Uz compinitzstyle ':omz:update' mode reminder
+
+for dump in "$ZDOTDIR"/.zcompdump(N.mh+24); do
+  compinit
+done
+compinit -C
+compinit
+_comp_options+=(globdots)
+
+# zstyle ':completion:*' menu select=2
+# zstyle ':completion:*' auto-description 'specify: %d'
+# zstyle ':completion:*' completer _expand _complete _correct _approximate
+# zstyle ':completion:*' format 'Completing %d'
+# zstyle ':completion:*' group-name ''
+
+zstyle ':completion:*' menu select # select completions with arrow keys
+zstyle ':completion:*' group-name '' # group results by category
+zstyle ':completion:::::' completer _expand _complete _ignored _approximate # enable approximate matches for completion
+zstyle ':completion:*' format '%F{magenta}  %d %f'
+zstyle ':completion:*:options' description yes
+zstyle ':completion:*:options' auto-description '%d'
+zstyle ':completion:*:corrections' format '%F{yellow}  %d (errors: %e) %f'
+zstyle ':completion:*:descriptions' format '%F{magenta}  %d %f'
+zstyle ':completion:*:messages' format '%F{blue} 𥉉%d %f'
+zstyle ':completion:*:warnings' format '%F{red}  No matches found... %f'
+zstyle ':completion:*:default' list-prompt '%S%M matches%s'
+zstyle ':completion:*:default' menu select=2
+zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':omz:update' mode reminder
+
+
+
+
+source ~/repos/sourcing/zabb/zabb.plugin.zsh
+
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
+
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
+# For a full list of active aliases, run `alias`.
 #
-# autoload -U add-zsh-hook
-# load-nvmrc() {
-#   local nvmrc_path="$(nvm_find_nvmrc)"
-#
-#   if [ -n "$nvmrc_path" ]; then
-#     local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-#
-#     if [ "$nvmrc_node_version" = "N/A" ]; then
-#       nvm install
-#     elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
-#       nvm use
-#     fi
-#   elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
-#     echo "Reverting to nvm default version"
-#     nvm use default
-#   fi
-# }
-# add-zsh-hook chpwd load-nvmrc
-# load-nvmrc
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+# Shell Jump
+alias eb="exec bash"
+alias ef="exec fish"
+alias ez="exec zsh"
+alias en="exec nu"
 
+alias cls="clear"
+alias j="just"
+alias sync_notes="onedrive --synchronize --single-directory 'mynotes'"
+alias sync_dev="onedrive --synchronize --single-directory 'dev'"
+alias fxd="fx ~/dotfiles"
+alias fxs="fx ~/sync/NO_LOGIC_HERE" 
+alias fxo="fx ~/OneDrive"
 
-vterm_printf() {
-    if [ -n "$TMUX" ] && ([ "${TERM%%-*}" = "tmux" ] || [ "${TERM%%-*}" = "screen" ]); then
-        # Tell tmux to pass the escape sequences through
-        printf "\ePtmux;\e\e]%s\007\e\\" "$1"
-    elif [ "${TERM%%-*}" = "screen" ]; then
-        # GNU screen (screen, screen-256color, screen-256color-bce)
-        printf "\eP\e]%s\007\e\\" "$1"
-    else
-        printf "\e]%s\e\\" "$1"
-    fi
-}
-[ -f "/home/aviik/.ghcup/env" ] && source "/home/aviik/.ghcup/env" # ghcup-env
-
-
-fpath=( ~/.zfunc "${fpath[@]}" )
-# echo $fpath
-# autoload -Uz mkcd
-autoload -Uz create-c-project
-autoload -Uz $(ls ~/.zfunc)
-
-fancy-ctrl-z () {
-  if [[ $#BUFFER -eq 0 ]]; then
-    BUFFER="fg"
-    zle accept-line -w
-  else
-    zle push-input -w
-    zle clear-screen -w
-  fi
-}
-zle -N fancy-ctrl-z
-bindkey '^Z' fancy-ctrl-z
-
-# fzf
-#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-# which green >& /dev/null && source "$( green --completion-file )"
 
 
 
@@ -269,33 +303,4 @@ bindkey '^a' beginning-of-line
 bindkey '^e' end-of-line
 bindkey '^[r' _atuin_search_widget
 
-mkcd() {
-  mkdir -p "$1" && cd "$1"
-}
-
-# Emacs modifications
-if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
-    alias clear='vterm_printf "51;Evterm-clear-scrollback";tput clear'
-    echo "in emacs"
-fi
-
-# emacs M-x shell
-if [[ "dumb" == $TERM ]] ; then
-  alias l='cat'
-  alias less='cat'
-  alias m='cat'
-  alias more='cat'
-  export PAGER=cat
-  export TERM=xterm-256color
-else
-  alias l='less'
-  alias m='more'
-  fi
-[[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ '
-
-# opam configuration
-[[ ! -r /home/aviik/.opam/opam-init/init.zsh ]] || source /home/aviik/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
-
-# mise
-eval "$(mise activate zsh)"
-eval "$(mise activate zsh --shims)"
+source /home/aviik/.config/broot/launcher/bash/br
