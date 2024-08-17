@@ -199,15 +199,19 @@ return {
       require("mason-lspconfig").setup({
         ensure_installed = {
           "clangd",
+          "glslls",
           "lua_ls",
           "cmake",
+          "godot-gdscript-toolkit",
+          -- "gdscript",
           "neocmake",
           "powershell_es",
           "pyright",
           "ruff_lsp",
           "rust_analyzer",
           "taplo",
-          "typst_lsp",
+          "tinymist", -- integrated language service for Typst
+          -- "typst_lsp",
           "yamlls",
         },
         handlers = {
@@ -255,6 +259,11 @@ return {
               },
             })
           end,
+          -- gdscript = function ()
+          --   require'lspconfig'.gdscript.setup{
+          --
+          --   }
+          -- end,
 
           -- JSONLS
           jsonls = function()
@@ -288,17 +297,43 @@ return {
             })
           end,
 
+          -- Pyright for everything else:
+          pyright = function()
+            require('lspconfig').pyright.setup {
+              settings = {
+                pyright = {
+                  autoImportCompletion = true,
+                  -- Using Ruff's import organizer
+                  disableOrganizeImports = true
+                },
+                python = {
+                  analysis = {
+                    -- Ignore all files for analysis to exclusively use Ruff for linting
+                    ignore = { '*' }
+                  }
+                }
+              }
+            }
+          end,
+
           -- Python Ruff Linter and Formatter
-          -- ruff_lsp = function()
-          --   require("lspconfig").ruff_lsp.setup({
-          --     init_options = {
-          --       settings = {
-          --         -- Any extra CLI arguments for `ruff` go here.
-          --         args = {},
-          --       },
-          --     },
-          --   })
-          -- end,
+          ruff_lsp = function()
+            local on_attach = function(client, bufnr)
+              if client.name == 'ruff_lsp' then
+                -- Disable hover in favor of Pyright
+                client.server_capabilities.hoverProvider = false
+              end
+            end
+            require("lspconfig").ruff_lsp.setup({
+              init_options = {
+                settings = {
+                  -- Any extra CLI arguments for `ruff` go here.
+                  args = {},
+                },
+              },
+              on_attach = on_attach,
+            })
+          end,
 
           -- C/C++ LSP
           clangd = function()
@@ -339,13 +374,39 @@ return {
             })
           end,
 
+
+
+          --GLSL
+          glslls = function()
+            require 'lspconfig'.glslls.setup {
+              -- filetypes = { "vert", "frag" },
+            }
+            -- code
+          end,
+
           -- Typst
-          typst_lsp = function()
-            require("lspconfig").typst_lsp.setup({
-              settings = {
-                exportPdf = "onType", -- Choose onType, onSave or never.
-                -- serverPath = "" -- Normally, there is no need to uncomment it.
-              },
+          -- typst_lsp = function()
+          --   require("lspconfig").typst_lsp.setup({
+          --     settings = {
+          --       exportPdf = "onType", -- Choose onType, onSave or never.
+          --       -- serverPath = "" -- Normally, there is no need to uncomment it.
+          --     },
+          --   })
+          -- end,
+          tinymist = function()
+            require("lspconfig").tinymist.setup({
+              on_attach = function(client, bufnr)
+                -- on_attach,
+                ih.on_attach(client, bufnr)
+              end,
+              settings =
+              {
+                exportPdf = "onDocumentHasTitle",
+                formatterMode = "typstyle",
+                preview = {
+                  refresh = "onSave"
+                }
+              }
             })
           end,
 
@@ -369,8 +430,13 @@ return {
       require("venv-selector").setup()
     end,
     keys = {
-      { ",v", "<cmd>VenvSelect<cr>" },
+      { "<leader>vs", "<cmd>VenvSelect<cr>" },
+      { '<leader>vc', '<cmd>VenvSelectCached<cr>' },
     },
+  },
+  {
+    "ejrichards/mise.nvim",
+    opts = {}
   },
   {
     "zbirenbaum/copilot.lua",

@@ -1,0 +1,16 @@
+alias ll="eza -al --icons --group-directories-first"
+alias ls="eza -a --icons --group-directories-first"
+
+alias eb="exec bash"
+alias ef="exec fish"
+alias ez="exec zsh"
+alias en="exec nu"
+
+alias cls="clear"
+alias j="just"
+# alias syncd="onedrive --synchronize --single-directory 'mynotes'"
+alias syncnotes="onedrive --synchronize --single-directory 'doc'"
+alias sync_dev="onedrive --synchronize --single-directory 'dev'"
+alias fxd="fx ~/dotfiles"
+alias fxs="fx ~/sync/NO_LOGIC_HERE" 
+alias fxo="fx ~/OneDrive"

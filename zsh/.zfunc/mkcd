@@ -1,5 +1,0 @@
-#make dir and cd into dir
-
-mkcd() {
-        mkdir "$1" && cd "$1"
-}

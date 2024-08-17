@@ -55,6 +55,15 @@ return {
         filetype = "justfile",
         maintainers = { "@IndianBoy42" },
       }
+      require("nvim-treesitter.parsers").get_parser_configs().c3 = {
+        install_info = {
+          url = "https://github.com/c3lang/tree-sitter-c3", -- local path or git repo
+          files = { "src/parser.c", "src/scanner.c" },
+          branch = "main",
+          use_makefile = true -- this may be necessary on MacOS (try if you see compiler errors)
+        },
+        filetype = "c3",
+      }
 
       -- IMPORTANT: Install tree-sitter-cli
       parser_config.PowerShell = require("ts-powershell").parser_config
@@ -63,27 +72,34 @@ return {
         ensure_installed = {
           "bash",
           "c",
+          "comment",
           "csv",
           "cmake",
+          "cuda",
           "dockerfile",
           "fennel",
           "fish",
+          "glsl",
           "gitignore",
           "haskell",
+          "hjson",
+          "hlsl",
           "html",
+          "javascript",
           "lua",
           "make",
-          -- "meson",
-          -- "nix",
+          "ninja",
+          "markdown",
+          "meson",
+          "nix",
           "python",
-          -- "qmljs",
-          -- "query",
           "ron",
           "rust",
           "toml",
           "vim",
           "vimdoc",
-          "javascript",
+          "yaml",
+          "wgsl_bevy"
         },
         query_linter = {
           enable = true,

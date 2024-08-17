@@ -96,6 +96,7 @@ for_window [title="*Viewport*"] floating enable
 for_window [title="Viewport"] floating enable
 for_window [title="NodeGraph"] floating enable
 for_window [title="Spaceship Game"] floating enable, resize set 640 960
+for_window [title="Script Editor - Godot Engine"] floating enable
 # for_window [title="wezterm"] floating enable, resize set 1300 900
 # for_window [instance="tabme"] move window to mark target
 #make VS code floating and borderless
