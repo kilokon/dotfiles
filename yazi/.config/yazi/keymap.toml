@@ -7,6 +7,7 @@
 [manager]
 
 prepend_keymap = [
+  { on = ["<Enter>"],   run = "plugin --sync smart-enter",         desc = "Open selected files" },
   { on = [
     "f",
   ], run = "plugin jump-to-char", desc = "jump to character" },
@@ -19,6 +20,9 @@ prepend_keymap = [
   { on = [
     "W",
   ], run = "tasks_show" },
+
+  # Run shell
+  { on = ["<C-s>"], run  = 'shell "$SHELL" --block --confirm', desc = "Open shell here"},
 
   # Navigation
   { on = [

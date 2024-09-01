@@ -1,2 +1,7 @@
+"$schema" = "https://yazi-rs.github.io/schemas/theme.json"
+
+# : Flavor {{{
 [flavor]
-use = "tokyo-night"
+use = "catppuccin-mocha"
+
+# : }}}
