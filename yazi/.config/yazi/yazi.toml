@@ -15,7 +15,16 @@ edit = [
   { run = 'code "%*"', orphan = true, for = "windows" },
   { run = 'nvim "$@"', block = true },
 ]
-play = [{ run = 'mpv "$@"', orphan = true, for = "unix" }]
+reveal = [
+  { run = 'xdg-open "$(dirname "$1")"', desc = "Reveal", for = "linux" },
+  { run = 'open -R "$1"', desc = "Reveal", for = "macos" },
+  { run = 'explorer /select,"%1"', orphan = true, desc = "Reveal", for = "windows" },
+  { run = '''exiftool "$1"; echo "Press enter to exit"; read _''', block = true, desc = "Show EXIF", for = "unix" },
+]
+play = [
+  { run = 'mpv "$@"', orphan = true, for = "unix" },
+  { run = 'mpv --force-window %*', orphan = true, for = "windows" },
+]
 extract = [
   { run = 'ouch d -y "%*"', desc = "Extract here with ouch", for = "windows" },
   { run = 'ouch d -y "$@"', desc = "Extract here with ouch", for = "unix" },
@@ -25,17 +34,23 @@ open = [
   { run = 'start "" "%1"', orphan = true, desc = "Open", for = "windows" },
 ]
 
+[editor]
+default = "krita"
+
 [open]
 rules = [
   # Media
-  { mime = "video/*", use = "play" },
+  { mime = "{audio,video}/*", use = [ "play", "reveal" ] },
   # Text
   { mime = "text/*", use = ["edit", "reveal"] },
   # Image
   { mime = "image/*", use = ["open", "reveal"] },
+  # Empty file
   { mime = "inode/x-empty", use = ["edit", "reveal"] },
   { mime = "application/json", use = ["edit", "reveal"] },
   { mime = "*/javascript", use = ["edit", "reveal"] },
+  # Fallback
+	{ name = "*", use = [ "open", "reveal" ] },
 ]
 
 [plugin]

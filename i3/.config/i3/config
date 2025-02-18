@@ -37,9 +37,9 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 exec --no-startup-id kmonad /home/aviik/dotfiles/kmonad/.config/kmonad/ms_wireless_kbd.kbd
+exec --no-startup-id setxkbmap -option ctrl:nocaps
 # redshift &
 exec_always --no-startup-id i3-layouts
-
 
 
 
@@ -108,6 +108,7 @@ for_window [title="Script Editor - Godot Engine"] floating enable
 tiling_drag modifier titlebar
 
 # start a terminal
+# bindsym $mod+Return exec wezterm; split toggle 
 bindsym $mod+Return exec wezterm
 # bindsym $mod+Shift+Return exec --no-startup-id /usr/bin/emacsclient -c
 bindsym $mod+Shift+Return exec warp-terminal
@@ -325,7 +326,7 @@ bindsym $mod+r mode "resize"
 bar {
     font pango:Source Code Pro, FontAwesome 12
     position top
-    output primary
+    output nonprimary
     status_command i3status-rs $HOME/.config/i3status-rs/config.toml
     colors {
         separator #666666

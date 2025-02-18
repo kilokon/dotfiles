@@ -1,0 +1,31 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font";
+    font-weight: bold;
+    font-size: 13px;
+    font-feature-settings: '"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"';
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: rgba(0,0,0,0.3);
+    color: #ffffff;
+    transition-property: background-color;
+    transition-duration: .5s;
+    border-radius: 0px;
+}
+
+tooltip label {
+  color: white;
+}
+
+#workspaces,
+#network, 
+#clock, 
+#pulseaudio  {
+	padding-top: 1px;
+	padding-bottom: 1px;
+	padding-right: 6px;
+	padding-left: 6px;
+}

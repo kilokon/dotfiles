@@ -1,0 +1,146 @@
+# This is your rocks.nvim plugins declaration file.
+# Here is a small yet pretty detailed example on how to use it:
+#
+# [plugins]
+# nvim-treesitter = "semver_version"  # e.g. "1.0.0"
+
+# List of non-Neovim rocks.
+# This includes things like `toml` or other lua packages.
+# [rocks]
+
+# List of Neovim plugins to install alongside their versions.
+# If the plugin name contains a dot then you must add quotes to the key name!
+[plugins]
+"rocks.nvim" = "2.43.1"
+"plenary.nvim" = "scm"
+"rocks-git.nvim" = "2.5.2"
+"rocks-config.nvim" = "3.1.0"
+"rocks-lazy.nvim" = "scm"
+"rocks-treesitter.nvim" = "1.3.0"
+"nvim-treesitter" = { git = "nvim-treesitter/nvim-treesitter" }
+"nvim-treesitter-textobjects" = { git = "nvim-treesitter/nvim-treesitter-textobjects", rev = "ad8f0a4" }
+"tokyonight.nvim" = "scm"
+"friendly-snippets" = "scm"
+"telescope.nvim" = { version = "scm", cmd = "Telescope" }
+"lazydev.nvim" = "scm"
+"neo-tree.nvim" = "scm"
+"nvim-dap" = "0.9.0"
+"conform.nvim" = "scm"
+"mason.nvim" = "1.10.0"
+"mason-lspconfig.nvim" = "1.31.0"
+"lualine.nvim" = "scm"
+"nvim-web-devicons" = "scm"
+"numb.nvim" = { version = "scm", event = "CmdlineEnter" }
+"fidget.nvim" = "scm"
+"rustaceanvim" = "scm"
+"toggleterm.nvim" = { version = "scm" }
+"oil.nvim" = "scm"
+# "gitsigns.nvim" = { git = "lewis6991/gitsigns.nvim", rev = "v1.0.0", opt = true }
+"gitsigns.nvim" = { git = "lewis6991/gitsigns.nvim", rev = "v1.0.0" }
+"neogit" = { git = "NeogitOrg/neogit" }
+"which-key.nvim" = "scm"
+
+# ----- TREESITTER PARSERS -----
+"tree-sitter-markdown" = "scm"
+"tree-sitter-json" = "scm"
+"tree-sitter-rust" = "scm"
+"tree-sitter-toml" = "scm"
+"tree-sitter-lua" = "scm"
+"tree-sitter-jsonc" = "0.0.29"
+"tree-sitter-css" = "0.0.36"
+"tree-sitter-xml" = "0.0.36"
+"tree-sitter-nu" = "scm"
+
+[plugin."oil-git-status.nvim"]
+git = "refractalize/oil-git-status.nvim"
+
+[plugin."hlchunk.nvim"]
+rev = "v1.3.0"
+event = "DeferredUIEnter"
+
+[plugins."nvim-autopairs"]
+git = "windwp/nvim-autopairs"
+
+[plugins."nvim-lsp-endhints"]
+git = "chrisgrieser/nvim-lsp-endhints"
+
+[plugins.nvim-lspconfig]
+version = "1.6.0"
+#
+[plugins.nvim-cmp]
+git = "hrsh7th/nvim-cmp"
+
+[plugins.cmp_luasnip]
+git = "saadparwaiz1/cmp_luasnip"
+
+[plugins.cmp-nvim-lsp]
+git = "hrsh7th/cmp-nvim-lsp"
+
+[plugins."lsp-zero.nvim"]
+git = "VonHeikemen/lsp-zero.nvim"
+
+[plugins."crates.nvim"]
+git = "saecki/crates.nvim"
+event = "BufRead Cargo.toml"
+
+# [plugins."blink.cmp"]
+# git = "saghen/blink.cmp"
+# rev = "v0.11.0"
+
+# [plugins."lsp_lines.nvim"]
+# git = "https://git.sr.ht/~whynothugo/lsp_lines.nvim"
+# rev = "v3.0.0"
+
+[plugins.LuaSnip]
+git = "L3MON4D3/LuaSnip"
+build = "make install_jsregexp"
+
+[bundles.lsp] # Create a bundle called `lsp`
+items = [
+    "lsp-zero.nvim",
+    "mason.nvim",
+    "mason-lspconfig.nvim",
+    "friendly-snippets",
+    "LuaSnip",
+    "nvim-cmp",
+    "cmp-nvim-lsp",
+    "rustaceanvim",
+]
+# config = "bundles.language_support"
+#
+[config]
+plugins_dir = "plugins/"
+auto_setup = false
+colorscheme = "tokyonight"
+#
+[rocks_lazy]
+import = "lazy_specs/"
+
+[config.options]
+number = true
+relativenumber = true
+splitbelow = true
+splitright = true
+wrap = false
+expandtab = true
+tabstop = 4
+shiftwidth = 4
+clipboard = "unnamedplus"
+scrolloff = 999
+virtualedit = "block"
+inccommand = "split"
+termguicolors = true
+updatetime = 100
+conceallevel = 2
+hlsearch = true
+completeopt = 'menu,menuone,noinsert,fuzzy,preview,noselect'
+swapfile = false
+backup = false
+writebackup = false
+ignorecase = true
+smartcase = true
+
+
+[treesitter]
+auto_highlight = "all"
+auto_install = "prompt"

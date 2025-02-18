@@ -52,8 +52,8 @@ SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 
 # Customize the style that the suggestions are shown with.
 # See https://github.com/zsh-users/zsh-autosuggestions/blob/master/README.md#suggestion-highlight-style
-# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='bold'
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#8c92ac, bold'
+# export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
 export  ZSH_AUTOSUGGEST_STRATEGY=(history completion) 
 #
 # zsh-syntax-highlighting
@@ -81,25 +81,22 @@ if [[ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions ]]; th
   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 fi
 
-if [[ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting ]]; then
-  echo "Installing zsh-syntax-highlighting"
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-fi
-
-if [[ ! -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-completions ]]; then
-  echo "Installing zsh-completions"
-  git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:-${ZSH:-~/.oh-my-zsh}/custom}/plugins/zsh-completions
-fi
+source ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-completions/zsh-completions.zsh
 
 source $ZSH/oh-my-zsh.sh
-plugins=( 
-  zsh-autosuggestions 
+plugins+=( 
+  # zsh-autosuggestions 
   zsh-completions
   zsh-syntax-highlighting 
+  direnv
+  zsh-pyenv
   fzf
 )
-autoload -Uz compinitzstyle ':omz:update' mode reminder
-
+# autoload -Uz compinitzstyle ':omz:update' mode reminder
+# Use modern completion system. Other than enabling globdots for showing
+# hidden files, these ares values in the default generated zsh config.
+autoload -Uz compinit
 for dump in "$ZDOTDIR"/.zcompdump(N.mh+24); do
   compinit
 done
@@ -108,7 +105,7 @@ compinit
 _comp_options+=(globdots)
 
 
-
+# zmodload zsh/complist
 zstyle ':completion:*' menu select # select completions with arrow keys
 zstyle ':completion:*' group-name '' # group results by category
 zstyle ':completion:::::' completer _expand _complete _ignored _approximate # enable approximate matches for completion
@@ -123,8 +120,11 @@ zstyle ':completion:*:default' list-prompt '%S%M matches%s'
 zstyle ':completion:*:default' menu select=2
 zstyle ':completion:*:default' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':omz:update' mode reminder
-
-
+# Environment Variables
+# zstyle ':completion::*:(-command-|export):*' fake-parameters ${${${_comps[(I)-value-*]#*,}%%,*}:#-*-}
+# # # Man
+# zstyle ':completion:*:manuals' separate-sections true
+# zstyle ':completion:*:manuals.(^1*)' insert-sections true
 
 ZSH_DOTENV_FILE=.dotenv
 
@@ -164,6 +164,7 @@ source $ZDOTDIR/functions/aliases.zsh
 source $ZDOTDIR/functions/zfuncs.zsh
 source $ZDOTDIR/functions/zabb.plugin.zsh
 source $ZDOTDIR/functions/yazi.zsh
+source $ZDOTDIR/functions/mise_completions.zsh
 
 source /home/aviik/.config/broot/launcher/bash/br
 # Change Yazi's CWD to PWD on subshell exit
@@ -173,3 +174,27 @@ source /home/aviik/.config/broot/launcher/bash/br
 # 	}
 # 	add-zsh-hook zshexit _yazi_cd
 # fi
+#
+#
+# if [[ -n "$NVIM_LISTEN_ADDRESS" ]]; then
+#     echo "Zsh is running inside Neovim"
+#     # You can add any specific commands you want to run in this environment
+# fi
+if [[ -n "$NVIM" ]]; then
+    echo "Zsh is running inside Neovim"
+    # Additional custom behavior for Neovim can go here
+fi
+
+
+
+. "$HOME/.cargo/env"
+
+# bun completions
+[ -s "/home/aviik/.bun/_bun" ] && source "/home/aviik/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+
+
