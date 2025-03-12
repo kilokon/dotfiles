@@ -1,0 +1,48 @@
+# import = ["/home/aviik/.config/alacritty/tokyo-night.toml"]
+
+[font]
+size = 12
+
+[font.bold]
+family = "RobotoMono Nerd Font"
+style = "Bold"
+
+[font.bold_italic]
+family = "RobotoMono Nerd Font"
+style = "Bold Italic"
+
+[font.italic]
+family = "RobotoMono Nerd Font"
+style = "Italic"
+
+[font.normal]
+family = "RobotoMono Nerd Font"
+style = "Regular"
+
+[font.offset]
+x = 1
+y = 0
+
+[mouse]
+hide_when_typing = false
+
+[terminal.shell]
+program = "/usr/bin/zsh"
+args = ["-l"]
+
+[window]
+opacity = 0.9
+
+[window.padding]
+x = 0
+y = 2
+
+[terminal]
+
+
+# ENV
+# All key-value pairs in the [env] section will be added as environment variables for any process spawned by Alacritty, including its shell. Some entries may override variables set by alacritty itself.
+# Example:
+
+# [env]
+# WINIT_X11_SCALE_FACTOR = "1.0"

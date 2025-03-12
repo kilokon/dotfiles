@@ -1,0 +1,30 @@
+{
+	"contributes": {
+		"snippets": [
+			{
+				"language": "python",
+				"path": "./python.json"
+			},
+			{
+				"language": "lua",
+				"path": "./lua.json"
+			},
+			{
+				"language": ["javascript", "typescript"],
+				"path": "./javascript.json"
+			},
+			{
+				"language": "rust",
+				"path": "./rust.json"
+			},
+      {
+        "language": "cmake",
+        "path": "./cmake.json"
+      },
+      {
+        "language": "markdown",
+        "path": "./markdown.json"
+      },
+		]
+	},
+}
