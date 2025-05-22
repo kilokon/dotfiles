@@ -1,18 +1,19 @@
-return {
+local M = {
   "nvim-treesitter/nvim-treesitter",
   build = ":TSUpdate",
   event = { "VeryLazy" },
   cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
   lazy = vim.fn.argc(-1) == 0,
-  main = "nvim-treesitter.configs",
-  keys = {
-    { "<c-space>", desc = "Increment Selection" },
-    { "<bs>", desc = "Decrement Selection", mode = "x" },
-  },
-  opts_extend = { "ensure_installed" },
-  ---@type TSConfig
-  ---@diagnostic disable-next-line: missing-fields
-  opts = {
+}
+function M.init()
+  require("vim.treesitter.query").add_predicate("is-mise?", function(_, _, bufnr, _)
+    local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
+    local filename = vim.fn.fnamemodify(filepath, ":t")
+    return string.match(filename, ".*mise.*%.toml$")
+  end, { force = true, all = false })
+end
+function M.config()
+  require("nvim-treesitter.configs").setup({
     ensure_installed = {
       "bash",
       "c",
@@ -49,9 +50,9 @@ return {
     matchup = {
       enable = true,
     },
-    autotag = {
-      enable = true,
-    },
+    -- autotag = {
+    --   enable = true,
+    -- },
     endwise = {
       enable = true,
     },
@@ -118,5 +119,7 @@ return {
         enable = true,
       },
     },
-  },
-}
+  })
+end
+
+return M

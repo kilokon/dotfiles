@@ -7,6 +7,7 @@ return {
     -- },
     opts = {--[[ things you want to change go here]]
       open_mapping = [[<c-\>]],
+      -- quit_on_exit = "never",
     },
   },
 }

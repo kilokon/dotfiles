@@ -4,6 +4,7 @@ return {
     dependencies = {
       "folke/which-key.nvim",
       { "polirritmico/telescope-lazy-plugins.nvim" },
+      { "nvim-telescope/telescope-fzf-native.nvim" },
     },
     -- replace all Telescope keymaps with only one mapping
     keys = function()

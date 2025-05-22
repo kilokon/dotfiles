@@ -1,3 +1,4 @@
+---@diagnostic disable:missing-parameter
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
@@ -17,7 +18,7 @@ require("lazy").setup({
   change_detection = {
     notify = false,
   },
-  install = { colorscheme = { "tokyonight", "habamax" } },
+  install = { colorscheme = { "tokyonight", "habamax", "gruvbox" } },
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update

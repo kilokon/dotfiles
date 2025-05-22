@@ -1,22 +1,42 @@
 {
-	"contributes": {
-		"snippets": [
-			{
-				"language": "python",
-				"path": "./python.json"
-			},
-			{
-				"language": "lua",
-				"path": "./lua.json"
-			},
-			{
-				"language": ["javascript", "typescript"],
-				"path": "./javascript.json"
-			},
-			{
-				"language": "rust",
-				"path": "./rust.json"
-			},
+  "name": "kilo-snippets",
+  "engines": {
+    "vscode": "^1.11.0"
+  },
+  "contributes": {
+    "snippets": [
+      {
+        "language": "python",
+        "path": "./python.json"
+      },
+      {
+        "language": "lua",
+        "path": "./lua.json"
+      },
+      {
+        "language": [
+          "javascript",
+          "typescript"
+        ],
+        "path": "./javascript.json"
+      },
+      {
+        "language": [
+          "c",
+          "C"
+        ],
+        "path": "./c.json"
+      },
+      {
+        "language": [
+          "cpp"
+        ],
+        "path": "./cpp.json"
+      },
+      {
+        "language": "rust",
+        "path": "./rust.json"
+      },
       {
         "language": "cmake",
         "path": "./cmake.json"
@@ -25,6 +45,62 @@
         "language": "markdown",
         "path": "./markdown.json"
       },
-		]
-	},
+      {
+        "language": [
+          "javascript",
+          "vue",
+          "typescript",
+          "svelte"
+        ],
+        "path": "./javascript.json"
+      },
+      {
+        "language": [
+          "javascriptnode"
+        ],
+        "path": "./javascript-node.json"
+      },
+      {
+        "language": [
+          "javascriptreact"
+        ],
+        "path": "./javascript_react.json"
+      },
+      {
+        "language": [
+          "license"
+        ],
+        "path": "./snippets/license.json"
+      },
+      {
+        "language": [
+          "shellscript",
+          "shell",
+          "sh",
+          "zsh"
+        ],
+        "path": "./snippets/shell.json"
+      },
+      {
+        "language": "nu",
+        "path": "./snippets/nushell.json"
+      },
+      {
+        "language": "glsl",
+        "path": "./snippets/glsl.json"
+      },
+      {
+        "language": [
+          "scratch",
+          "plaintext",
+          "markdown",
+          "tex",
+          "html",
+          "global",
+          "all"
+        ],
+        "path": "./snippets/global.json"
+      }
+    ]
+  }
 }

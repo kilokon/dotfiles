@@ -8,6 +8,10 @@ alias cat = bat --number
 alias cr = cargo run
 alias cb = cargo build
 alias gdoc = cd ~/OneDrive/doc/personal_notes/
+alias ezsh = exec zsh
+alias ebash = exec bash
+alias enu = exec nu
+alias znv = cd ~/dotfiles/nvim/.config/nvim
 
 
 def --env yy [...args] {

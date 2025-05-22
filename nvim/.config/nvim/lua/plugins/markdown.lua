@@ -132,6 +132,25 @@ return {
       }
     end,
   },
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    build = "cd app && npm install",
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+    end,
+    ft = { "markdown" },
+  },
+  {
+    "lukas-reineke/headlines.nvim",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+    ft = { "markdown", "orgmode", "neorg" },
+  },
+  {
+    "Myzel394/easytables.nvim",
+    ft = { "markdown" },
+    lazy = true,
+  },
 
   -- {
   --   "iamcco/markdown-preview.nvim",

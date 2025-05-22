@@ -4,11 +4,21 @@ theme = "srcery"
 [icons]
 icons = "awesome6"
 
+# [[block]]
+# block = "disk_space"
+# info_type = "available"
+# alert_unit = "GB"
+# path = "/boot"
+# alert = 10.0
+# warning = 15.0
+# format = " $icon $available "
+# format_alt = " $icon $available / $total "
+#
 [[block]]
 block = "disk_space"
 info_type = "available"
 alert_unit = "GB"
-path = "/home/"
+path = "/"
 alert = 10.0
 warning = 15.0
 format = " $icon $available "
@@ -18,6 +28,7 @@ format_alt = " $icon $available / $total "
 block = "disk_space"
 info_type = "available"
 alert_unit = "GB"
+path = "/home"
 alert = 10.0
 warning = 15.0
 format = " $icon $available "
@@ -41,27 +52,6 @@ format = " [ $icon $utilization ] "
 block = "nvidia_gpu"
 interval = 1
 format = " [ $icon RTX 3070 $utilization $temperature $clocks ] "
-# [[block.click]]
-# button = "left"
-# cmd = ""
-# format = " $icon RTX 3070 $utilization"
-
-# [[block]]
-# block = "pacman"
-# interval = 600
-# format = " $icon $pacman updates available "
-# format_singular = " $icon $pacman update available "
-# format_up_to_date = " $icon system up to date "
-# critical_updates_regex = "(linux|linux-lts|linux-zen)"
-# # aur_command = "paru -Qua"
-# [[block.click]]
-# # pop-up a menu showing the available updates. Replace wofi with your favourite menu command.
-# button = "left"
-# cmd = "fakeroot pacman -Qu --dbpath /tmp/checkup-db-i3statusrs/ | rofi -dmenu"
-# [[block.click]]
-# # Updates the block on right click
-# button = "right"
-# update = true
 
 [[block]]
 block = "packages"
@@ -88,6 +78,28 @@ format = " $output_name{ $volume|} "
 "bluez_sink.5C_44_3E_31_44_6C.a2dp_sink" = "🎧"
 # "alsa_output.pci-0000_00_1b.0.analog-stereo" = "🎧"
 
+
+[[block]]
+block = "music"
+player = "spotify"
+format = " {$icon $combo.str(max_w:25,rot_interval:0.5) $prev  $play  $next |}"
+[[block.click]]
+button = "left"
+action = "play_pause"
+[[block.click]]
+button = "forward"
+action = "next"
+[[block.click]]
+button = "back"
+action = "prev"
+[[block.click]]
+button = "up"
+action = "volume_up"
+[[block.click]]
+button = "down"
+action = "volume_down"
+
+
 [[block]]
 block = "hueshift"
 hue_shifter = "redshift"
@@ -104,3 +116,9 @@ interval = 60
 [block.format]
 full = "$icon $timestamp.datetime(f:'%a %Y-%m-%d %R') "
 short = " $icon $timestamp.datetime(f:%R) "
+
+# [[block]]
+# block = "custom"
+# shell = "/usr/bin/zsh"
+# [[block.click]]
+# command = "poweroff"

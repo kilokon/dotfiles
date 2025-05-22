@@ -137,7 +137,7 @@ return {
       },
       -- winbar = {},
       inactive_winbar = {},
-      extensions = {},
+      extensions = { "neo-tree", "nvim-dap-ui", "toggleterm", "overseer", "lazy" },
     })
   end,
 }

@@ -1,4 +1,7 @@
 $env.RUST_BACKTRACE = 1
+$env.VCPKG_ROOT =  $"($env.HOME)/.local/share/vcpkg"
+$env.EDITOR = "nvim"
+# $env.config.edit_mode='vi'
 
 $env.PATH = [
   "/usr/bin"
@@ -8,8 +11,8 @@ $env.PATH = [
   $"($env.HOME)/.cabal/bin"
   $"($env.HOME)/.cargo/bin"
   $"($env.HOME)/.pyenv/bin"
-  #  $"($env.HOME)/bin/google-cloud-sdk/bin"
   $"($env.HOME)/bin/poetry/bin"
+  $"($env.HOME)/.cache/paru/clone/texlive-full/pkg/texlive-full/opt/texlive/2025/bin/x86_64-linux"
   # $"($env.HOME)/Library/Python/3.11/bin"
 ]
 def create_left_prompt [] {
@@ -44,6 +47,9 @@ $env.ENV_CONVERSIONS = {
 
 $env.NU_LIB_DIRS = [
     ($nu.default-config-dir | path join 'scripts') # add <nushell-config-dir>/scripts
+    ($nu.default-config-dir | path join 'hooks') # add <nushell-config-dir>/hooks
+    ($nu.default-config-dir | path join 'completions') # add <nushell-config-dir>/completions
+    ($nu.default-config-dir | path join 'themes') # add <nushell-config-dir>/themes
     ($nu.data-dir | path join 'completions') # default home for nushell completions
 ]
 

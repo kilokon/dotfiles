@@ -5,6 +5,7 @@ local g = vim.g
 g.mapleader = " "
 g.maplocalleader = " "
 
+opt.guifont = "JetBrains Mono"
 opt.clipboard:append({ "unnamed", "unnamedplus" })
 
 vim.o.number = true
@@ -22,6 +23,9 @@ vim.o.splitright = true
 
 vim.o.smartcase = true
 vim.o.ignorecase = true
+
+-- show hidden characters
+vim.opt.listchars = "tab:^ ,nbsp:¬,extends:»,precedes:«,trail:•"
 
 -- Temp Files
 opt.backup = false
@@ -50,3 +54,12 @@ vim.opt.pumheight = 10
 vim.lsp.set_log_level("error")
 
 -- vim.o.mouse = ""
+
+-- Filetypes
+vim.filetype.add({
+  extension = {
+    c3 = "c3",
+    c3i = "c3",
+    c3t = "c3",
+  },
+})

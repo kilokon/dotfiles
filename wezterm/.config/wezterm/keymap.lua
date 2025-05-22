@@ -5,6 +5,40 @@ local act = wezterm.action
 --PLugins
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
+local sessionizer = wezterm.plugin.require("https://github.com/mikkasendke/sessionizer.wezterm")
+local history = wezterm.plugin.require("https://github.com/mikkasendke/sessionizer-history")
+
+local schema = {
+  options = { callback = history.Wrapper(sessionizer.DefaultCallback) },
+  sessionizer.DefaultWorkspace({}),
+  history.MostRecentWorkspace({}),
+  wezterm.home_dir .. "/OneDrive/dev",
+  wezterm.home_dir .. "/OneDrive/docs",
+  sessionizer.FdSearch(wezterm.home_dir .. "/OneDrive/dev"),
+  sessionizer.FdSearch(wezterm.home_dir .. "/OneDrive/docs"),
+  processing = sessionizer.for_each_entry(function(entry)
+    entry.label = entry.label:gsub(wezterm.home_dir, "~")
+  end),
+}
+
+local smart_workspace_switcher_replica = {
+  options = {
+    prompt = "Workspace to switch: ",
+    callback = history.Wrapper(sessionizer.DefaultCallback),
+  },
+  {
+    sessionizer.AllActiveWorkspaces({ filter_current = false, filter_default = false }),
+    processing = sessionizer.for_each_entry(function(entry)
+      entry.label = wezterm.format({
+        { Text = "󱂬 : " .. entry.label },
+      })
+    end),
+  },
+  wezterm.plugin.require("https://github.com/mikkasendke/sessionizer-zoxide.git").Zoxide({}),
+  processing = sessionizer.for_each_entry(function(entry)
+    entry.label = entry.label:gsub(wezterm.home_dir, "~")
+  end),
+}
 
 local M = {}
 M.keys = function()
@@ -84,6 +118,9 @@ M.keys = function()
         end)
       end),
     },
+    { key = "S", mods = "ALT", action = sessionizer.show(schema) },
+    { key = "m", mods = "ALT", action = history.switch_to_most_recent_workspace },
+    { key = "e", mods = "ALT", action = sessionizer.show(smart_workspace_switcher_replica) },
     {
       key = "s",
       mods = "LEADER",

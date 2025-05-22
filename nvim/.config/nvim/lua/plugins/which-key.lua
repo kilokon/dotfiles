@@ -6,6 +6,7 @@ return {
     -- or leave it empty to use the default settings
     -- refer to the configuration section below
   },
+  preset = "helix",
   keys = {
     {
       "<leader>?",
@@ -15,17 +16,42 @@ return {
       desc = "Buffer Local Keymaps (which-key)",
     },
   },
-  config = function()
-    local wk = require("which-key")
-    wk.add({
+  spec = {
+    {
+      mode = { "n", "v" },
+
       { "<leader>f", group = "file" }, -- group
       { "<leader>e", group = "explore" },
-      { "<leader>g", group = "lsp" },
+      { "<leader>d", group = "DAP" }, -- group
+      { "<leader>g", group = "git" },
       { "<leader>a", group = "Edit" },
       { "<leader>as", group = "Snippets", nowait = false, remap = false },
       { "<leader>ar", group = "Refactor" },
-    })
-
+      { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
+      { "z", group = "fold" },
+      { "[", group = "prev" },
+      { "]", group = "next" },
+      {
+        "<leader>b",
+        group = "buffer",
+        expand = function()
+          return require("which-key.extras").expand.buf()
+        end,
+      },
+      {
+        "<leader>w",
+        group = "windows",
+        proxy = "<c-w>",
+        expand = function()
+          return require("which-key.extras").expand.win()
+        end,
+      },
+      -- better descriptions
+      { "gx", desc = "Open with system app" },
+    },
+  },
+  config = function()
+    local wk = require("which-key")
     wk.add({
       -- NeoTree
       { "<leader>ee", "<cmd>Neotree reveal<cr>", desc = "NeoTree" },

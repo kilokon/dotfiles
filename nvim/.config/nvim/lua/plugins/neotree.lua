@@ -8,13 +8,16 @@ return {
     -- { "3rd/image.nvim", opts = {} }, -- Optional image support in preview window: See `# Preview Mode` for more information
     "saifulapm/neotree-file-nesting-config",
   },
+  keys = {
+    -- { "\\", ":Neotree reveal<CR>", desc = "NeoTree reveal" },
+  },
+  lazy = false,
   config = function(_, opts)
     opts.nesting_rules = require("neotree-file-nesting-config").nesting_rules
     -- require("neo-tree").setup(opts)
     require("neo-tree").setup({
       window = {
         mappings = {
-          --["<cr>"] = "open_split",
           ["<cr>"] = "open_vsplit",
         },
       },
@@ -28,6 +31,7 @@ return {
         window = {
           mappings = {
             ["o"] = "system_open",
+            ["\\"] = "close_window",
           },
         },
       },

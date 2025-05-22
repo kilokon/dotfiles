@@ -1,0 +1,12 @@
+{
+  "def": {
+    "prefix": "def",
+    "body": "def ${1:name}():\n\t\"\"\"\n\tPurpose: $2\n\t\"\"\"\n\t$0\n# end def",
+    "description": "Defining Function"
+  },
+  "main": {
+    "prefix": "__main",
+    "body": "if __name__ == \"__main__\":\n\t$0\n# end main",
+    "description": "similar to main function"
+  }
+}

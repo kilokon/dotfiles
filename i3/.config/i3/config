@@ -78,9 +78,9 @@ for_window [window_type="menu"] floating enable
 
 
 
-# for_window [title="Hello*"] floating enable, border pixel 3
-# for_window [title="Vulkan*"] floating enable
-# for_window [title="Bevy*"] floating enable, border pixel 3
+for_window [title="Hello*"] floating enable, border pixel 3
+for_window [title="Vulkan*"] floating enable
+for_window [title="Bevy*"] floating enable, border pixel 3
 for_window [class="feh"] floating enable, border pixel 3
 for_window [class="love"] floating enable, border pixel 3
 for_window [class="code-oss"] floating enable, border pixel 1

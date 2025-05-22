@@ -9,16 +9,16 @@ return {
     build = "make install_jsregexp",
     config = function()
       local ls = require("luasnip")
-      -- local types = require("luasnip.util.types")
       require("luasnip.loaders.from_vscode").lazy_load({
-        paths = { vim.fn.stdpath("config") .. "/snippets" },
+        -- paths = { vim.fn.stdpath("config") .. "/snippets" },
+        paths = { "./snippets" },
       })
-
-      ls.config.set_config({
+      -- ls.filetype_set("C", { "c" })
+      ls.setup({
+        -- ls.config.set_config({
         update_events = { "TextChanged", "TextChangedI" },
         delete_check_events = { "InsertLeave" },
         region_check_events = { "InsertEnter" },
-
         enable_autosnippets = true,
       })
     end,
